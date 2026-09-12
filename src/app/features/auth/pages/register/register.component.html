@@ -1,0 +1,213 @@
+<div class="register-page">
+  <main class="register-page__content">
+    <!-- Header with Back Button & Title on Same Line -->
+    <div class="register-page__hero">
+      <div class="register-page__header-row">
+        <button type="button" (click)="onBack()" class="register-page__back-btn" aria-label="Retour">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <h1 class="register-page__title">Rejoindre AYYOU</h1>
+      </div>
+      <p class="register-page__subtitle">
+        Créez votre compte en quelques instants pour débuter votre voyage gustatif.
+      </p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-page__form">
+      @if (errorMessage) {
+        <div class="register-page__error-banner">{{ errorMessage }}</div>
+      }
+
+      <!-- First Name & Last Name (Side by Side Row) -->
+      <div class="register-page__name-row">
+        <app-auth-input
+          label="PRÉNOM"
+          placeholder="Amine"
+          icon="user"
+          formControlName="firstName"
+          [isError]="isFirstNameInvalid"
+          [errorMessage]="isFirstNameInvalid ? 'Prénom valide requis.' : ''"
+        ></app-auth-input>
+
+        <app-auth-input
+          label="NOM"
+          placeholder="Benali"
+          icon="user"
+          formControlName="lastName"
+          [isError]="isLastNameInvalid"
+          [errorMessage]="isLastNameInvalid ? 'Nom valide requis.' : ''"
+        ></app-auth-input>
+      </div>
+
+      <!-- Phone Number Field with Country Selector & Search Bar -->
+      <div class="register-page__field-group">
+        <label class="register-page__label" for="phoneInput">NUMÉRO DE TÉLÉPHONE</label>
+        <div class="register-page__phone-wrapper" [class.register-page__phone-wrapper--error]="isPhoneInvalid">
+          <button
+            type="button"
+            (click)="toggleCountryDropdown()"
+            class="register-page__country-prefix"
+            aria-label="Sélectionner le pays"
+          >
+            <span class="register-page__flag" aria-hidden="true">{{ selectedCountry.flag }}</span>
+            <span class="register-page__code">{{ selectedCountry.prefix }}</span>
+            <svg class="register-page__dropdown-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6E6E6E" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+            <span class="register-page__prefix-divider"></span>
+          </button>
+
+          @if (showCountryDropdown) {
+            <div class="register-page__country-dropdown">
+              <div class="register-page__search-container">
+                <input
+                  type="text"
+                  [(ngModel)]="countrySearchQuery"
+                  [ngModelOptions]="{standalone: true}"
+                  placeholder="Rechercher un pays ou indicatif..."
+                  class="register-page__search-input"
+                  (click)="$event.stopPropagation()"
+                />
+              </div>
+              <ul class="register-page__country-list">
+                @for (c of filteredCountries; track c.code) {
+                  <li (click)="selectCountry(c)" class="register-page__country-option" [class.selected]="c.code === selectedCountry.code">
+                    <span class="flag">{{ c.flag }}</span>
+                    <span class="name">{{ c.name }}</span>
+                    <span class="prefix">{{ c.prefix }}</span>
+                  </li>
+                } @empty {
+                  <li class="register-page__no-country">Aucun pays trouvé</li>
+                }
+              </ul>
+            </div>
+          }
+
+          <input
+            id="phoneInput"
+            type="tel"
+            formControlName="phone"
+            placeholder="77 12 34 56 78"
+            class="register-page__phone-input"
+          />
+          <span class="register-page__field-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9E9E9E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+              <line x1="12" y1="18" x2="12.01" y2="18"></line>
+            </svg>
+          </span>
+        </div>
+        <p class="register-page__help-text">Nécessaire pour le suivi du livreur en temps réel</p>
+        @if (isPhoneInvalid) {
+          <span class="register-page__error-msg">Numéro de téléphone invalide pour le pays sélectionné.</span>
+        }
+      </div>
+
+      <!-- Email Field -->
+      <div class="register-page__field-group">
+        <app-auth-input
+          label="ADRESSE EMAIL"
+          type="email"
+          placeholder="gourmet&#64;ayyou.fr"
+          formControlName="email"
+          [isError]="isEmailInvalid"
+          [errorMessage]="isEmailInvalid ? 'Veuillez saisir une adresse email valide.' : ''"
+        ></app-auth-input>
+      </div>
+
+      <!-- Password Field & Security Meter -->
+      <div class="register-page__field-group">
+        <div class="register-page__password-input-wrapper">
+          <app-auth-input
+            label="MOT DE PASSE"
+            [type]="showPassword ? 'text' : 'password'"
+            icon="password"
+            placeholder="SuperMotDePasse&#64;2024"
+            formControlName="password"
+            [isError]="isPasswordInvalid"
+            [errorMessage]="isPasswordInvalid ? 'Au moins 8 caractères, une lettre, un chiffre et un symbole requis.' : ''"
+          ></app-auth-input>
+        </div>
+
+        @if (passwordValue) {
+          <div class="register-page__security-meter">
+            <div class="register-page__security-header">
+              <span class="register-page__security-title">NIVEAU DE SÉCURITÉ</span>
+              <span class="register-page__security-status" [ngClass]="'register-page__security-status--' + passwordStrength.level">
+                &bull; {{ passwordStrength.label }}
+              </span>
+            </div>
+            <div class="register-page__security-bar">
+              <span class="register-page__bar-segment" [class.active]="passwordStrength.score >= 1" [ngClass]="'segment--' + passwordStrength.level"></span>
+              <span class="register-page__bar-segment" [class.active]="passwordStrength.score >= 2" [ngClass]="'segment--' + passwordStrength.level"></span>
+              <span class="register-page__bar-segment" [class.active]="passwordStrength.score >= 3" [ngClass]="'segment--' + passwordStrength.level"></span>
+            </div>
+            <p class="register-page__help-text">Au moins 8 caractères, un chiffre et un symbole culinaire.</p>
+          </div>
+        }
+      </div>
+
+      <!-- Password Confirmation Field -->
+      <div class="register-page__field-group">
+        <div class="register-page__confirmation-wrapper">
+          <app-auth-input
+            label="CONFIRMATION DU MOT DE PASSE"
+            [type]="showPassword ? 'text' : 'password'"
+            placeholder="SuperMotDePasse&#64;2024"
+            formControlName="passwordConfirmation"
+            [isError]="isPasswordConfirmationInvalid"
+            [errorMessage]="isPasswordConfirmationInvalid ? 'Les mots de passe ne correspondent pas.' : ''"
+          ></app-auth-input>
+
+          @if (isPasswordMatching) {
+            <span class="register-page__valid-checkmark" title="Mot de passe confirmé">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00C853" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </span>
+          }
+        </div>
+      </div>
+
+      <!-- Accept Terms Checkbox -->
+      <div class="register-page__terms-group">
+        <label class="register-page__terms-label">
+          <input
+            type="checkbox"
+            formControlName="acceptTerms"
+            class="register-page__checkbox"
+          />
+          <span class="register-page__terms-text">
+            J'accepte les <a routerLink="/terms" target="_blank" class="register-page__terms-link">Conditions Générales</a> et la <a routerLink="/privacy" target="_blank" class="register-page__terms-link">Politique de confidentialité</a> d'AYYOU.
+          </span>
+        </label>
+        @if (registerForm.get('acceptTerms')?.invalid && registerForm.get('acceptTerms')?.touched) {
+          <span class="register-page__error-msg">Vous devez accepter les conditions pour continuer.</span>
+        }
+      </div>
+
+      <!-- Main Action Button -->
+      <div class="register-page__submit-wrapper">
+        <app-auth-button
+          text="Continuer &rarr;"
+          [disabled]="registerForm.invalid"
+          [loading]="loading"
+        ></app-auth-button>
+      </div>
+    </form>
+
+    <!-- Divider -->
+    <div class="register-page__divider">
+      <span>OU INSCRIPTION RAPIDE</span>
+    </div>
+
+    <!-- Footer Link to Login -->
+    <div class="register-page__footer">
+      <p class="register-page__login-prompt">
+        Déjà un compte ? <a routerLink="/login" class="register-page__login-link">Se connecter</a>
+      </p>
+    </div>
+  </main>
+</div>

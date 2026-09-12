@@ -1,0 +1,40 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.social-btn {
+  @include button-reset;
+  @include flex-center;
+  gap: 10px;
+  width: 100%;
+  height: 46px;
+  padding: 0 $spacing-md;
+  background-color: $color-dominant;
+  border: 1.5px solid #EAEAEA;
+  border-radius: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #333333;
+  transition: background-color $transition-fast, border-color $transition-fast, transform $transition-fast;
+
+  &:hover:not(:disabled) {
+    background-color: $color-gray-50;
+    border-color: #D6D6D6;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.99);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  &__icon {
+    flex-shrink: 0;
+  }
+
+  &__text {
+    white-space: nowrap;
+  }
+}

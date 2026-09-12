@@ -1,0 +1,74 @@
+<div class="login-page">
+  <app-auth-header
+    [showBackButton]="true"
+    [showSkipButton]="true"
+    (backClicked)="onBack()"
+    (skipClicked)="onSkip()"
+  ></app-auth-header>
+
+  <main class="login-page__content">
+    <div class="login-page__hero">
+      <h1 class="login-page__title">Bienvenue sur</h1>
+      <div class="login-page__logo-container">
+        <img src="/assets/branding/logo.svg" alt="AYYOU Logo" class="login-page__logo" />
+      </div>
+      <p class="login-page__subtitle">
+        Connectez-vous pour retrouver vos restaurants favoris, vos adresses et vos commandes.
+      </p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-page__form">
+      @if (errorMessage) {
+        <div class="login-page__error-banner">{{ errorMessage }}</div>
+      }
+
+      <app-auth-input
+        label="ADRESSE EMAIL OU NUMÉRO DE MOBILE"
+        placeholder="gourmet&#64;ayyou.com ou +221..."
+        icon="user"
+        formControlName="identifier"
+        [isError]="isIdentifierInvalid"
+        [errorMessage]="isIdentifierInvalid ? 'Ce champ est obligatoire.' : ''"
+      ></app-auth-input>
+
+      <app-auth-input
+        label="MOT DE PASSE"
+        rightLinkLabel="Mot de passe oublié ?"
+        type="password"
+        icon="password"
+        placeholder="••••••••••••"
+        formControlName="password"
+        (rightLinkClick)="onForgotPassword()"
+        [isError]="isPasswordInvalid"
+        [errorMessage]="isPasswordInvalid ? 'Ce champ est obligatoire.' : ''"
+      ></app-auth-input>
+
+      <div class="login-page__submit-wrapper">
+        <app-auth-button text="Se connecter &rarr;" [loading]="loading"></app-auth-button>
+      </div>
+    </form>
+
+    <div class="login-page__social">
+      <app-social-login-button
+        provider="google"
+        label="Continuer avec Google"
+        (socialClick)="onSocialLogin($event)"
+      ></app-social-login-button>
+    </div>
+
+    <div class="login-page__footer">
+      <p class="login-page__signup-prompt">
+        Vous n'avez pas de compte ? <a routerLink="/register" class="login-page__signup-link">S'inscrire</a>
+      </p>
+
+      <div class="login-page__legal">
+        <p class="login-page__legal-links">
+          <a routerLink="/terms">Conditions Générales</a> &bull; <a routerLink="/privacy">Politique de Confidentialité</a>
+        </p>
+        <p class="login-page__copyright">
+          AYYOU Corporation &copy; 2025. Tous droits réservés.
+        </p>
+      </div>
+    </div>
+  </main>
+</div>

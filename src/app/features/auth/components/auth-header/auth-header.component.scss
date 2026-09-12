@@ -1,0 +1,63 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.auth-header {
+  @include flex-between;
+  padding: 12px $spacing-md 0 $spacing-md;
+  width: 100%;
+  min-height: 48px;
+  background: transparent;
+
+  &__action {
+    display: flex;
+    align-items: center;
+    min-width: 40px;
+
+    &--right {
+      justify-content: flex-end;
+    }
+  }
+
+  &__btn {
+    @include button-reset;
+    @include flex-center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background-color: $color-dominant;
+    border: 1px solid #ECECEC;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    color: $color-secondary;
+    transition: background-color $transition-fast, transform $transition-fast;
+
+    &:hover {
+      background-color: $color-gray-50;
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  &__branding {
+    @include flex-center;
+    flex: 1;
+  }
+
+  &__logo {
+    height: 32px;
+    width: auto;
+  }
+
+  &__skip-btn {
+    @include button-reset;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #A0A0A0;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: $color-primary;
+    }
+  }
+}

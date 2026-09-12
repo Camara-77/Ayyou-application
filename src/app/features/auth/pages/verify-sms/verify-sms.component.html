@@ -1,0 +1,99 @@
+<div class="verify-sms-page">
+  <app-auth-header
+    [showBackButton]="true"
+    [showSkipButton]="false"
+    (backClicked)="onBack()"
+  ></app-auth-header>
+
+  <main class="verify-sms-page__content">
+    <!-- SMS Badge Icon -->
+    <div class="verify-sms-page__badge-container">
+      <div class="verify-sms-page__badge">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          <line x1="8" y1="9" x2="16" y2="9"></line>
+          <line x1="8" y1="13" x2="14" y2="13"></line>
+        </svg>
+        <span class="verify-sms-page__dot-badge"></span>
+      </div>
+    </div>
+
+    <!-- Title & Phone Line -->
+    <div class="verify-sms-page__hero">
+      <h1 class="verify-sms-page__title">Vérification par SMS</h1>
+      <p class="verify-sms-page__subtitle">
+        Code envoyé au <strong>{{ phoneNumber }}</strong>
+      </p>
+      <button type="button" (click)="onModifyNumber()" class="verify-sms-page__modify-btn">
+        Modifier
+      </button>
+    </div>
+
+    <!-- OTP Form -->
+    <form [formGroup]="otpForm" (ngSubmit)="onSubmit()" class="verify-sms-page__form">
+      @if (errorMessage) {
+        <div class="verify-sms-page__error-banner">{{ errorMessage }}</div>
+      }
+      @if (resendMessage) {
+        <div class="verify-sms-page__info-banner">{{ resendMessage }}</div>
+      }
+
+      <div class="verify-sms-page__otp-container" (paste)="onPaste($event)" formArrayName="digits">
+        @for (control of digitsArray.controls; track $index) {
+          <input
+            #otpInput
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxLength="1"
+            [formControlName]="$index"
+            (input)="onInput($event, $index)"
+            (keydown)="onKeyDown($event, $index)"
+            class="verify-sms-page__otp-box"
+            [class.active]="digitsArray.controls[$index].value"
+          />
+        }
+      </div>
+
+      <!-- Timer & Resend Controls -->
+      <div class="verify-sms-page__resend-section">
+        <div class="verify-sms-page__timer-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>Renvoyer le code dans <strong>{{ formattedTimer }}</strong></span>
+        </div>
+
+        <button
+          type="button"
+          (click)="resendCode()"
+          [disabled]="isResendDisabled"
+          class="verify-sms-page__resend-btn"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 4v6h-6"></path>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+          <span>Renvoyer le code par SMS</span>
+        </button>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="verify-sms-page__submit-wrapper">
+        <app-auth-button
+          text="Valider le code &rarr;"
+          [disabled]="!isOtpComplete"
+          [loading]="loading"
+        ></app-auth-button>
+      </div>
+    </form>
+
+    <!-- Security Footer -->
+    <div class="verify-sms-page__security-footer">
+      <p>
+        Chiffrement de bout en bout <strong>AES-256</strong> &bull; Authentification bancaire <strong>PSD2</strong>
+      </p>
+    </div>
+  </main>
+</div>

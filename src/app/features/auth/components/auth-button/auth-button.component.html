@@ -1,0 +1,16 @@
+<button
+  [type]="type"
+  [disabled]="disabled || loading"
+  (click)="onClick($event)"
+  class="auth-btn"
+  [class.auth-btn--loading]="loading"
+  [class.auth-btn--disabled]="disabled"
+>
+  @if (loading) {
+    <span class="auth-btn__spinner" aria-hidden="true"></span>
+  } @else {
+    <span class="auth-btn__text">
+      <ng-content>{{ text }}</ng-content>
+    </span>
+  }
+</button>

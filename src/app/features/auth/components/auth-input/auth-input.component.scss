@@ -1,0 +1,99 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.auth-input {
+  @include flex-column;
+  width: 100%;
+  margin-bottom: 12px;
+
+  &__header {
+    @include flex-between;
+    margin-bottom: 5px;
+    width: 100%;
+  }
+
+  &__label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #4A4A4A;
+  }
+
+  &__right-link {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #E51A29;
+    text-decoration: none;
+    transition: opacity $transition-fast;
+
+    &:hover {
+      opacity: 0.85;
+      text-decoration: underline;
+    }
+  }
+
+  &__wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  &__field {
+    @include input-reset;
+    width: 100%;
+    height: 46px;
+    padding: 0 40px 0 $spacing-md;
+    background-color: $color-dominant;
+    border: 1.5px solid #EAEAEA;
+    border-radius: 12px;
+    font-size: 13.5px;
+    color: $color-secondary;
+    transition: border-color $transition-fast, box-shadow $transition-fast;
+
+    &::placeholder {
+      color: #A0A0A0;
+      font-size: 13px;
+    }
+
+    &:focus {
+      border-color: #E51A29;
+      box-shadow: 0 0 0 3px rgba(229, 26, 41, 0.08);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  &__icon-btn {
+    @include button-reset;
+    @include flex-center;
+    position: absolute;
+    right: 12px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+  }
+
+  &__icon {
+    @include flex-center;
+    position: absolute;
+    right: 12px;
+    pointer-events: none;
+  }
+
+  &__error-msg {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: $color-error;
+    margin-top: 3px;
+  }
+
+  &--error &__field {
+    border-color: $color-error;
+    background-color: #FFF5F5;
+  }
+}

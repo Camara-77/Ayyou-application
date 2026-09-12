@@ -1,0 +1,25 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.welcome-page {
+  @include flex-column;
+  min-height: 100vh;
+
+  &__content {
+    @include flex-column;
+    @include flex-center;
+    flex: 1;
+    padding: $spacing-xl $spacing-md;
+    text-align: center;
+  }
+
+  &__title {
+    color: $color-primary;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__subtitle {
+    color: $color-gray-600;
+    font-size: $font-size-base;
+  }
+}

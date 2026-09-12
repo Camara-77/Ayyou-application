@@ -1,0 +1,263 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #FAFAFA;
+}
+
+.location-page {
+  max-width: 440px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+
+  &__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 24px 32px;
+  }
+
+  /* Concentric Radar Graphic */
+  &__radar-container {
+    margin-top: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__radar {
+    position: relative;
+    width: 130px;
+    height: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__ring {
+    position: absolute;
+    border-radius: 50%;
+    box-sizing: border-box;
+
+    &--outer {
+      width: 130px;
+      height: 130px;
+      background: rgba(229, 26, 41, 0.03);
+      border: 1.5px dashed rgba(229, 26, 41, 0.2);
+      animation: radar-pulse 3s infinite ease-in-out;
+    }
+
+    &--middle {
+      width: 90px;
+      height: 90px;
+      background: rgba(229, 26, 41, 0.07);
+      border: 1.5px solid rgba(229, 26, 41, 0.25);
+    }
+
+    &--inner {
+      width: 58px;
+      height: 58px;
+      background: rgba(229, 26, 41, 0.12);
+      border: 1.5px solid rgba(229, 26, 41, 0.4);
+    }
+  }
+
+  &__pin-center {
+    position: relative;
+    z-index: 2;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    box-shadow: 0 4px 14px rgba(229, 26, 41, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Discovery Badge Pill */
+  &__badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(229, 26, 41, 0.08);
+    border: 1px solid rgba(229, 26, 41, 0.15);
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+
+  &__badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #E51A29;
+  }
+
+  &__badge-text {
+    font-size: 11px;
+    font-weight: 700;
+    color: #E51A29;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+
+  /* Hero Title & Subtitle */
+  &__hero {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  &__title {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: #1A1A1A;
+    margin: 0 0 8px;
+    letter-spacing: -0.3px;
+  }
+
+  &__subtitle {
+    font-size: 13.5px;
+    font-weight: 400;
+    line-height: 1.45;
+    color: #666666;
+    margin: 0;
+    padding: 0 8px;
+  }
+
+  /* Banners */
+  &__error-banner {
+    width: 100%;
+    background-color: #FEE2E2;
+    border: 1px solid #FCA5A5;
+    color: #DC2626;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.4;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+  }
+
+  &__success-banner {
+    width: 100%;
+    background-color: #D1FAE5;
+    border: 1px solid #6EE7B7;
+    color: #047857;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+  }
+
+  /* Feature Cards */
+  &__features {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  &__feature-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: #FAFAFA;
+    border: 1px solid #EAEAEA;
+    border-radius: 12px;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      border-color: rgba(229, 26, 41, 0.3);
+      transform: translateY(-1px);
+    }
+  }
+
+  &__feature-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(229, 26, 41, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__feature-info {
+    flex: 1;
+  }
+
+  &__feature-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1A1A1A;
+    margin: 0 0 2px;
+    line-height: 1.3;
+  }
+
+  &__feature-desc {
+    font-size: 12px;
+    font-weight: 400;
+    color: #757575;
+    margin: 0;
+    line-height: 1.35;
+  }
+
+  /* Actions */
+  &__actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: auto;
+  }
+
+  &__secondary-btn {
+    width: 100%;
+    padding: 14px 16px;
+    background-color: transparent;
+    border: 1.5px solid #E5E5E5;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333333;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+      background-color: #F5F5F5;
+      border-color: #CCCCCC;
+    }
+
+    &:active {
+      background-color: #EEEEEE;
+    }
+  }
+}
+
+@keyframes radar-pulse {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.96);
+    opacity: 0.7;
+  }
+}

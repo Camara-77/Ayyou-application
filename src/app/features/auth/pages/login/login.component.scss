@@ -1,0 +1,130 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.login-page {
+  @include flex-column;
+  min-height: 100vh;
+  background-color: $color-dominant;
+
+  &__content {
+    @include flex-column;
+    flex: 1;
+    padding: 24px $spacing-lg 24px $spacing-lg;
+    max-width: 420px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  &__hero {
+    @include flex-column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  &__title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1A1A1A;
+    margin-bottom: 2px;
+    letter-spacing: -0.5px;
+  }
+
+  &__logo-container {
+    @include flex-center;
+    margin-bottom: 6px;
+  }
+
+  &__logo {
+    height: 38px;
+    width: auto;
+  }
+
+  &__subtitle {
+    font-size: 12.5px;
+    line-height: 1.35;
+    color: #757575;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  &__form {
+    @include flex-column;
+    width: 100%;
+    margin-bottom: 14px;
+  }
+
+  &__error-banner {
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    background-color: #FFEBEE;
+    border-radius: 8px;
+    color: $color-error;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  &__submit-wrapper {
+    margin-top: 10px;
+  }
+
+  &__social {
+    @include flex-column;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  &__footer {
+    @include flex-column;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 16px;
+    width: 100%;
+  }
+
+  &__signup-prompt {
+    font-size: 13px;
+    color: #6E6E6E;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  &__signup-link {
+    color: #E51A29;
+    font-weight: 700;
+    text-decoration: none;
+    transition: opacity $transition-fast;
+
+    &:hover {
+      opacity: 0.85;
+      text-decoration: underline;
+    }
+  }
+
+  &__legal {
+    @include flex-column;
+    align-items: center;
+    gap: 3px;
+    text-align: center;
+  }
+
+  &__legal-links {
+    font-size: 10px;
+    color: #B5B5B5;
+
+    a {
+      color: #B5B5B5;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  &__copyright {
+    font-size: 10px;
+    color: #C5C5C5;
+  }
+}

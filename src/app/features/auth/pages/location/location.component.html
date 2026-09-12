@@ -1,0 +1,109 @@
+<div class="location-page">
+  <app-auth-header
+    [showBackButton]="true"
+    [showSkipButton]="true"
+    (backClicked)="onBack()"
+    (skipClicked)="skipForNow()"
+  ></app-auth-header>
+
+  <main class="location-page__content">
+    <!-- Radar Graphic with Pin -->
+    <div class="location-page__radar-container">
+      <div class="location-page__radar">
+        <div class="location-page__ring location-page__ring--outer"></div>
+        <div class="location-page__ring location-page__ring--middle"></div>
+        <div class="location-page__ring location-page__ring--inner"></div>
+        <div class="location-page__pin-center">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="#E51A29" stroke="none">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Discovery Badge Pill -->
+    <div class="location-page__badge-pill">
+      <span class="location-page__badge-dot"></span>
+      <span class="location-page__badge-text">DÉCOUVERTE GÉOLOCALISÉE</span>
+    </div>
+
+    <!-- Title & Subtitle -->
+    <div class="location-page__hero">
+      <h1 class="location-page__title">Trouvez les meilleures adresses autour de vous</h1>
+      <p class="location-page__subtitle">
+        Utilisez votre position pour découvrir les restaurants et vendeurs autour de vous.
+      </p>
+    </div>
+
+    <!-- Status Banners -->
+    @if (locationError) {
+      <div class="location-page__error-banner">{{ locationError }}</div>
+    }
+    @if (locationGranted) {
+      <div class="location-page__success-banner">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span>Position enregistrée avec succès ({{ latitude?.toFixed(4) }}, {{ longitude?.toFixed(4) }})</span>
+      </div>
+    }
+
+    <!-- 3 Info Feature Cards -->
+    <div class="location-page__features">
+      <div class="location-page__feature-card">
+        <div class="location-page__feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+        </div>
+        <div class="location-page__feature-info">
+          <h3 class="location-page__feature-title">Restaurants à proximité immédiate</h3>
+          <p class="location-page__feature-desc">Plats chauds et tables signalées près de vous</p>
+        </div>
+      </div>
+
+      <div class="location-page__feature-card">
+        <div class="location-page__feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+        <div class="location-page__feature-info">
+          <h3 class="location-page__feature-title">Temps de livraison calculé en temps réel</h3>
+          <p class="location-page__feature-desc">Estimation ultra-précise de vos courses</p>
+        </div>
+      </div>
+
+      <div class="location-page__feature-card">
+        <div class="location-page__feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+        </div>
+        <div class="location-page__feature-info">
+          <h3 class="location-page__feature-title">Offres exclusives de votre quartier</h3>
+          <p class="location-page__feature-desc">Avantages gourmands réservés à votre zone</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="location-page__actions">
+      <app-auth-button
+        text="Autoriser la localisation &rarr;"
+        [loading]="locating"
+        (click)="requestLocation()"
+      ></app-auth-button>
+
+      <button
+        type="button"
+        (click)="enterAddressManually()"
+        class="location-page__secondary-btn"
+      >
+        Saisir une adresse manuellement
+      </button>
+    </div>
+  </main>
+</div>

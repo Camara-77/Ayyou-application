@@ -1,0 +1,180 @@
+<div class="google-auth-page">
+  <!-- Header -->
+  <header class="google-auth-header">
+    <button type="button" (click)="onBack()" class="google-auth-header__back-btn" aria-label="Retour">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <div class="google-auth-header__logo-container">
+      <span class="google-auth-header__logo-text">ÂYYOU</span>
+    </div>
+  </header>
+
+  <main class="google-auth-page__content">
+    <!-- Culinary Banner Card -->
+    <div class="google-auth-page__hero-card">
+      <div class="google-auth-page__hero-badge">
+        <div class="google-auth-page__hero-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#E51A29" stroke="none">
+            <path d="M12 23c6.075 0 11-4.925 11-11 0-4.05-2.22-7.58-5.5-9.45a.75.75 0 0 0-1.07.82c.57 2.05.02 4.29-1.48 5.79-1.5 1.5-3.74 2.05-5.79 1.48a.75.75 0 0 0-.82 1.07C10.42 20.78 13.95 23 18 23z"/>
+          </svg>
+        </div>
+        <span class="google-auth-page__hero-badge-text">EXPÉRIENCE CULINAIRE DIRECTE</span>
+      </div>
+      <h1 class="google-auth-page__hero-title">Un clic pour savourer</h1>
+      <p class="google-auth-page__hero-desc">
+        Synchronisez vos favoris, découvrez les créations des chefs en direct et commandez sans ressaisir vos coordonnées.
+      </p>
+    </div>
+
+    <!-- Main Google Auth Box -->
+    <div class="google-card">
+      <!-- Multicolor Top Border Strip -->
+      <div class="google-card__accent-bar"></div>
+
+      <!-- Google Card Header -->
+      <div class="google-card__header">
+        <div class="google-card__g-logo">
+          <svg width="24" height="24" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.15C3.26 21.3 7.31 24 12 24z"/>
+            <path fill="#FBBC05" d="M5.28 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.39l3.99-3.15z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.61l3.99 3.15c.95-2.85 3.6-4.96 6.72-4.96z"/>
+          </svg>
+        </div>
+
+        <div class="google-card__title-stack">
+          <h2 class="google-card__title">Continuer avec Google</h2>
+          <p class="google-card__subtitle">Accès instantané et sécurisé</p>
+        </div>
+
+        <div class="google-card__ssl-badge">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+          </svg>
+          <span>SSL 256</span>
+        </div>
+      </div>
+
+      <!-- Banners / Messages -->
+      @if (errorMessage) {
+        <div class="google-card__error-banner">{{ errorMessage }}</div>
+      }
+      @if (infoMessage) {
+        <div class="google-card__info-banner">{{ infoMessage }}</div>
+      }
+
+      <!-- Accounts Section -->
+      <div class="google-card__accounts">
+        @for (acc of accounts; track acc.sub) {
+          <div
+            class="google-card__account-item"
+            [class.selected]="selectedAccount?.sub === acc.sub"
+            (click)="selectAccount(acc)"
+          >
+            <div class="google-card__avatar">
+              @if (acc.picture) {
+                <img [src]="acc.picture" [alt]="acc.name" class="google-card__avatar-img" />
+              } @else {
+                <span class="google-card__avatar-initials">{{ acc.initials }}</span>
+              }
+            </div>
+
+            <div class="google-card__account-info">
+              <div class="google-card__account-name-row">
+                <span class="google-card__account-name">{{ acc.name }}</span>
+                @if (selectedAccount?.sub === acc.sub) {
+                  <span class="google-card__status-tag">Actif</span>
+                }
+              </div>
+              <span class="google-card__account-email">{{ acc.email }}</span>
+            </div>
+
+            <div class="google-card__radio-container">
+              @if (selectedAccount?.sub === acc.sub) {
+                <div class="google-card__check-circle">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+              } @else {
+                <div class="google-card__uncheck-circle"></div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- "Utiliser un autre compte" Option -->
+        <button type="button" (click)="useAnotherAccount()" class="google-card__another-btn">
+          <div class="google-card__another-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <div class="google-card__another-text">
+            <span class="google-card__another-title">Utiliser un autre compte</span>
+            <span class="google-card__another-sub">Ajouter au trousseau de profil bio</span>
+          </div>
+          <svg class="google-card__another-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9E9E9E" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      <!-- GIS Native Container (Hidden or initialized) -->
+      <div #googleBtnContainer class="google-card__native-btn"></div>
+
+      <!-- Legal Data Sharing Notice Box -->
+      <div class="google-card__notice-box">
+        <div class="google-card__notice-row">
+          <svg class="google-card__notice-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <p class="google-card__notice-text">
+            Pour continuer, Google partagera de manière sécurisée votre nom, adresse e-mail et photo de profil avec l'application AYYOU.
+          </p>
+        </div>
+        <div class="google-card__notice-links">
+          <a routerLink="/privacy" class="google-card__legal-link">Politique de confidentialité</a>
+          <span class="bullet">&bull;</span>
+          <a routerLink="/terms" class="google-card__legal-link">Conditions d'utilisation</a>
+        </div>
+      </div>
+
+      <!-- Primary Action Button -->
+      <div class="google-card__submit-wrapper">
+        <button
+          type="button"
+          (click)="onContinue()"
+          [disabled]="authState === 'loading'"
+          class="google-card__action-btn"
+        >
+          <svg class="google-card__action-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+            <polyline points="10 17 15 12 10 7"></polyline>
+            <line x1="15" y1="12" x2="3" y2="12"></line>
+          </svg>
+          <span>{{ continueButtonText }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Encryption Footer -->
+    <div class="google-auth-page__security-footer">
+      <div class="google-auth-page__security-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00C853" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <polyline points="9 12 11 14 15 10"></polyline>
+        </svg>
+        <span class="google-auth-page__security-title">CONNEXION CHIFFRÉE & PROTÉGÉE</span>
+      </div>
+      <p class="google-auth-page__security-sub">
+        Garanti par Google Identity Services & protocole AYYOU Safe-Key
+      </p>
+    </div>
+  </main>
+</div>

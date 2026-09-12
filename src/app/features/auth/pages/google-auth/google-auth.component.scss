@@ -1,0 +1,482 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #FAFAFA;
+}
+
+.google-auth-page {
+  max-width: 440px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+
+  &__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 20px 32px;
+  }
+}
+
+/* Header */
+.google-auth-header {
+  height: 60px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  background-color: #FFFFFF;
+
+  &__back-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #FAFAFA;
+    border: 1px solid #EAEAEA;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1A1A1A;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    z-index: 2;
+
+    &:hover {
+      background-color: #F0F0F0;
+    }
+  }
+
+  &__logo-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  &__logo-text {
+    font-size: 20px;
+    font-weight: 800;
+    color: #E51A29;
+    letter-spacing: -0.5px;
+  }
+}
+
+/* Hero / Culinary Banner Card */
+.google-auth-page__hero-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(229, 26, 41, 0.15);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 14px rgba(229, 26, 41, 0.04);
+}
+
+.google-auth-page__hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.google-auth-page__hero-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(229, 26, 41, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.google-auth-page__hero-badge-text {
+  font-size: 10px;
+  font-weight: 700;
+  color: #E51A29;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.google-auth-page__hero-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin: 0 0 6px;
+  line-height: 1.25;
+}
+
+.google-auth-page__hero-desc {
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: #757575;
+  margin: 0;
+}
+
+/* Main Google Container Card */
+.google-card {
+  position: relative;
+  background: #FFFFFF;
+  border: 1px solid #EAEAEA;
+  border-radius: 20px;
+  padding: 20px 18px 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  margin-bottom: 24px;
+
+  &__accent-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4285F4 0%, #EA4335 33%, #FBBC05 66%, #34A853 100%);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-top: 4px;
+  }
+
+  &__g-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #FAFAFA;
+    border: 1px solid #EAEAEA;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__title-stack {
+    flex: 1;
+  }
+
+  &__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1A1A1A;
+    margin: 0 0 2px;
+    line-height: 1.2;
+  }
+
+  &__subtitle {
+    font-size: 12px;
+    color: #757575;
+    margin: 0;
+  }
+
+  &__ssl-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #F5F5F5;
+    border: 1px solid #E5E5E5;
+    border-radius: 12px;
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #616161;
+  }
+
+  /* Banners */
+  &__error-banner {
+    background-color: #FEE2E2;
+    border: 1px solid #FCA5A5;
+    color: #DC2626;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    line-height: 1.4;
+    margin-bottom: 16px;
+  }
+
+  &__info-banner {
+    background-color: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    color: #1D4ED8;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    margin-bottom: 16px;
+  }
+
+  /* Accounts List */
+  &__accounts {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  &__account-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: #FFFFFF;
+    border: 1px solid #EAEAEA;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover {
+      border-color: rgba(229, 26, 41, 0.3);
+    }
+
+    &.selected {
+      background: rgba(229, 26, 41, 0.03);
+      border-color: #FCA5A5;
+      box-shadow: 0 2px 8px rgba(229, 26, 41, 0.06);
+    }
+  }
+
+  &__avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #BDBDBD;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  &__avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__avatar-initials {
+    font-size: 13px;
+    font-weight: 700;
+    color: #FFFFFF;
+  }
+
+  &__account-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__account-name-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__account-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1A1A1A;
+  }
+
+  &__status-tag {
+    font-size: 9px;
+    font-weight: 700;
+    color: #E51A29;
+    background: #FEE2E2;
+    padding: 1px 6px;
+    border-radius: 8px;
+    text-transform: uppercase;
+  }
+
+  &__account-email {
+    font-size: 12px;
+    color: #757575;
+  }
+
+  &__check-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #E51A29;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__uncheck-circle {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid #CCCCCC;
+  }
+
+  /* Another Account Button */
+  &__another-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: #FAFAFA;
+    border: 1px dashed #D1D5DB;
+    border-radius: 14px;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      background-color: #F3F4F6;
+      border-color: #9CA3AF;
+    }
+  }
+
+  &__another-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #EEEEEE;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__another-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__another-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  &__another-sub {
+    font-size: 11px;
+    color: #9CA3AF;
+  }
+
+  &__native-btn {
+    display: none;
+  }
+
+  /* Legal Notice Box */
+  &__notice-box {
+    background: #F9FAFB;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 20px;
+  }
+
+  &__notice-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  &__notice-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  &__notice-text {
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: #6B7280;
+    margin: 0;
+  }
+
+  &__notice-links {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    padding-left: 26px;
+
+    .bullet {
+      color: #9CA3AF;
+    }
+  }
+
+  &__legal-link {
+    color: #6B7280;
+    text-decoration: underline;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: #E51A29;
+    }
+  }
+
+  /* Submit Action Button */
+  &__submit-wrapper {
+    width: 100%;
+  }
+
+  &__action-btn {
+    width: 100%;
+    height: 52px;
+    background-color: #E51A29;
+    border: none;
+    border-radius: 12px;
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(229, 26, 41, 0.25);
+    transition: background-color 0.2s ease, transform 0.1s ease;
+
+    &:hover {
+      background-color: #D01422;
+    }
+
+    &:active {
+      transform: scale(0.99);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+/* Security Footer */
+.google-auth-page__security-footer {
+  text-align: center;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.google-auth-page__security-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.google-auth-page__security-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #424242;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.google-auth-page__security-sub {
+  font-size: 11px;
+  color: #9E9E9E;
+  margin: 0;
+}

@@ -1,0 +1,327 @@
+<div class="legal-page">
+  <!-- Header -->
+  <header class="legal-header">
+    <button type="button" (click)="onBack()" class="legal-header__back-btn" aria-label="Retour">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <div class="legal-header__title-container">
+      <div class="legal-header__branding">
+        <span class="legal-header__logo-text">AYYOU</span>
+        <span class="legal-header__divider">|</span>
+        <span class="legal-header__sub-tag">LÉGAL</span>
+      </div>
+      <h2 class="legal-header__page-title">Conditions Générales</h2>
+    </div>
+    <span class="legal-header__badge">CGU / CGV</span>
+  </header>
+
+  <main class="legal-page__content">
+    <!-- Hero / Metadata Banner -->
+    <div class="legal-page__hero">
+      <div class="legal-page__tag-row">
+        <span class="legal-page__tag-pill">DOCUMENT OFFICIEL</span>
+        <span class="legal-page__tag-meta">Sénégal &bull; Droit applicable</span>
+      </div>
+
+      <h1 class="legal-page__title">Conditions Générales d'Utilisation et de Vente (CGU/CGV)</h1>
+
+      <div class="legal-page__date-badge">
+        Dernière mise à jour : <span class="legal-page__date-text">12 Septembre 2025</span> &bull; v1.0
+      </div>
+
+      <div class="legal-page__notice-box">
+        <p>
+          <strong>Avis préliminaire :</strong> Les présentes Conditions régissent l'accès et l'utilisation des services de l'application mobile et des plateformes AYYOU au Sénégal. Veuillez lire attentivement l'intégralité de ces dispositions avant d'utiliser le service.
+        </p>
+      </div>
+    </div>
+
+    <!-- Summary / TOC Grid -->
+    <div class="legal-page__toc">
+      <div class="legal-page__toc-header">
+        <span class="legal-page__toc-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+          SOMMAIRE DES 18 ARTICLES
+        </span>
+        <span class="legal-page__toc-subtitle">Accès rapide</span>
+      </div>
+
+      <div class="legal-page__toc-grid">
+        <a (click)="scrollToArticle('art-1')" class="legal-page__toc-item">1. Objet</a>
+        <a (click)="scrollToArticle('art-2')" class="legal-page__toc-item">2. Définitions</a>
+        <a (click)="scrollToArticle('art-3')" class="legal-page__toc-item">3. Acceptation</a>
+        <a (click)="scrollToArticle('art-4')" class="legal-page__toc-item">4. Compte utilisateur</a>
+        <a (click)="scrollToArticle('art-5')" class="legal-page__toc-item">5. Fonctionnement</a>
+        <a (click)="scrollToArticle('art-6')" class="legal-page__toc-item">6. Restaurants & Vendeurs</a>
+        <a (click)="scrollToArticle('art-7')" class="legal-page__toc-item">7. Produits & Disponibilité</a>
+        <a (click)="scrollToArticle('art-8')" class="legal-page__toc-item">8. Commandes</a>
+        <a (click)="scrollToArticle('art-9')" class="legal-page__toc-item">9. Paiement</a>
+        <a (click)="scrollToArticle('art-10')" class="legal-page__toc-item">10. Livraison</a>
+        <a (click)="scrollToArticle('art-11')" class="legal-page__toc-item">11. Annulation & Récl.</a>
+        <a (click)="scrollToArticle('art-12')" class="legal-page__toc-item">12. Obligations</a>
+        <a (click)="scrollToArticle('art-13')" class="legal-page__toc-item">13. Contenus publiés</a>
+        <a (click)="scrollToArticle('art-14')" class="legal-page__toc-item">14. Propriété intellectuelle</a>
+        <a (click)="scrollToArticle('art-15')" class="legal-page__toc-item">15. Responsabilités</a>
+        <a (click)="scrollToArticle('art-16')" class="legal-page__toc-item">16. Résiliation</a>
+        <a (click)="scrollToArticle('art-17')" class="legal-page__toc-item">17. Droit & Litiges</a>
+        <a (click)="scrollToArticle('art-18')" class="legal-page__toc-item">18. Contact légal</a>
+      </div>
+    </div>
+
+    <!-- Article Content -->
+    <article class="legal-page__article-body">
+      <section id="art-1" class="legal-page__section">
+        <h2>1. Objet</h2>
+        <p>
+          Les présentes Conditions Générales d'Utilisation et de Vente (ci-après désignées « les Conditions » ou « CGU/CGV ») ont pour objet d'encadrer l'accès, la consultation et l'utilisation de l'application mobile et des services numériques AYYOU.
+        </p>
+        <p class="legal-page__highlight-p">
+          <strong>AYYOU est une plateforme technologique numérique permettant aux Utilisateurs de découvrir des restaurants, vendeurs et produits alimentaires, de consulter leurs cartes, menus et offres promotionnelles, de passer commande en ligne, et, lorsque cette option est disponible, de bénéficier d'un service d'acheminement (livraison) ou de retrait direct auprès de l'établissement (Click & Collect).</strong>
+        </p>
+        <div class="legal-page__callout">
+          <p>
+            <strong>Rôle d'intermédiaire :</strong> AYYOU intervient exclusivement en qualité d'intermédiaire technique et de plateforme de mise en relation entre les Clients, les Restaurants, les Vendeurs et, le cas échéant, les Livreurs indépendants opérant sur le réseau. AYYOU ne prépare pas les repas et ne fabrique pas les produits commercialisés par les tiers référencés.
+          </p>
+        </div>
+      </section>
+
+      <section id="art-2" class="legal-page__section">
+        <h2>2. Définitions</h2>
+        <p>Pour la parfaite compréhension des présentes, les termes ci-après définis auront la signification suivante :</p>
+        <ul class="legal-page__list">
+          <li><strong>AYYOU :</strong> Désigne l'entité éditrice et opératrice de l'application mobile et de la plateforme technologique AYYOU Sénégal.</li>
+          <li><strong>Application :</strong> Désigne l'application logicielle mobile AYYOU, disponible sur systèmes d'exploitation mobiles (iOS, Android) ainsi que tout portail web associé.</li>
+          <li><strong>Utilisateur :</strong> Toute personne physique ou morale accédant à l'Application, à titre occasionnel ou régulier.</li>
+          <li><strong>Client :</strong> Tout Utilisateur titulaire d'un Compte qui commande un ou plusieurs Produits via l'Application.</li>
+          <li><strong>Restaurant :</strong> Tout établissement professionnel de restauration tiers dûment enregistré sur AYYOU proposant des plats préparés, repas et boissons à la vente.</li>
+          <li><strong>Vendeur :</strong> Tout commerçant ou professionnel partenaire proposant des produits alimentaires, condiments, épicerie ou accessoires culinaires via l'Application.</li>
+          <li><strong>Livreur :</strong> Tout prestataire logistique ou coursier partenaire chargé de l'acheminement physique de la Commande depuis le Restaurant/Vendeur jusqu'à l'adresse de livraison indiquée par le Client.</li>
+          <li><strong>Produit :</strong> Tout aliment, plat cuisiné, boisson ou article commercialisé par un Restaurant ou Vendeur sur l'Application.</li>
+          <li><strong>Commande :</strong> Tout acte d'achat de Produits validé et payé (ou confirmé) par le Client sur l'Application.</li>
+          <li><strong>Livraison :</strong> L'opération matérielle d'acheminement de la Commande par un Livreur.</li>
+          <li><strong>Compte :</strong> L'espace personnel et sécurisé créé par l'Utilisateur pour accéder aux fonctionnalités d'AYYOU.</li>
+        </ul>
+      </section>
+
+      <section id="art-3" class="legal-page__section">
+        <h2>3. Acceptation des conditions</h2>
+        <p>
+          L'inscription, l'ouverture d'un Compte ou la passation de toute Commande sur l'Application emporte acceptation expresse, pleine et sans réserve de l'intégralité des présentes Conditions par l'Utilisateur.
+        </p>
+        <p>
+          Si l'Utilisateur refuse tout ou partie des présentes stipulations, il doit s'abstenir sans délai d'utiliser l'Application et supprimer son Compte.
+        </p>
+        <p>
+          <strong>Modifications futures :</strong> AYYOU se réserve la faculté d'adapter ou de modifier à tout moment les présentes Conditions afin de refléter l'évolution des fonctionnalités, des contraintes techniques ou de la législation en vigueur. Toute version révisée sera publiée sur l'Application avec mention de sa date de mise à jour. L'utilisation continue des services après publication des modifications vaut acceptation irrévocable de ces dernières.
+        </p>
+      </section>
+
+      <section id="art-4" class="legal-page__section">
+        <h2>4. Création et gestion du compte</h2>
+        <p>L'accès à la passation de Commandes requiert la création préalable d'un Compte personnel AYYOU.</p>
+        
+        <h3>4.1. Données d'inscription</h3>
+        <p>
+          L'Utilisateur s'engage à fournir des informations exactes, complètes, sincères et à jour lors de son inscription, notamment son prénom, son nom, un numéro de téléphone mobile valide et, le cas échéant, une adresse de messagerie électronique.
+        </p>
+
+        <h3>4.2. Exactitude et mise à jour</h3>
+        <p>
+          L'Utilisateur assume l'entière responsabilité de l'actualisation de ses données personnelles et coordonnées postales afin de garantir le bon acheminement des Commandes et notifications.
+        </p>
+
+        <h3>4.3. Sécurité des identifiants</h3>
+        <p>
+          L'identifiant de connexion, le mot de passe et les codes temporaires de vérification (notamment transmis par SMS) sont strictly personnels et confidentiels. L'Utilisateur est seul responsable de toute activité ou transaction réalisée depuis son Compte. En cas de perte, de vol ou de suspicion de compromission, l'Utilisateur doit alerter immédiatement AYYOU.
+        </p>
+
+        <h3>4.4. Clôture de compte</h3>
+        <p>
+          L'Utilisateur peut demander la clôture et la suppression de son Compte à tout moment depuis les paramètres de l'Application ou par demande adressée au support AYYOU, sous réserve du règlement intégral des Commandes en cours.
+        </p>
+      </section>
+
+      <section id="art-5" class="legal-page__section">
+        <h2>5. Fonctionnement de la plateforme</h2>
+        <p>AYYOU met à disposition une infrastructure logicielle comprenant notamment :</p>
+        <ul class="legal-page__list">
+          <li>La découverte de contenus et d'univers alimentaires via des cartes et flux vidéo immersifs ;</li>
+          <li>La recherche ciblée de Restaurants, Vendeurs, spécialités culinaires et types de plats à proximité ;</li>
+          <li>La consultation dynamique des fiches établissements, menus détaillés, ingrédients, allergènes déclarés et tarifs ;</li>
+          <li>L'ajout au panier interactif avec sélection d'options de personnalisation ou garnitures ;</li>
+          <li>La validation du récapitulatif de Commande et le règlement dématérialisé sécurisé ;</li>
+          <li>Le suivi en direct du statut d'avancement de la Commande (Reçue, En cuisine, Prête, En livraison, Livrée) ;</li>
+          <li>L'option de retrait direct sur place (Click & Collect) avec génération de code ou QR Code de validation ;</li>
+          <li>L'envoi de notifications d'état indispensables à la bonne exécution du service de commande.</li>
+        </ul>
+      </section>
+
+      <section id="art-6" class="legal-page__section">
+        <h2>6. Restaurants et vendeurs</h2>
+        <p>
+          Les Restaurants et Vendeurs tiers référencés exercent leur activité sous leur statut professionnel propre, sous leur entière et exclusive responsabilité légale, réglementaire et sanitaire.
+        </p>
+        <p>
+          Ils sont personnellement et exclusivement responsables de la conformité, de l'exactitude et de la mise à jour des éléments qu'ils publient ou transmettent à AYYOU, notamment :
+        </p>
+        <ul class="legal-page__list">
+          <li>La nature, la qualité, la fraîcheur et la conformité sanitaire des denrées et plats préparés ;</li>
+          <li>Les tarifs TTC affichés, les grammages et les descriptions de recettes ;</li>
+          <li>La disponibilité effective des stocks et ingrédients en cuisine ;</li>
+          <li>Les horaires d'ouverture, temps moyen de préparation et adresses précises de leurs locaux.</li>
+        </ul>
+      </section>
+
+      <section id="art-7" class="legal-page__section">
+        <h2>7. Produits et disponibilité</h2>
+        <p>
+          Les Produits présentés sur l'Application sont proposés dans la limite des stocks disponibles auprès du Restaurant ou Vendeur concerné. Compte tenu de la nature périssable des aliments et du flux d'activité en temps réel des cuisines, un Produit affiché comme disponible peut devenir indisponible avant la validation définitive ou la prise en charge de la Commande par l'établissement.
+        </p>
+        <p>
+          Les prix des Produits sont affichés en Francs CFA (FCFA) toutes taxes comprises (TTC). Les frais de livraison et frais opérationnels applicables font l'objet d'une mention distincte et chiffrée avant toute validation finale de la Commande.
+        </p>
+      </section>
+
+      <section id="art-8" class="legal-page__section">
+        <h2>8. Processus de commande</h2>
+        <p>La passation d'une Commande sur AYYOU s'opère selon les étapes séquentielles suivantes :</p>
+        <ol class="legal-page__ordered-list">
+          <li><strong>Sélection :</strong> Choix des Produits, quantités, sauces, formats et éventuelles instructions particulières ;</li>
+          <li><strong>Panier :</strong> Regroupement des articles sélectionnés et vérification de la cohérence de la sélection ;</li>
+          <li><strong>Récapitulatif :</strong> Contrôle des Produits, du Restaurant émetteur, de l'adresse de réception, du créneau indicatif et du montant total TTC ;</li>
+          <li><strong>Validation & Paiement :</strong> Choix du moyen de paiement proposé et confirmation irrévocable de l'ordre d'achat ;</li>
+          <li><strong>Transmission & Confirmation :</strong> Envoi instantané au Restaurant pour acceptation et mise en préparation ;</li>
+          <li><strong>Acheminement :</strong> Prise en charge par un Livreur ou mise à disposition pour retrait au comptoir.</li>
+        </ol>
+        <div class="legal-page__callout">
+          <p>
+            <strong>Erreurs de saisie :</strong> Il appartient au Client de vérifier rigoureusement l'exactitude des informations saisies (adresse, numéro d'appartement, numéro de téléphone de contact) avant de confirmer. Toute erreur d'adresse imputable au Client entraînant l'échec de la livraison demeure sous la responsabilité exclusive de ce dernier.
+          </p>
+        </div>
+      </section>
+
+      <section id="art-9" class="legal-page__section">
+        <h2>9. Modalités de paiement</h2>
+        <p>
+          Le règlement des Commandes s'effectue via les moyens de paiement mobiles et numériques intégrés à l'Application AYYOU, à savoir :
+        </p>
+        <ul class="legal-page__list">
+          <li><strong>Wave Sénégal (Wave Digital Finance)</strong></li>
+          <li><strong>Orange Money Sénégal</strong></li>
+        </ul>
+        <p>
+          Le paiement est exigible immédiatement au moment de la passation de la Commande dès lors que le parcours de commande l'exige. La Commande n'est transmise pour préparation en cuisine qu'après validation effective de l'autorisation de débit par le prestataire de paiement mobile sélectionné.
+        </p>
+        <p>
+          AYYOU n'enregistre ni ne stocke sur ses serveurs les identifiants confidentiels, codes secrets ou clés cryptographiques des comptes de paiement mobile des Utilisateurs.
+        </p>
+      </section>
+
+      <section id="art-10" class="legal-page__section">
+        <h2>10. Livraison</h2>
+        <h3>10.1. Frais et calcul</h3>
+        <p>
+          Les frais de livraison sont calculés et affichés en toute transparence lors de l'étape de récapitulatif avant validation de la Commande, en fonction de la distance séparant le Restaurant de l'adresse de livraison indiquée et des conditions opérationnelles du moment.
+        </p>
+
+        <h3>10.2. Attribution du livreur et suivi</h3>
+        <p>
+          Dès que la Commande est prête ou en cours d'achèvement, un Livreur disponible est assigné à la course. Le Client peut suivre la progression de son coursier en direct sur la carte intégrée à l'Application.
+        </p>
+
+        <h3>10.3. Remise et validation par QR Code</h3>
+        <p>
+          La remise de la Commande au Client peut faire l'objet d'une procédure de sécurisation et de vérification physique, notamment par la présentation et le scan d'un QR Code de validation généré dans l'Application ou la transmission d'un code numérique de restitution. Cette procédure atteste de la réception effective des articles.
+        </p>
+
+        <h3>10.4. Commandes multi-vendeurs</h3>
+        <p>
+          Lorsque le panier d'un Client comprend des Produits provenant de plusieurs Restaurants ou Vendeurs distincts, le Client est expressément informé que chaque établissement fait l'objet d'une préparation et d'un acheminement logistique séparés. Plusieurs livraisons distinctes peuvent ainsi être opérées, avec application des frais de livraison cumulés dûment affichés et acceptés avant paiement.
+        </p>
+      </section>
+
+      <section id="art-11" class="legal-page__section">
+        <h2>11. Annulation, remboursement et réclamations</h2>
+        <p>Compte tenu de la nature hautement périssable des denrées alimentaires et de l'immédiateté de leur mise en préparation en cuisine :</p>
+        <ul class="legal-page__list">
+          <li><strong>Annulation par le Client :</strong> Aucune annulation gratuite n'est possible dès lors que le Restaurant a commencé la préparation des plats. En cas d'annulation tardive initiée par le Client, l'intégralité du montant de la Commande reste due.</li>
+          <li><strong>Indisponibilité constatée par le Restaurant :</strong> Si un Produit s'avère indisponible après validation, le Restaurant ou AYYOU en informe le Client pour proposer un Produit équivalent de substitution ou l'annulation de la ligne avec remboursement correspondant.</li>
+          <li><strong>Incident de livraison ou non-conformité :</strong> En cas de plat endommagé, d'article manquant ou de retard manifeste imputable à la chaîne de service, le Client doit signaler l'incident dans un délai maximal de 2 heures suivant l'heure prévue via l'espace support de l'Application en joignant des photographies probantes.</li>
+          <li><strong>Modalités de remboursement :</strong> Les remboursements éventuellement accordés sont traités via le canal initial de paiement (Wave ou Orange Money) ou sous forme d'avoirs sur le compte AYYOU.</li>
+        </ul>
+      </section>
+
+      <section id="art-12" class="legal-page__section">
+        <h2>12. Obligations des utilisateurs</h2>
+        <p>
+          L'Utilisateur s'engage formellement à utiliser l'Application avec loyauté, bonne foi et dans le respect des lois sénégalaises en vigueur. Il lui est formellement interdit de :
+        </p>
+        <ul class="legal-page__list">
+          <li>Communiquer des informations délibérément fausses, inexactes ou usurpant l'identité d'un tiers ;</li>
+          <li>Recourir à des pratiques frauduleuses, contourner les mécanismes de paiement ou d'authentification ;</li>
+          <li>Refuser abusivement la réception d'une Commande préparée et acheminée conformément à ses instructions ;</li>
+          <li>Adopter un comportement agressif, menaçant, injurieux ou déplacé envers les Livreurs, les restaurateurs ou les agents du support client AYYOU ;</li>
+          <li>Détourner l'Application de son objet, procéder à de l'ingénierie inverse ou saturer les infrastructures techniques par des requêtes automatisées.</li>
+        </ul>
+      </section>
+
+      <section id="art-13" class="legal-page__section">
+        <h2>13. Contenus publiés</h2>
+        <p>
+          Les avis, commentaires ou évaluations publiés par l'Utilisateur doivent respecter les règles de courtoisie et ne pas contenir de propos diffamatoires, obscènes ou illégaux. AYYOU se réserve le droit de modérer ou supprimer tout contenu non conforme.
+        </p>
+      </section>
+
+      <section id="art-14" class="legal-page__section">
+        <h2>14. Propriété intellectuelle</h2>
+        <p>
+          L'ensemble des éléments de l'Application (marques, logos AYYOU, designs, graphismes, logiciels, bases de données) sont la propriété exclusive d'AYYOU. Toute reproduction, représentation ou exploitation sans autorisation préalable est strictement interdite.
+        </p>
+      </section>
+
+      <section id="art-15" class="legal-page__section">
+        <h2>15. Responsabilités</h2>
+        <p>
+          AYYOU s'efforce d'assurer la disponibilité de la plateforme mais ne saurait être tenue responsable des interruptions temporaires, cas de force majeure ou défaillances des réseaux télécoms tiers.
+        </p>
+      </section>
+
+      <section id="art-16" class="legal-page__section">
+        <h2>16. Résiliation</h2>
+        <p>
+          AYYOU se réserve le droit de suspendre ou résilier immédiatement l'accès au Compte d'un Utilisateur en cas de manquement grave ou répété aux présentes Conditions Générales.
+        </p>
+      </section>
+
+      <section id="art-17" class="legal-page__section">
+        <h2>17. Droit applicable et litiges</h2>
+        <p>
+          Les présentes Conditions sont régies et interprétées conformément au droit de la République du Sénégal. Tout litige non résolu à l'amiable sera soumis aux juridictions compétentes du ressort de Dakar.
+        </p>
+      </section>
+
+      <section id="art-18" class="legal-page__section">
+        <h2>18. Contact légal</h2>
+        <p>Pour toute question d'ordre juridique ou contractuel :</p>
+        <div class="legal-page__box">
+          <p><strong>Service Juridique AYYOU</strong></p>
+          <p>Email : legal&#64;ayyou.sn</p>
+          <p>Adresse : Siège AYYOU, Dakar, Sénégal</p>
+        </div>
+
+        <p class="legal-page__cross-link">
+          Consultez également notre <a routerLink="/privacy">Politique de Confidentialité</a>.
+        </p>
+      </section>
+    </article>
+  </main>
+</div>

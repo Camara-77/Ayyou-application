@@ -1,0 +1,279 @@
+<div class="legal-page">
+  <!-- Header -->
+  <header class="legal-header">
+    <button type="button" (click)="onBack()" class="legal-header__back-btn" aria-label="Retour">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <div class="legal-header__title-container">
+      <div class="legal-header__branding">
+        <span class="legal-header__page-title">Confidentialité</span>
+        <span class="legal-header__logo-text">AYYOU</span>
+      </div>
+      <span class="legal-header__sub-tag">Protection des données CDP</span>
+    </div>
+    <span class="legal-header__badge">DPO</span>
+  </header>
+
+  <main class="legal-page__content">
+    <!-- Hero / Metadata Banner -->
+    <div class="legal-page__hero">
+      <div class="legal-page__tag-row">
+        <span class="legal-page__tag-pill">PROTECTION DES DONNÉES</span>
+        <span class="legal-page__tag-meta">Sénégal &bull; Loi 2008-12</span>
+      </div>
+
+      <h1 class="legal-page__title">Politique de confidentialité</h1>
+
+      <div class="legal-page__date-badge">
+        Dernière mise à jour : <span class="legal-page__date-text">12 Septembre 2025</span> &bull; v1.0
+      </div>
+
+      <div class="legal-page__notice-box">
+        <p>
+          La présente Politique détaille les engagements d'AYYOU concernant la collecte, l'utilisation, la conservation et la sécurité de vos données personnelles sous l'autorité de la CDP.
+        </p>
+      </div>
+    </div>
+
+    <!-- Summary / TOC -->
+    <div class="legal-page__toc">
+      <div class="legal-page__toc-header">
+        <span class="legal-page__toc-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+          SOMMAIRE DES 15 ARTICLES
+        </span>
+        <span (click)="scrollToArticle('art-1')" class="legal-page__toc-action">Afficher</span>
+      </div>
+    </div>
+
+    <!-- Article Content -->
+    <article class="legal-page__article-body">
+      <section id="art-1" class="legal-page__section">
+        <h2>1. Introduction et cadre d'engagement</h2>
+        <p>
+          AYYOU accorde une importance primordiale au respect de la vie privée et à la confidentialité des données personnelles de ses Utilisateurs, Clients, Livreurs et Partenaires professionnels.
+        </p>
+        <p>
+          Le traitement des données à caractère personnel effectué via l'Application AYYOU est strictement encadré et réalisé conformément à la réglementation applicable en République du Sénégal, notamment la <strong>Loi n° 2008-12 du 25 janvier 2008</strong> portant sur la protection des données à caractère personnel, et sous l'autorité de la <strong>Commission de Protection des Données Personnelles (CDP)</strong>.
+        </p>
+      </section>
+
+      <section id="art-2" class="legal-page__section">
+        <h2>2. Responsable du traitement</h2>
+        <p>Le responsable du traitement des données collectées via l'Application est l'opérateur de la plateforme AYYOU :</p>
+        <div class="legal-page__dashed-box">
+          <p>AYYOU Sénégal SARL</p>
+          <p>Adresse légale : Siège AYYOU, Dakar, Sénégal</p>
+          <p>Identifiant légal : SN-DKR-2024-B-12345</p>
+          <p>Email protection des données : dpo&#64;ayyou.sn</p>
+        </div>
+      </section>
+
+      <section id="art-3" class="legal-page__section">
+        <h2>3. Données collectées</h2>
+        <p>
+          Dans le cadre de l'exploitation de l'Application et de la fourniture de nos services, les catégories suivantes de données sont strictement collectées :
+        </p>
+
+        <h3>3.1. Données d'identification et de profil</h3>
+        <ul class="legal-page__list">
+          <li>Nom et prénom de l'Utilisateur ;</li>
+          <li>Numéro de téléphone mobile (nécessaire à l'authentification sécurisée par SMS et à la liaison avec le livreur en temps réel) ;</li>
+          <li>Adresse de courrier électronique (pour l'envoi des reçus, confirmations et communications de compte) ;</li>
+          <li>Photo de profil (uniquement lorsque celle-ci est volontairement téléversée par l'Utilisateur).</li>
+        </ul>
+
+        <h3>3.2. Données relatives aux commandes et transactions</h3>
+        <ul class="legal-page__list">
+          <li>Historique des Produits sélectionnés, plats commandés, garnitures et options choisies ;</li>
+          <li>Identité des Restaurants et Vendeurs sollicités ;</li>
+          <li>Montants totaux TTC, ventilations des frais de livraison et horodatages précis des transactions ;</li>
+          <li>Statut d'avancement des Commandes et historique de facturation ;</li>
+          <li>Informations d'acheminement : adresses textuelles de réception, indications complémentaires d'accès (bâtiment, étage, repères géographiques urbains).</li>
+        </ul>
+
+        <h3>3.3. Données de géolocalisation géographique</h3>
+        <p>
+          Lorsque l'Utilisateur l'autorise expressément sur son terminal mobile (permission système « Autoriser la localisation »), les données de géolocalisation en temps réel sont traitées aux fins exclusives de :
+        </p>
+        <ul class="legal-page__list">
+          <li>Afficher les Restaurants et Vendeurs pertinents situés dans le rayon de livraison effectif ;</li>
+          <li>Faciliter la saisie et la précision de l'adresse de destination pour le Livreur ;</li>
+          <li>Déterminer les informations de distance et les frais d'acheminement logistique applicables.</li>
+        </ul>
+
+        <div class="legal-page__callout">
+          <p>
+            <strong>Contrôle de la localisation :</strong> L'Utilisateur peut à tout moment désactiver ou modifier le partage de sa position géographique via les réglages système de son téléphone. Dans ce cas, la saisie manuelle d'une adresse de livraison valide reste requise pour passer commande.
+          </p>
+        </div>
+      </section>
+
+      <section id="art-4" class="legal-page__section">
+        <h2>4. Finalités du traitement</h2>
+        <p>
+          Les données personnelles recueillies par AYYOU sont exclusivement utilisées pour des finalités déterminées, explicites et légitimes :
+        </p>
+        <ul class="legal-page__list">
+          <li><strong>Création et gestion du Compte :</strong> Enregistrement, vérification de l'identité via numéro mobile et maintenance du profil Utilisateur ;</li>
+          <li><strong>Authentification et sécurité :</strong> Vérification par code SMS à usage unique et sécurisation des accès ;</li>
+          <li><strong>Traitement opérationnel des Commandes :</strong> Transmission des bons de préparation aux cuisines des Restaurants et Vendeurs ;</li>
+          <li><strong>Organisation de la logistique et livraison :</strong> Affectation de la course au Livreur, calcul d'itinéraire et mise en relation téléphonique ponctuelle durant l'acheminement ;</li>
+          <li><strong>Traitement des paiements :</strong> Initialisation de la demande de règlement auprès de Wave Sénégal ou d'Orange Money selon le choix du Client ;</li>
+          <li><strong>Suivi de commande et transparence :</strong> Affichage de l'avancement en temps réel (Reçue, En cuisine, En route, Livrée) et validation par QR Code ;</li>
+          <li><strong>Amélioration du service technique :</strong> Détection des dysfonctionnements applicatifs, stabilité de l'infrastructure et ergonomie ;</li>
+          <li><strong>Support client et réclamations :</strong> Réponse aux demandes d'assistance, traitement des contestations relatives aux commandes ou livraisons ;</li>
+          <li><strong>Respect des obligations légales :</strong> Tenue des pièces comptables, respect des règles fiscales sénégalaises et réponse aux réquisitions légales des autorités compétentes.</li>
+        </ul>
+      </section>
+
+      <section id="art-5" class="legal-page__section">
+        <h2>5. Base et cadre du traitement</h2>
+        <p>Conformément aux principes régissant la protection des données personnelles, tout traitement opéré par AYYOU repose sur un fondement juridique valide :</p>
+        <ul class="legal-page__list">
+          <li><strong>Exécution du contrat de service :</strong> Le traitement des données d'identification, de commande et de contact est strictement indispensable à l'exécution de la relation contractuelle (préparation du repas, acheminement et paiement) ;</li>
+          <li><strong>Consentement de l'Utilisateur :</strong> Requis notamment pour l'activation des services de localisation géographique précise sur le terminal mobile ;</li>
+          <li><strong>Obligations légales :</strong> Conservation des pièces comptables et factures conformément aux dispositions commerciales et fiscales en vigueur en République du Sénégal ;</li>
+          <li><strong>Intérêt légitime :</strong> Prévention de la fraude, garantie de la sécurité technique de la plateforme et protection des droits de la communauté AYYOU.</li>
+        </ul>
+      </section>
+
+      <section id="art-6" class="legal-page__section">
+        <h2>6. Partage et destinataires des données</h2>
+        <p>
+          AYYOU applique un principe rigoureux de minimisation : seules les données strictly nécessaires à l'accomplissement de chaque étape opérationnelle sont transmises aux destinataires suivants :
+        </p>
+        <ul class="legal-page__list">
+          <li><strong>Les Restaurants et Vendeurs :</strong> Reçoivent les informations relatives aux Produits commandés, instructions de préparation culinaire et le prénom du Client pour la préparation du colis ;</li>
+          <li><strong>Les Livreurs :</strong> Reçoivent le prénom du Client, l'adresse de livraison exacte, les repères de localisation et le numéro de téléphone masqué ou direct pour finaliser la remise physique ;</li>
+          <li><strong>Les prestataires de paiement (Wave, Orange Money) :</strong> Reçoivent les éléments requis pour l'émission de la requête de débit (montant, référence de transaction, numéro de compte téléphonique) ;</li>
+          <li><strong>Les prestataires techniques et d'hébergement :</strong> Qui interviennent comme sous-traitants pour le stockage sécurisé des données et l'envoi de messages transactionnels (SMS de vérification), sous contrat strict de confidentialité ;</li>
+          <li><strong>Les autorités judiciaires ou administratives :</strong> Uniquement lorsque la loi l'impose ou en réponse à une réquisition légale officielle.</li>
+        </ul>
+
+        <div class="legal-page__callout">
+          <p>
+            <strong>Non-commercialisation des données :</strong> AYYOU ne vend, ne loue et ne cède aucune donnée personnelle d'Utilisateur à des tiers à des fins de prospection publicitaire ou de courtage de données.
+          </p>
+        </div>
+      </section>
+
+      <section id="art-7" class="legal-page__section">
+        <h2>7. Traitement des paiements</h2>
+        <p>
+          Les opérations de règlement financier s'effectuent par le biais d'intégrations directes avec les opérateurs de monnaie électronique agréés au Sénégal, principalement Wave Sénégal et Orange Money.
+        </p>
+        <p>
+          AYYOU ne collecte, ne visualisait et ne stocke jamais les codes secrets (PIN), clés d'authentification bancaire ou mots de passe personnels de paiement des Utilisateurs. L'authentification du débit est gérée dans l'environnement sécurisé propre à l'opérateur financier choisi par l'Utilisateur.
+        </p>
+      </section>
+
+      <section id="art-8" class="legal-page__section">
+        <h2>8. Conservation des données</h2>
+        <p>
+          Les données à caractère personnel sont conservées par AYYOU uniquement pendant la durée strictement nécessaire à l'accomplissement des finalités pour lesquelles elles ont été collectées, ou conformément aux durées de prescription et obligations d'archivage légal applicables au Sénégal.
+        </p>
+        <ul class="legal-page__list">
+          <li><strong>Données de Compte :</strong> Conservées pendant toute la durée d'activité du Compte de l'Utilisateur jusqu'à sa demande expresse de suppression ;</li>
+          <li><strong>Données relatives aux commandes et reçus :</strong> Conservées pendant les délais légaux prescrits par le droit commercial et fiscal pour la justification des opérations comptables ;</li>
+          <li><strong>Données de géolocalisation :</strong> Utilisées en temps réel durant l'acheminement de la course et non conservées de manière continue au-delà de la clôture de la livraison.</li>
+        </ul>
+      </section>
+
+      <section id="art-9" class="legal-page__section">
+        <h2>9. Sécurité des systèmes</h2>
+        <p>
+          AYYOU met en œuvre des mesures techniques et organisationnelles appropriées afin de préserver la sécurité, l'intégrité et la confidentialité des données personnelles et d'empêcher leur altération, perte ou accès non autorisé :
+        </p>
+        <ul class="legal-page__list">
+          <li>Chiffrement des flux de communication entre l'Application et les serveurs AYYOU (protocoles TLS/HTTPS) ;</li>
+          <li>Contrôle strict des accès aux bases de données, réservé aux seuls personnels et prestataires habilités ;</li>
+          <li>Authentification par code à usage unique (OTP) lors de la création de compte ou de la re-connexion ;</li>
+          <li>Surveillance continue et journalisation des événements systèmes pour détecter toute tentative d'intrusion.</li>
+        </ul>
+      </section>
+
+      <section id="art-10" class="legal-page__section">
+        <h2>10. Droits des utilisateurs</h2>
+        <p>
+          Conformément aux dispositions de la législation sénégalaise sur la protection des données (Loi n° 2008-12) et aux recommandations de la CDP, chaque Utilisateur dispose des droits fondamentaux suivants :
+        </p>
+        <ul class="legal-page__list">
+          <li><strong>Droit à l'information :</strong> Le droit de disposer d'une information claire, transparente et accessible sur l'identité du responsable, les finalités et la durée des traitements ;</li>
+          <li><strong>Droit d'accès :</strong> Le droit de demander la confirmation que des données le concernant sont traitées et d'en obtenir une copie lisible ;</li>
+          <li><strong>Droit de rectification :</strong> Le droit de faire corriger, compléter ou actualiser toute information inexacte ou périmée (directement modifiable dans l'écran « Modifier mon profil ») ;</li>
+          <li><strong>Droit à la suppression :</strong> Le droit de solliciter l'effacement de ses données personnelles lorsque celles-ci ne sont plus nécessaires aux finalités poursuivies ou lorsque les conditions légales sont réunies ;</li>
+          <li><strong>Droit d'opposition et de retrait du consentement :</strong> Le droit de retirer à tout moment son consentement aux fonctionnalités basées sur celui-ci (notamment la géolocalisation mobile).</li>
+        </ul>
+      </section>
+
+      <section id="art-11" class="legal-page__section">
+        <h2>11. Exercice des droits et réclamation</h2>
+        <p>
+          Pour exercer l'un quelconque de ces droits, l'Utilisateur peut adresser sa demande par voie électronique ou postale aux coordonnées officielles du responsable de traitement :
+        </p>
+        <div class="legal-page__dashed-box">
+          <p>Email officiel d'exercice des droits : dpo&#64;ayyou.sn</p>
+          <p>Adresse officielle du siège AYYOU, Dakar, Sénégal</p>
+        </div>
+        <p>
+          La demande doit préciser l'identité du demandeur (nom, prénom, numéro de téléphone associé au Compte AYYOU). Une réponse sera apportée dans les meilleurs délais conformément aux exigences de la réglementation.
+        </p>
+        <p>
+          En cas de contestation ou de difficulté non résolue, l'Utilisateur est informé de sa faculté de saisir la <strong>Commission de Protection des Données Personnelles du Sénégal (CDP)</strong> (www.cdp.sn).
+        </p>
+      </section>
+
+      <section id="art-12" class="legal-page__section">
+        <h2>12. Traceurs et technologies logicielles</h2>
+        <p>
+          L'Application mobile AYYOU utilise exclusivement des jetons d'authentification de session et des traceurs techniques strictement nécessaires au maintien de la connexion sécurisée, à la mémorisation du panier d'achat et au bon fonctionnement opérationnel de la navigation.
+        </p>
+        <p>
+          Aucun traceur publicitaire intrusif ou dispositif de profilage commercial tiers n'est déployé au sein de l'Application sans information préalable des Utilisateurs.
+        </p>
+      </section>
+
+      <section id="art-13" class="legal-page__section">
+        <h2>13. Protection des mineurs</h2>
+        <p>
+          L'Application AYYOU s'adresse à des personnes disposant de la capacité juridique de souscrire des contrats au regard des lois de la République du Sénégal. L'utilisation de l'Application par des personnes mineures doit s'effectuer sous la supervision et avec l'autorisation expresse de leurs parents ou tuteurs légaux. AYYOU ne collecte pas sciemment de données auprès d'enfants sans l'accord préalable des titulaires de l'autorité parentale.
+        </p>
+      </section>
+
+      <section id="art-14" class="legal-page__section">
+        <h2>14. Modifications de la politique de confidentialité</h2>
+        <p>
+          AYYOU peut être amenée à modifier la présente Politique de confidentialité pour tenir compte de l'évolution de ses services applicatifs, des innovations techniques ou des obligations légales.
+        </p>
+        <p>
+          La date de dernière mise à jour figurant en tête du document sera systématiquement actualisée. Nous encourageons nos Utilisateurs à consulter périodiquement cette page pour rester informés de nos pratiques en matière de protection des données.
+        </p>
+      </section>
+
+      <section id="art-15" class="legal-page__section">
+        <h2>15. Contact</h2>
+        <p>Pour toute question, demande d'information ou clarification concernant cette Politique ou la gestion de vos données par AYYOU :</p>
+        <div class="legal-page__dashed-box">
+          <p><strong>Service Protection des Données AYYOU</strong></p>
+          <p>Email : privacy&#64;ayyou.sn</p>
+          <p>Téléphone officiel AYYOU : +221 33 800 00 00</p>
+          <p>Adresse légale : Siège AYYOU, Dakar, Sénégal</p>
+        </div>
+
+        <p class="legal-page__cross-link">
+          Consultez également nos <a routerLink="/terms">Conditions Générales contractuelles (CGU/CGV)</a>.
+        </p>
+      </section>
+    </article>
+  </main>
+</div>

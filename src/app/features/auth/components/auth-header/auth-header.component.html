@@ -1,0 +1,33 @@
+<header class="auth-header">
+  <div class="auth-header__action auth-header__action--left">
+    @if (showBackButton) {
+      @if (backUrl) {
+        <a [routerLink]="backUrl" class="auth-header__btn" aria-label="Retour">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </a>
+      } @else {
+        <button type="button" (click)="onBack()" class="auth-header__btn" aria-label="Retour">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+      }
+    }
+  </div>
+
+  <div class="auth-header__branding">
+    @if (showLogo) {
+      <img [src]="logoUrl" alt="AYYOU Logo" class="auth-header__logo" />
+    }
+  </div>
+
+  <div class="auth-header__action auth-header__action--right">
+    @if (showSkipButton) {
+      <button type="button" (click)="onSkip()" class="auth-header__skip-btn">
+        Passer pour l'instant
+      </button>
+    }
+  </div>
+</header>

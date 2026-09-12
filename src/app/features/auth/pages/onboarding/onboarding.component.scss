@@ -1,0 +1,141 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #FAFAFA;
+}
+
+.onboarding-page {
+  max-width: 440px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: radial-gradient(circle at 50% 15%, rgba(229, 26, 41, 0.04) 0%, #FFFFFF 70%);
+  display: flex;
+  flex-direction: column;
+
+  &__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 60px 24px 20px;
+    box-sizing: border-box;
+  }
+
+  /* Animated Logo Container */
+  &__logo-container {
+    width: 100%;
+    max-width: 280px;
+    min-height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: auto;
+    margin-bottom: 24px;
+  }
+
+  &__logo-img,
+  &__logo-video {
+    max-width: 100%;
+    height: auto;
+    max-height: 160px;
+    object-fit: contain;
+    display: block;
+    background: transparent;
+    mix-blend-mode: multiply;
+    filter: contrast(110%) brightness(100%);
+    isolation: isolate;
+  }
+
+  /* Hero Headline / Slogan */
+  &__hero {
+    text-align: center;
+    margin-bottom: auto;
+    padding: 0 12px;
+  }
+
+  &__slogan {
+    font-size: 21px;
+    font-weight: 800;
+    color: #1F2937;
+    line-height: 1.35;
+    margin: 0;
+    letter-spacing: -0.3px;
+  }
+
+  /* Actions Section */
+  &__actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  &__primary-btn {
+    width: 100%;
+    height: 52px;
+    background-color: #E51A29;
+    border: none;
+    border-radius: 16px;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(229, 26, 41, 0.28);
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+
+    &:hover {
+      background-color: #D01422;
+      box-shadow: 0 10px 28px rgba(229, 26, 41, 0.35);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  &__arrow {
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  &__login-prompt {
+    font-size: 13.5px;
+    color: #9CA3AF;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__login-link {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #E51A29;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+
+    &:hover {
+      text-decoration: underline;
+      opacity: 0.85;
+    }
+  }
+
+  /* iOS Bottom Indicator Bar */
+  &__home-indicator {
+    width: 120px;
+    height: 4px;
+    background-color: #E5E7EB;
+    border-radius: 2px;
+    margin-top: 8px;
+  }
+}

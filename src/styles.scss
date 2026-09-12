@@ -1,0 +1,37 @@
+// ==========================================================================
+// AYYOU Main Global Styles
+// ==========================================================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+@use 'typography' as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: $color-dominant;
+  overflow-x: hidden;
+}
+
+// Mobile-first app container max-width constraint for desktop testing
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+  background-color: $color-dominant;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+
+  @include desktop-up {
+    border-left: 1px solid $color-gray-200;
+    border-right: 1px solid $color-gray-200;
+  }
+}

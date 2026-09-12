@@ -1,0 +1,55 @@
+<div class="onboarding-page">
+  <main class="onboarding-page__content">
+    <!-- Animated Logo Container (MP4 Video) -->
+    <div class="onboarding-page__logo-container">
+      @if (logoAssetType === 'video') {
+        <video
+          #logoVideo
+          autoplay
+          muted
+          loop
+          playsinline
+          [muted]="true"
+          class="onboarding-page__logo-video"
+        >
+          <source [src]="logoAssetUrl" type="video/mp4" />
+          <source src="/assets/branding/logoanimeayyou.mp4" type="video/mp4" />
+          <source src="/logoanimeayyou.mp4" type="video/mp4" />
+        </video>
+      } @else {
+        <img
+          [src]="logoAssetUrl"
+          alt="AYYOU Logo"
+          class="onboarding-page__logo-img"
+        />
+      }
+    </div>
+
+    <!-- Main Headline / Slogan -->
+    <div class="onboarding-page__hero">
+      <h1 class="onboarding-page__slogan">L'art de bien manger à Dakar</h1>
+    </div>
+
+    <!-- Actions -->
+    <div class="onboarding-page__actions">
+      <button
+        type="button"
+        (click)="onContinue()"
+        class="onboarding-page__primary-btn"
+      >
+        <span>Continuer</span>
+        <span class="onboarding-page__arrow">&rarr;</span>
+      </button>
+
+      <p class="onboarding-page__login-prompt">
+        Déjà un compte ?
+        <button type="button" (click)="onLogin()" class="onboarding-page__login-link">
+          Se connecter
+        </button>
+      </p>
+    </div>
+
+    <!-- iOS Home Indicator -->
+    <div class="onboarding-page__home-indicator"></div>
+  </main>
+</div>
