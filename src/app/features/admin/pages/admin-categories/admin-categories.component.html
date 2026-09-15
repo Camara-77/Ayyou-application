@@ -1,0 +1,162 @@
+<div class="categories-page-container">
+  <!-- Top Header Section -->
+  <div class="page-header-row">
+    <div class="title-wrap">
+      <span class="breadcrumb-tag">ADMINISTRATION DAKAR • TAXONOMIE & CLIENT</span>
+      <h1 class="main-title">Catégories</h1>
+      <p class="subtitle">
+        Configuration des univers et catégories de l'application mobile AYYOU (Restaurants, Vendeurs, Plats, Produits). Gestion des vignettes circulaires, statuts et hiérarchies.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="btn-outline-gray" (click)="onOpenReorderModal()">
+        <span class="handles-icon">⠇⠇</span>
+        <span>Réordonner pour le Feed Client</span>
+      </button>
+
+      <button type="button" class="btn-primary-red" (click)="onOpenAddModal()">
+        + Ajouter une catégorie
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter & Search Controls Bar -->
+  <div class="filters-bar-card mt-24">
+    <div class="left-type-pills">
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="(typeTab$ | async) === 'ALL'"
+        (click)="onTypeTabSelect('ALL')"
+      >
+        Toutes <span class="badge-num">68</span>
+      </button>
+
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="(typeTab$ | async) === 'RESTAURANTS'"
+        (click)="onTypeTabSelect('RESTAURANTS')"
+      >
+        Restaurants <span class="badge-num">16</span>
+      </button>
+
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="(typeTab$ | async) === 'VENDEURS'"
+        (click)="onTypeTabSelect('VENDEURS')"
+      >
+        Vendeurs / Commerces <span class="badge-num">12</span>
+      </button>
+
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="(typeTab$ | async) === 'PLATS'"
+        (click)="onTypeTabSelect('PLATS')"
+      >
+        Plats <span class="badge-num">24</span>
+      </button>
+
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="(typeTab$ | async) === 'PRODUITS'"
+        (click)="onTypeTabSelect('PRODUITS')"
+      >
+        Produits <span class="badge-num">16</span>
+      </button>
+    </div>
+
+    <!-- Center Search Input -->
+    <div class="search-input-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input
+        type="text"
+        placeholder="Rechercher une catégorie..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearchInput()"
+      />
+    </div>
+
+    <!-- Right Status Filter Pills -->
+    <div class="right-status-pills">
+      <button
+        type="button"
+        class="status-pill-btn"
+        [class.active]="(statusTab$ | async) === 'ALL'"
+        (click)="onStatusTabSelect('ALL')"
+      >
+        TOUTES
+      </button>
+
+      <button
+        type="button"
+        class="status-pill-btn"
+        [class.active]="(statusTab$ | async) === 'ACTIVES'"
+        (click)="onStatusTabSelect('ACTIVES')"
+      >
+        ACTIVES
+      </button>
+
+      <button
+        type="button"
+        class="status-pill-btn"
+        [class.active]="(statusTab$ | async) === 'DESACTIVESS'"
+        (click)="onStatusTabSelect('DESACTIVESS')"
+      >
+        DÉSACTIVÉES
+      </button>
+    </div>
+  </div>
+
+  <!-- Meta Header Bar above Category Cards Grid -->
+  <div class="list-meta-bar mt-20" *ngIf="categories$ | async as categories">
+    <span class="meta-count-text">
+      Liste active de Dakar • {{ categories.length }} catégories affichées
+    </span>
+
+    <div class="sort-wrapper">
+      <span class="sort-label">Trier par :</span>
+      <select class="sort-select">
+        <option value="PRIORITY">Priorité d'affichage ▾</option>
+        <option value="NAME">Nom A-Z</option>
+        <option value="ITEMS">Nombre d'éléments</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Category Cards 2-Column Grid -->
+  <div class="categories-grid mt-16" *ngIf="categories$ | async as categories">
+    <app-category-card
+      *ngFor="let cat of categories"
+      [category]="cat"
+      (editCategory)="onEditCategory($event)"
+      (toggleStatus)="onToggleStatus($event)"
+      (deleteCategory)="onDeleteCategory($event)"
+    ></app-category-card>
+  </div>
+
+  <!-- Add / Edit Category Management Modal -->
+  <app-category-management-modal
+    [isOpen]="isManagementModalOpen"
+    [categories]="(allCategories$ | async) || []"
+    [editingCategory]="editingCategory"
+    (closeModal)="onCloseManagementModal()"
+    (saveCategory)="onSaveCategory($event)"
+    (deleteCategory)="onDeleteCategory($event)"
+  ></app-category-management-modal>
+
+  <!-- Feed Client Reorder Modal -->
+  <app-category-reorder-modal
+    [isOpen]="isReorderModalOpen"
+    [categories]="(allCategories$ | async) || []"
+    (closeModal)="onCloseReorderModal()"
+    (saveOrder)="onSaveReorder($event)"
+  ></app-category-reorder-modal>
+</div>

@@ -1,0 +1,71 @@
+<div class="deliveries-page-container">
+  <!-- Top Page Header -->
+  <div class="page-title-wrap">
+    <div class="title-with-pill">
+      <h1 class="main-title">Livraisons</h1>
+      <span class="console-pill">CONSOLE ACTIVE</span>
+    </div>
+    <p class="subtitle">
+      Supervision logistique des courses en temps réel, monitoring des corridors dakarois et gestion des incidents.
+    </p>
+  </div>
+
+  <!-- Stats Block -->
+  <div class="mt-20">
+    <app-delivery-stats
+      *ngIf="statsSummary$ | async as stats"
+      [stats]="stats"
+      [selectedTab]="(activeTab$ | async) || 'ALL'"
+      (selectTab)="onTabChange($event)"
+    ></app-delivery-stats>
+  </div>
+
+  <!-- Filter Pills + Search Row -->
+  <div class="mt-24">
+    <app-delivery-filters
+      [selectedTab]="(activeTab$ | async) || 'ALL'"
+      [totalCount]="74"
+      [inDeliveryCount]="48"
+      [pendingCount]="18"
+      [potentialDelayCount]="5"
+      [incidentsCount]="3"
+      (tabChange)="onTabChange($event)"
+      (searchChange)="onSearchChange($event)"
+      (corridorChange)="onCorridorChange($event)"
+      (vehicleChange)="onVehicleChange($event)"
+    ></app-delivery-filters>
+  </div>
+
+  <!-- Main Grid (2/3 Table on Left, 1/3 Details Panel on Right) -->
+  <div class="deliveries-main-grid mt-24">
+    <div class="table-column">
+      <app-delivery-table
+        *ngIf="deliveries$ | async as deliveries"
+        [deliveries]="deliveries"
+        [selectedDelivery]="selectedDelivery$ | async"
+        (selectDelivery)="onSelectDelivery($event)"
+      ></app-delivery-table>
+
+      <!-- Corridors & Map Block below table -->
+      <div class="mt-24">
+        <app-delivery-corridors
+          *ngIf="logisticsCorridors$ | async as corridors"
+          [corridors]="corridors"
+        ></app-delivery-corridors>
+      </div>
+    </div>
+
+    <!-- Right Side Details Column -->
+    <div class="details-column" *ngIf="selectedDelivery$ | async as selectedDelivery">
+      <app-delivery-details-panel
+        [delivery]="selectedDelivery"
+        [timelineEvents]="(timelineEvents$ | async) || []"
+        (closePanel)="onClosePanel()"
+        (reassign)="onReassign($event)"
+        (closeIncident)="onCloseIncident($event)"
+        (callCourier)="onCallCourier($event)"
+        (contactClient)="onContactClient($event)"
+      ></app-delivery-details-panel>
+    </div>
+  </div>
+</div>

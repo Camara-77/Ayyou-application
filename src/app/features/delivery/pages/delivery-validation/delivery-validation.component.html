@@ -1,0 +1,199 @@
+<div class="delivery-app-layout">
+  <!-- Top Navigation Header -->
+  <header class="delivery-header">
+    <button class="btn-header-square" (click)="goBack()" aria-label="Retour">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+    </button>
+    
+    <h1 class="header-title">Validation Livraison</h1>
+
+    <button class="btn-header-square" aria-label="Notifications">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      </svg>
+    </button>
+  </header>
+
+  <!-- Main Scrollable Content -->
+  <main class="delivery-content">
+    <!-- Order Summary Card -->
+    <div class="order-summary-card">
+      <div class="summary-top-row">
+        <span class="order-ref-text">Commande {{ orderRef }}</span>
+        <span class="amount-badge">{{ amountFcfa }}</span>
+      </div>
+      <div class="summary-bottom-row">
+        <span class="client-name-text">{{ clientName }}</span>
+        <span class="location-text">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          {{ deliveryLocation }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Instruction Paragraph -->
+    <p class="instruction-text">
+      Demandez au client de vous présenter son QR Code de commande ou son code de confirmation secret.
+    </p>
+
+    <!-- QR Code Scanner Card -->
+    <div class="qr-scanner-card">
+      <!-- Flashlight Toggle Button -->
+      <button class="btn-flashlight" [class.on]="isFlashlightOn" (click)="toggleFlashlight()" aria-label="Lampe torche">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v2"></path>
+          <path d="M6 6h12l-2 5v9a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-9L6 6z"></path>
+          <line x1="12" y1="12" x2="12" y2="12.01"></line>
+        </svg>
+      </button>
+
+      <!-- Viewfinder Overlay Area -->
+      <div class="viewfinder-box">
+        <!-- 4 Corner Reticles -->
+        <div class="reticle corner-tl"></div>
+        <div class="reticle corner-tr"></div>
+        <div class="reticle corner-bl"></div>
+        <div class="reticle corner-br"></div>
+
+        <!-- Scanning Laser Line or Red Dot -->
+        <div class="laser-dot"></div>
+
+        <!-- Simulated QR Pattern Graphic -->
+        <svg class="qr-pattern-svg" viewBox="0 0 100 100" fill="none" stroke="#FFFFFF" stroke-opacity="0.4">
+          <!-- Top Left QR Finder -->
+          <rect x="10" y="10" width="26" height="26" rx="4" stroke-width="4"/>
+          <rect x="17" y="17" width="12" height="12" fill="#FFFFFF" fill-opacity="0.4" stroke="none"/>
+          
+          <!-- Top Right QR Finder -->
+          <rect x="64" y="10" width="26" height="26" rx="4" stroke-width="4"/>
+          <rect x="71" y="17" width="12" height="12" fill="#FFFFFF" fill-opacity="0.4" stroke="none"/>
+
+          <!-- Bottom Left QR Finder -->
+          <rect x="10" y="64" width="26" height="26" rx="4" stroke-width="4"/>
+          <rect x="17" y="71" width="12" height="12" fill="#FFFFFF" fill-opacity="0.4" stroke="none"/>
+
+          <!-- Random Data Blocks -->
+          <rect x="45" y="15" width="10" height="10" fill="#FFFFFF" fill-opacity="0.3" stroke="none"/>
+          <rect x="45" y="32" width="10" height="10" fill="#FFFFFF" fill-opacity="0.3" stroke="none"/>
+          <rect x="15" y="45" width="10" height="10" fill="#FFFFFF" fill-opacity="0.3" stroke="none"/>
+          <rect x="30" y="45" width="10" height="10" fill="#FFFFFF" fill-opacity="0.3" stroke="none"/>
+          <rect x="60" y="45" width="10" height="10" fill="#FFFFFF" fill-opacity="0.3" stroke="none"/>
+          <rect x="75" y="45" width="10" height="10" fill="#FFFFFF" fill-opacity="0.3" stroke="none"/>
+          <rect x="45" y="60" width="10" height="10" fill="#FFFFFF" fill-opacity="0.3" stroke="none"/>
+          <rect x="60" y="60" width="10" height="10" fill="#FFFFFF" fill-opacity="0.3" stroke="none"/>
+          <rect x="75" y="75" width="15" height="15" rx="2" fill="#FFFFFF" fill-opacity="0.4" stroke="none"/>
+        </svg>
+      </div>
+
+      <!-- Bottom Target Pill Badge -->
+      <button class="target-pill-btn" (click)="simulateQrScan()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="6" x2="12" y2="8"></line>
+          <line x1="12" y1="16" x2="12" y2="18"></line>
+          <line x1="6" y1="12" x2="8" y2="12"></line>
+          <line x1="16" y1="12" x2="18" y2="12"></line>
+        </svg>
+        <span>Cadrez le QR Code du client</span>
+      </button>
+    </div>
+
+    <!-- Or Divider Section -->
+    <div class="or-divider">
+      <div class="line"></div>
+      <span class="divider-label">OU SAISIE MANUELLE</span>
+      <div class="line"></div>
+    </div>
+
+    <!-- Manual Code Card -->
+    <div class="manual-code-card">
+      <h2 class="card-title">Code de sécurité à 4 chiffres</h2>
+      <p class="card-subtitle">Fourni au destinataire lors de sa commande</p>
+
+      <!-- 4 PIN Digit Display Boxes -->
+      <div class="pin-display-row">
+        <div class="pin-box" [class.filled]="pinDigits[0] !== ''">
+          {{ pinDigits[0] ? pinDigits[0] : '' }}
+        </div>
+        <div class="pin-box" [class.filled]="pinDigits[1] !== ''">
+          {{ pinDigits[1] ? pinDigits[1] : '' }}
+        </div>
+        <div class="pin-box" [class.filled]="pinDigits[2] !== ''">
+          {{ pinDigits[2] ? pinDigits[2] : '' }}
+        </div>
+        <div class="pin-box" [class.filled]="pinDigits[3] !== ''">
+          {{ pinDigits[3] ? pinDigits[3] : '' }}
+        </div>
+      </div>
+
+      <!-- Error message display -->
+      <p class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+      <!-- Interactive 3x4 Touch Keypad Grid -->
+      <div class="keypad-grid">
+        <button class="key-btn" (click)="pressKey('1')">1</button>
+        <button class="key-btn" (click)="pressKey('2')">2</button>
+        <button class="key-btn" (click)="pressKey('3')">3</button>
+
+        <button class="key-btn" (click)="pressKey('4')">4</button>
+        <button class="key-btn" (click)="pressKey('5')">5</button>
+        <button class="key-btn" (click)="pressKey('6')">6</button>
+
+        <button class="key-btn" (click)="pressKey('7')">7</button>
+        <button class="key-btn" (click)="pressKey('8')">8</button>
+        <button class="key-btn" (click)="pressKey('9')">9</button>
+
+        <button class="key-btn action-key" (click)="pressKey('C')">c</button>
+        <button class="key-btn" (click)="pressKey('0')">0</button>
+        <button class="key-btn action-key" (click)="pressKey('⌫')" aria-label="Effacer">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+            <line x1="18" y1="9" x2="12" y2="15"></line>
+            <line x1="12" y1="9" x2="18" y2="15"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Validation Action Button -->
+  <footer class="delivery-footer">
+    <button 
+      class="btn-validate-delivery" 
+      [class.active]="isPinComplete" 
+      [disabled]="!isPinComplete || isValidating" 
+      (click)="validateDelivery()">
+      
+      <svg *ngIf="!isValidating" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="9 12 11 14 15 10"></polyline>
+      </svg>
+      
+      <span *ngIf="!isValidating">Valider la livraison</span>
+      <span *ngIf="isValidating">Validation en cours...</span>
+    </button>
+  </footer>
+
+  <!-- Success Notification Overlay -->
+  <div class="success-overlay" *ngIf="validationSuccess">
+    <div class="success-card">
+      <div class="success-icon-circle">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <h3>Livraison Validée !</h3>
+      <p>La commande #AY-9482 a été livrée avec succès.</p>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <app-delivery-bottom-nav activeTab="deliveries"></app-delivery-bottom-nav>
+</div>

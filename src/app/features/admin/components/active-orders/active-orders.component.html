@@ -1,0 +1,37 @@
+<div class="active-orders-card">
+  <div class="card-header">
+    <h3 class="card-title">Commandes en cours</h3>
+    <span class="active-count-badge">{{ totalActiveCount }} actives</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>N° COMMANDE</th>
+          <th>CLIENT</th>
+          <th>RESTAURANT / VENDEUR</th>
+          <th>MONTANT</th>
+          <th class="text-right">STATUT</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of orders">
+          <td class="col-ref">{{ order.reference }}</td>
+          <td class="col-client">{{ order.customerName }}</td>
+          <td class="col-merchant">{{ order.merchantName }}</td>
+          <td class="col-amount">{{ order.amountFormatted }}</td>
+          <td class="col-status text-right">
+            <app-status-badge [label]="order.status" [color]="order.statusColor"></app-status-badge>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-footer-link">
+    <a routerLink="/admin/orders" class="link-view-all">
+      Voir toutes les commandes ({{ totalActiveCount }} en cours)
+    </a>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+<div class="pending-actions-card">
+  <div class="card-header">
+    <h3 class="card-title">À traiter</h3>
+    <p class="card-subtitle">Urgence administrative & validations clés</p>
+  </div>
+
+  <div class="actions-list">
+    <div class="action-item-card" *ngFor="let item of actions">
+      <div class="item-top-row">
+        <span class="item-type-label">
+          {{ item.type === 'VALIDATION_RESTAURANT' ? 'VALIDATION RESTAURANT' : (item.type === 'VALIDATION_COURSIER' ? 'VALIDATION COURSIER' : 'ABONNEMENTS') }}
+        </span>
+        <span class="item-badge-pill" *ngIf="item.badgeText">{{ item.badgeText }}</span>
+      </div>
+
+      <h4 class="item-title">{{ item.title }}</h4>
+      <p class="item-description">{{ item.description }}</p>
+
+      <div class="item-action-row">
+        <a 
+          [routerLink]="item.type.startsWith('VALIDATION') ? ['/admin/applications', item.targetId] : ['/admin/payments']"
+          class="btn-action-outline"
+          (click)="onAction(item)"
+        >
+          {{ item.actionButtonText }}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,60 @@
+<div class="modal-backdrop" (click)="onCancel()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <button class="btn-close" (click)="onCancel()" aria-label="Fermer">✕</button>
+
+    <div class="modal-header">
+      <div class="shield-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#E51B2A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M12 8v4"/>
+          <path d="M12 16h.01"/>
+        </svg>
+      </div>
+      <h2 class="modal-title">Double Authentification 2FA</h2>
+      <p class="modal-subtitle">
+        Saisissez le code de vérification à 6 chiffres généré par votre application Authenticator.
+      </p>
+    </div>
+
+    <div class="code-inputs" (paste)="onPaste($event)">
+      <input
+        *ngFor="let digit of digits; let i = index"
+        type="text"
+        maxLength="1"
+        pattern="[0-9]*"
+        inputmode="numeric"
+        [(ngModel)]="digits[i]"
+        (input)="onDigitInput($event, i)"
+        (keydown)="onKeyDown($event, i)"
+        class="digit-box"
+        [class.filled]="digits[i]"
+        [disabled]="isLoading"
+      />
+    </div>
+
+    <div *ngIf="errorMessage" class="error-banner">
+      <span class="error-icon">⚠️</span>
+      <span class="error-message">{{ errorMessage }}</span>
+    </div>
+
+    <div class="modal-actions">
+      <button 
+        type="button" 
+        class="btn-submit" 
+        (click)="onVerify()" 
+        [disabled]="digits.join('').length < 6 || isLoading"
+      >
+        <span *ngIf="!isLoading">Vérifier & Accéder à la Console</span>
+        <span *ngIf="isLoading" class="spinner-text">Vérification en cours...</span>
+      </button>
+
+      <button type="button" class="btn-cancel" (click)="onCancel()" [disabled]="isLoading">
+        Annuler
+      </button>
+    </div>
+
+    <p class="help-text">
+      Problème avec votre application TOTP ? Contactez l'équipe Sécurité AYYOU.
+    </p>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+<div class="page-container">
+  <app-header></app-header>
+
+  <main class="feed-content" #feedContent (scroll)="onFeedScroll()">
+    <app-food-post
+      *ngFor="let item of feedItems"
+      [feedItem]="item"
+      (orderDish)="onOrderDish($event)"
+      (quickCart)="onQuickCart($event)"
+    ></app-food-post>
+  </main>
+
+  <app-chatbot-floating></app-chatbot-floating>
+  <app-bottom-nav activeTab="home"></app-bottom-nav>
+</div>

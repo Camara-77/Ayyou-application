@@ -1,0 +1,100 @@
+.pending-actions-card {
+  .card-header {
+    margin-bottom: 20px;
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #1A1A1A;
+      margin: 0 0 4px 0;
+    }
+
+    .card-subtitle {
+      font-size: 13px;
+      color: #757575;
+      margin: 0;
+    }
+  }
+
+  .actions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .action-item-card {
+      background: #F9FAFB;
+      border-radius: 16px;
+      padding: 18px 20px;
+      border: 1px solid #F3F4F6;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #FFFFFF;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+      }
+
+      .item-top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .item-type-label {
+          font-size: 10px;
+          font-weight: 800;
+          color: #757575;
+          letter-spacing: 0.6px;
+          text-transform: uppercase;
+        }
+
+        .item-badge-pill {
+          font-size: 10px;
+          font-weight: 700;
+          color: #757575;
+        }
+      }
+
+      .item-title {
+        font-size: 15px;
+        font-weight: 800;
+        color: #1A1A1A;
+        margin: 2px 0 0 0;
+      }
+
+      .item-description {
+        font-size: 12px;
+        color: #6B7280;
+        line-height: 1.45;
+        margin: 0;
+      }
+
+      .item-action-row {
+        margin-top: 10px;
+        display: flex;
+        justify-content: flex-end;
+
+        .btn-action-outline {
+          font-size: 12px;
+          font-weight: 800;
+          color: #1A1A1A;
+          background: #FFFFFF;
+          border: 1px solid #E5E7EB;
+          padding: 8px 20px;
+          border-radius: 20px;
+          text-decoration: none;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+
+          &:hover {
+            background: #1A1A1A;
+            color: #FFFFFF;
+            border-color: #1A1A1A;
+          }
+        }
+      }
+    }
+  }
+}

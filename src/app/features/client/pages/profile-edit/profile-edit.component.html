@@ -1,0 +1,189 @@
+<div class="page-container">
+  <!-- Top Global Header -->
+  <app-header></app-header>
+
+  <main class="profile-edit-content">
+    <!-- Sub-header Row -->
+    <div class="profile-edit-page-header">
+      <a routerLink="/profile" class="btn-back-circle" aria-label="Retour au profil">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 19L8 12L15 5" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <h1 class="page-title">Modifier mon profil</h1>
+      <div class="header-spacer"></div>
+    </div>
+
+    <!-- Avatar Upload Section -->
+    <div class="avatar-edit-section">
+      <div class="avatar-container">
+        <img [src]="userProfile?.avatarUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80'" alt="Photo de profil" class="edit-avatar" />
+        <button class="camera-btn" aria-label="Changer la photo">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M23 19A2 2 0 0 1 21 21H3A2 2 0 0 1 1 19V8A2 2 0 0 1 3 6H7L9 3H15L17 6H21A2 2 0 0 1 23 8Z" fill="#E51A29" stroke="#E51A29" stroke-width="2"/>
+            <circle cx="12" cy="13" r="4" fill="#FFFFFF"/>
+          </svg>
+        </button>
+      </div>
+      <span class="avatar-hint">MODIFIER LA PHOTO DE PROFIL</span>
+    </div>
+
+    <!-- Form Fields List -->
+    <div class="form-fields-group">
+      <!-- Field 1: Nom Complet -->
+      <div class="field-card">
+        <div class="field-top-row">
+          <div class="label-group">
+            <svg class="field-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 21V19C20 16.7909 18.2091 15 16 15H8C5.79086 15 4 16.7909 4 19V21" stroke="#E51A29" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="12" cy="7" r="4" stroke="#E51A29" stroke-width="2"/>
+            </svg>
+            <span class="field-label">NOM COMPLET</span>
+          </div>
+        </div>
+        <div class="field-body-row">
+          <input type="text" class="field-input" [(ngModel)]="fullName" />
+          <svg class="action-icon-pencil" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Field 2: Numéro de téléphone -->
+      <div class="field-card">
+        <div class="field-top-row">
+          <div class="label-group">
+            <svg class="field-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="#E51A29" stroke-width="2"/>
+            </svg>
+            <span class="field-label">NUMÉRO DE TÉLÉPHONE</span>
+          </div>
+          <span class="badge-verified">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17L4 12" stroke="#2E7D32" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Vérifié
+          </span>
+        </div>
+        <div class="field-body-row">
+          <input type="text" class="field-input" [(ngModel)]="phone" />
+          <svg class="action-icon-pencil" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Field 3: Adresse e-mail -->
+      <div class="field-card">
+        <div class="field-top-row">
+          <div class="label-group">
+            <svg class="field-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="#E51A29" stroke-width="2"/>
+              <polyline points="22,6 12,13 2,6" stroke="#E51A29" stroke-width="2"/>
+            </svg>
+            <span class="field-label">ADRESSE E-MAIL</span>
+          </div>
+          <span class="badge-verified">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17L4 12" stroke="#2E7D32" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Vérifié
+          </span>
+        </div>
+        <div class="field-body-row">
+          <input type="email" class="field-input" [(ngModel)]="email" />
+          <svg class="action-icon-pencil" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Field 4: Adresse principale de livraison -->
+      <div class="field-card">
+        <div class="field-top-row">
+          <div class="label-group">
+            <svg class="field-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 21C16 16.5 19 13.2 19 9.5C19 5.6 15.9 2.5 12 2.5C8.1 2.5 5 5.6 5 9.5C5 13.2 8 16.5 12 21Z" stroke="#E51A29" stroke-width="2"/>
+              <circle cx="12" cy="9.5" r="2.5" stroke="#E51A29" stroke-width="2"/>
+            </svg>
+            <span class="field-label">ADRESSE PRINCIPALE DE LIVRAISON</span>
+          </div>
+        </div>
+        <div class="field-body-row address-row">
+          <div class="address-text-group">
+            <span class="addr-main">{{ addressMain }}</span>
+            <span class="addr-sub">{{ addressSub }}</span>
+          </div>
+          <span class="chevron">&gt;</span>
+        </div>
+      </div>
+
+      <!-- Field 5: Date de naissance -->
+      <div class="field-card">
+        <div class="field-top-row">
+          <div class="label-group">
+            <svg class="field-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="4" width="18" height="18" rx="2" stroke="#E51A29" stroke-width="2"/>
+              <line x1="16" y1="2" x2="16" y2="6" stroke="#E51A29" stroke-width="2"/>
+              <line x1="8" y1="2" x2="8" y2="6" stroke="#E51A29" stroke-width="2"/>
+              <line x1="3" y1="10" x2="21" y2="10" stroke="#E51A29" stroke-width="2"/>
+            </svg>
+            <span class="field-label">DATE DE NAISSANCE</span>
+          </div>
+          <span class="badge-optional">Optionnel</span>
+        </div>
+        <div class="field-body-row">
+          <input type="text" class="field-input" [(ngModel)]="birthDate" />
+          <svg class="action-icon-calendar" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="4" width="18" height="18" rx="2" stroke="#9CA3AF" stroke-width="2"/>
+            <line x1="16" y1="2" x2="16" y2="6" stroke="#9CA3AF" stroke-width="2"/>
+            <line x1="8" y1="2" x2="8" y2="6" stroke="#9CA3AF" stroke-width="2"/>
+            <line x1="3" y1="10" x2="21" y2="10" stroke="#9CA3AF" stroke-width="2"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Sécurité du Compte -->
+    <div class="security-section">
+      <h3 class="section-title">SÉCURITÉ DU COMPTE</h3>
+
+      <div class="security-card">
+        <div class="sec-left">
+          <div class="icon-circle-lock">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="11" width="18" height="11" rx="2" stroke="#757575" stroke-width="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#757575" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="sec-text">
+            <span class="sec-title">Mot de passe</span>
+            <span class="sec-sub">Modifié il y a 3 mois</span>
+          </div>
+        </div>
+        <span class="chevron">&gt;</span>
+      </div>
+    </div>
+
+    <!-- Primary Action Button -->
+    <button class="btn-save-primary" (click)="saveChanges()">
+      <span *ngIf="!isSavedNotification">Enregistrer les modifications</span>
+      <span *ngIf="isSavedNotification">Modifications enregistrées !</span>
+    </button>
+
+    <!-- Secondary Delete Account Link -->
+    <button class="btn-delete-account" (click)="deleteAccount()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 6H5H21" stroke="#E51A29" stroke-width="2" stroke-linecap="round"/>
+        <path d="M19 6V20C19 20.5523 18.5523 21 18 21H6C5.44772 21 5 20.5523 5 20V6M8 6V4C8 3.44772 8.44772 3 9 3H15C15.5523 3 16 3.44772 16 4V6" stroke="#E51A29" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>Supprimer mon compte</span>
+    </button>
+  </main>
+
+  <app-chatbot-floating></app-chatbot-floating>
+  <app-bottom-nav activeTab="profile"></app-bottom-nav>
+</div>

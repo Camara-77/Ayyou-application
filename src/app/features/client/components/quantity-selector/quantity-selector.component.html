@@ -1,0 +1,13 @@
+<div class="quantity-selector">
+  <button class="btn-qty btn-minus" (click)="decrement()" [disabled]="quantity <= min" aria-label="Diminuer">
+    <svg width="12" height="2" viewBox="0 0 12 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M1 1H11" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <span class="qty-display">{{ quantity }}</span>
+  <button class="btn-qty btn-plus" (click)="increment()" [disabled]="quantity >= max" aria-label="Augmenter">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 1V11M1 6H11" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+</div>

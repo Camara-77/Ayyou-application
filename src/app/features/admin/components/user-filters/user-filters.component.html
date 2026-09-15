@@ -1,0 +1,60 @@
+<div class="user-filters-row">
+  <!-- Left Pill Tabs -->
+  <div class="filter-tabs-pill">
+    <button
+      type="button"
+      class="tab-pill-btn"
+      [class.active]="activeTab === 'ALL'"
+      (click)="selectTab('ALL')"
+    >
+      Tous (24 580)
+    </button>
+
+    <button
+      type="button"
+      class="tab-pill-btn"
+      [class.active]="activeTab === 'CLIENTS'"
+      (click)="selectTab('CLIENTS')"
+    >
+      Clients (24 140)
+    </button>
+
+    <button
+      type="button"
+      class="tab-pill-btn"
+      [class.active]="activeTab === 'PROFESSIONALS'"
+      (click)="selectTab('PROFESSIONALS')"
+    >
+      Professionnels (440)
+    </button>
+
+    <button
+      type="button"
+      class="tab-pill-btn"
+      [class.active]="activeTab === 'ACTIVE'"
+      (click)="selectTab('ACTIVE')"
+    >
+      Actifs (24 395)
+    </button>
+
+    <button
+      type="button"
+      class="tab-pill-btn"
+      [class.active]="activeTab === 'DISABLED'"
+      (click)="selectTab('DISABLED')"
+    >
+      Désactivés (185)
+    </button>
+  </div>
+
+  <!-- Right Search Input -->
+  <div class="search-input-wrap">
+    <input
+      type="text"
+      class="search-field"
+      placeholder="Rechercher par nom, email, téléphone, N° de compte..."
+      [(ngModel)]="searchQuery"
+      (input)="onSearchInput()"
+    />
+  </div>
+</div>

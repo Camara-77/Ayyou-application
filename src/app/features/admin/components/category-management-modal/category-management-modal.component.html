@@ -1,0 +1,216 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="onClose()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+
+    <!-- Toast Notification Banner -->
+    <div class="toast-banner" *ngIf="toastMessage">
+      <i class="ri-checkbox-circle-fill"></i>
+      <span>{{ toastMessage }}</span>
+    </div>
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="title-with-badge">
+        <h2 class="modal-title">
+          {{ mode === 'EDIT' ? 'Modifier la catégorie' : 'Ajouter une catégorie' }}
+        </h2>
+        <span class="id-badge" *ngIf="mode === 'EDIT'">ID : {{ catCodeId }}</span>
+      </div>
+
+      <button type="button" class="btn-close-circle" (click)="onClose()" title="Fermer">✕</button>
+    </div>
+
+    <p class="modal-subtitle">
+      Définissez les informations, la taxonomie et la vignette circulaire pour l'application mobile AYYOU.
+    </p>
+
+    <!-- Modal Form Body -->
+    <div class="modal-body-scroll">
+
+      <!-- Section 1: Nom de la catégorie -->
+      <div class="form-group">
+        <div class="label-row">
+          <label class="input-label">Nom de la catégorie *</label>
+          <span class="char-count">{{ name.length }} / {{ maxNameLength }} CAR.</span>
+        </div>
+
+        <div class="input-icon-wrapper" [class.input-error]="isNameInvalid">
+          <input
+            type="text"
+            [(ngModel)]="name"
+            [maxlength]="maxNameLength"
+            placeholder="Thiéboudienne"
+            (blur)="onNameBlur()"
+            class="input-field"
+          />
+          <span class="utensil-icon">🍴</span>
+        </div>
+
+        <span class="error-msg" *ngIf="isNameInvalid">
+          Le nom de la catégorie est obligatoire.
+        </span>
+
+        <span class="helper-text">
+          Nom affiché sous la vignette dans l'app mobile client et dans les filtres du catalogue.
+        </span>
+      </div>
+
+      <!-- Section 2: Type de catégorie -->
+      <div class="form-group mt-16">
+        <label class="input-label">Type de catégorie *</label>
+        <div class="type-pills-grid">
+          <button
+            type="button"
+            *ngFor="let t of availableTypes"
+            class="type-pill-btn"
+            [class.active]="type === t.key"
+            (click)="selectType(t.key)"
+          >
+            {{ t.label }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 3: Catégorie parente -->
+      <div class="form-group mt-16">
+        <label class="input-label">Catégorie parente <span class="text-muted">(Facultatif)</span></label>
+        <div class="select-wrapper">
+          <select [(ngModel)]="parentCategoryId" class="select-field">
+            <option value="">Aucune (Catégorie Principale)</option>
+            <option *ngFor="let opt of parentCategoryOptions" [value]="opt.id">
+              {{ opt.name }}
+            </option>
+          </select>
+          <span class="select-arrow">▾</span>
+        </div>
+        <span class="helper-text">
+          Permet de regrouper cette catégorie dans les filtres avancés du catalogue.
+        </span>
+      </div>
+
+      <!-- Section 4: Image de la catégorie -->
+      <div class="form-group mt-16">
+        <div class="label-row">
+          <label class="input-label">Image de la catégorie *</label>
+          <span class="tag-label">VIGNETTE MOBILE AYYOU</span>
+        </div>
+
+        <div class="image-upload-box">
+          <!-- Left Avatar Circle Preview -->
+          <div class="preview-circle-wrap">
+            <div class="avatar-ring">
+              <img [src]="imageUrl" [alt]="name" class="circle-img" />
+              <span class="check-badge">✓</span>
+            </div>
+            <span class="circle-label-name">{{ nameUppercaseLabel }}</span>
+          </div>
+
+          <!-- Right Upload Dropzone -->
+          <div class="dropzone-box">
+            <div class="drop-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E51B2A" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+            </div>
+
+            <div class="drop-info">
+              <span class="drop-title">Glissez-déposez une image ici</span>
+              <span class="drop-specs">Carré 1:1, min. 400×400px • PNG, WebP ou JPG (Max 3 Mo)</span>
+              <span class="file-name-label">Fichier : <strong>{{ fileName }}</strong></span>
+            </div>
+
+            <input
+              type="file"
+              #fileInput
+              accept="image/png, image/jpeg, image/webp"
+              (change)="onReplaceImage($event)"
+              style="display: none;"
+            />
+            <button
+              type="button"
+              class="btn-replace-file"
+              (click)="fileInput.click()"
+            >
+              🔄 Remplacer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 5: Aperçu mobile en direct -->
+      <div class="mobile-preview-rail mt-16">
+        <span class="rail-title">📱 Aperçu en direct dans le rail de découverte mobile :</span>
+        <div class="mobile-chip">
+          <img [src]="imageUrl" class="chip-img" />
+          <span class="chip-name">{{ name || 'Thiéboudienne' }}</span>
+        </div>
+      </div>
+
+      <!-- Section 6: Statut d'activation -->
+      <div class="status-activation-card mt-16">
+        <div class="status-left">
+          <div class="eye-icon-bg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51B2A" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+          <div class="status-texts">
+            <span class="st-title">Statut d'activation</span>
+            <span class="st-sub">Visible immédiatement par les clients sur l'application mobile AYYOU.</span>
+          </div>
+        </div>
+
+        <label class="toggle-switch">
+          <input type="checkbox" [(ngModel)]="isActive" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+    </div>
+
+    <!-- Modal Footer Actions -->
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn-delete-link"
+        *ngIf="mode === 'EDIT'"
+        (click)="onConfirmDelete()"
+      >
+        🗑️ Supprimer cette catégorie
+      </button>
+
+      <div class="right-actions">
+        <button type="button" class="btn-cancel" (click)="onClose()">
+          Annuler
+        </button>
+
+        <button
+          type="button"
+          class="btn-save-red"
+          [disabled]="isSaving"
+          (click)="onSubmitSave()"
+        >
+          <i class="ri-save-line" *ngIf="mode === 'EDIT'"></i>
+          <span>{{ mode === 'EDIT' ? '💾 Enregistrer les modifications' : 'Ajouter la catégorie' }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal Overlay -->
+    <div class="delete-confirm-overlay" *ngIf="showDeleteConfirm" (click)="onCancelDelete()">
+      <div class="confirm-box" (click)="$event.stopPropagation()">
+        <h4 class="confirm-title">Supprimer la catégorie ?</h4>
+        <p class="confirm-msg">
+          Cette action peut affecter les articles ou établissements associés à cette catégorie.
+        </p>
+        <div class="confirm-actions">
+          <button type="button" class="btn-cancel-sm" (click)="onCancelDelete()">Annuler</button>
+          <button type="button" class="btn-danger-sm" (click)="onExecuteDelete()">Supprimer</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,12 @@
+<div class="stat-card">
+  <span class="card-title">{{ card.title }}</span>
+  <div class="card-value-row">
+    <span class="card-value">{{ card.value }}</span>
+  </div>
+  <div class="card-sub-row" *ngIf="card.subtext">
+    <span class="dot-indicator" *ngIf="card.dotColor" [style.background-color]="card.dotColor"></span>
+    <span class="card-subtext" [class.text-red]="card.statusColor === 'negative'" [class.text-green]="card.statusColor === 'positive'">
+      {{ card.subtext }}
+    </span>
+  </div>
+</div>

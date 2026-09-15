@@ -1,0 +1,83 @@
+<article class="food-post" *ngIf="feedItem">
+  <div class="post-media-wrapper" (click)="onMediaTap($event)">
+    <!-- Media: Single Image, Video, or Multi-Image Horizontal Scroll -->
+    <ng-container [ngSwitch]="feedItem.mediaType">
+      <!-- Video Media (Supports up to 3 minutes duration, tap to pause/play) -->
+      <video
+        #videoElement
+        *ngSwitchCase="'video'"
+        [src]="feedItem.mediaUrl"
+        class="post-media-content"
+        muted
+        loop
+        playsinline
+      ></video>
+
+      <!-- Multi-Image or Single Image -->
+      <ng-container *ngSwitchCase="'image'">
+        <div class="media-carousel" *ngIf="mediaList && mediaList.length > 1; else singleImg">
+          <div class="carousel-track">
+            <img
+              *ngFor="let imgUrl of mediaList"
+              [src]="imgUrl"
+              [alt]="feedItem.dish.name"
+              class="post-media-content carousel-item"
+            />
+          </div>
+        </div>
+
+        <ng-template #singleImg>
+          <img
+            [src]="feedItem.mediaUrl"
+            [alt]="feedItem.dish.name"
+            class="post-media-content"
+          />
+        </ng-template>
+      </ng-container>
+    </ng-container>
+
+    <!-- Top-Center Restaurant Profile Header (Centred Avatar + Name Below) -->
+    <a [routerLink]="['/restaurant', feedItem.restaurant.id]" class="restaurant-top-overlay" (click)="$event.stopPropagation()">
+      <img [src]="feedItem.restaurant.avatarUrl" [alt]="feedItem.restaurant.name" class="restaurant-avatar" />
+      <span class="restaurant-name">{{ feedItem.restaurant.name }}</span>
+    </a>
+
+    <!-- Right Column Interactions (Heart 1.2k, Share Partager) -->
+    <div class="interactions-overlay" (click)="$event.stopPropagation()">
+      <app-food-interaction
+        [likesCount]="feedItem.likesCount"
+        [isLiked]="feedItem.isLiked || false"
+        [sharesCount]="feedItem.sharesCount"
+        [dishTitle]="feedItem.dish.name"
+        [restaurantName]="feedItem.restaurant.name"
+        (likeToggle)="onLikeToggle($event)"
+      ></app-food-interaction>
+    </div>
+
+    <!-- Bottom Overlay Content -->
+    <div class="bottom-overlay" (click)="$event.stopPropagation()">
+      <div class="dish-details" (click)="onDishClick($event)" style="cursor: pointer;">
+        <h2 class="dish-title">{{ feedItem.dish.name }}</h2>
+        <p class="dish-description" *ngIf="feedItem.dish.description">{{ feedItem.dish.description }}</p>
+        <span class="dish-price">{{ formatPrice(feedItem.dish.price) }}</span>
+
+        <div class="action-row">
+          <app-order-button
+            label="Commander"
+            size="medium"
+            (orderClick)="onOrder($event)"
+          ></app-order-button>
+
+          <button class="btn-quick-cart" (click)="onQuickCart($event)" aria-label="Ajout rapide au panier">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 3.5h3.2l2.4 10.4a1 1 0 0 0 1 .8h10.8a1 1 0 0 0 1-.8L22 7H7.5" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M14 7.5v5M11.5 10h5" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
+              <circle cx="9.5" cy="19.5" r="1.8" fill="#FFFFFF"/>
+              <circle cx="17.5" cy="19.5" r="1.8" fill="#FFFFFF"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>

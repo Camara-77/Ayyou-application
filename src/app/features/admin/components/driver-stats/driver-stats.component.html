@@ -1,0 +1,57 @@
+<div class="driver-stats-grid">
+  <!-- Card 1 -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">LIVREURS CONNECTÉS</span>
+      <span class="dot-indicator red-dot"></span>
+    </div>
+    <span class="card-value">{{ stats?.connectedCount || 148 }}</span>
+    <span class="card-subtext text-red">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+        <polyline points="17 6 23 6 23 12"/>
+      </svg>
+      {{ stats?.connectedSubtext || 'En heure de pointe' }}
+    </span>
+  </div>
+
+  <!-- Card 2 -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">DISPONIBLES</span>
+      <span class="dot-indicator green-dot"></span>
+    </div>
+    <span class="card-value">{{ stats?.availableCount || 52 }}</span>
+    <span class="card-subtext text-gray">{{ stats?.availableSubtext || 'En attente d\'assignation' }}</span>
+  </div>
+
+  <!-- Card 3 -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">EN LIVRAISON</span>
+      <span class="dot-indicator blue-dot"></span>
+    </div>
+    <span class="card-value">{{ stats?.deliveringCount || 96 }}</span>
+    <span class="card-subtext text-gray">{{ stats?.deliveringSubtext || 'Courses en cours' }}</span>
+  </div>
+
+  <!-- Card 4 -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">HORS LIGNE</span>
+      <span class="dot-indicator gray-dot"></span>
+    </div>
+    <span class="card-value">{{ stats?.offlineCount || 42 }}</span>
+    <span class="card-subtext text-gray">{{ stats?.offlineSubtext || 'Inactifs ou repos' }}</span>
+  </div>
+
+  <!-- Card 5 -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">CANDIDATURES</span>
+      <span class="dot-indicator orange-dot"></span>
+    </div>
+    <span class="card-value text-orange">{{ stats?.applicationsCount || 6 }}</span>
+    <span class="card-subtext text-gray">{{ stats?.applicationsSubtext || 'Dossiers à vérifier' }}</span>
+  </div>
+</div>

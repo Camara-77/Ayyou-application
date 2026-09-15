@@ -1,0 +1,24 @@
+<div class="admin-layout-wrapper">
+  <!-- Persistent Sidebar -->
+  <app-admin-sidebar
+    [isOpenMobile]="isMobileSidebarOpen"
+    (closeMobile)="closeMobileSidebar()"
+    (logout)="onLogout()"
+  ></app-admin-sidebar>
+
+  <!-- Mobile Overlay Backdrop -->
+  <div 
+    class="sidebar-overlay" 
+    *ngIf="isMobileSidebarOpen" 
+    (click)="closeMobileSidebar()"
+  ></div>
+
+  <!-- Main Content Column -->
+  <div class="admin-main-container">
+    <app-admin-header (toggleMobileMenu)="toggleMobileSidebar()"></app-admin-header>
+
+    <main class="admin-page-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,70 @@
+<div class="orders-stats-grid" *ngIf="stats">
+  <!-- Card 1: Commandes du jour -->
+  <div
+    class="stat-card"
+    [class.active-card]="selectedTab === 'ALL'"
+    (click)="onCardClick('ALL')"
+  >
+    <div class="card-title-row">
+      <span class="card-title">COMMANDES DU JOUR</span>
+    </div>
+    <div class="card-value">{{ stats.todayCount }}</div>
+    <div class="card-subtext">{{ stats.todayVolumeFormatted }}</div>
+  </div>
+
+  <!-- Card 2: En préparation -->
+  <div
+    class="stat-card"
+    [class.active-card]="selectedTab === 'A_PREPARER'"
+    (click)="onCardClick('A_PREPARER')"
+  >
+    <div class="card-title-row">
+      <span class="card-title">EN PRÉPARATION</span>
+      <span class="dot-indicator orange-dot"></span>
+    </div>
+    <div class="card-value">{{ stats.preparingCount }}</div>
+    <div class="card-subtext">Chez les restaurateurs</div>
+  </div>
+
+  <!-- Card 3: En livraison -->
+  <div
+    class="stat-card"
+    [class.active-card]="selectedTab === 'EN_LIVRAISON'"
+    (click)="onCardClick('EN_LIVRAISON')"
+  >
+    <div class="card-title-row">
+      <span class="card-title">EN LIVRAISON</span>
+      <span class="dot-indicator blue-dot"></span>
+    </div>
+    <div class="card-value">{{ stats.deliveringCount }}</div>
+    <div class="card-subtext">Sur la route avec coursiers</div>
+  </div>
+
+  <!-- Card 4: Livrées avec succès -->
+  <div
+    class="stat-card"
+    [class.active-card]="selectedTab === 'LIVREES'"
+    (click)="onCardClick('LIVREES')"
+  >
+    <div class="card-title-row">
+      <span class="card-title">LIVRÉES AVEC SUCCÈS</span>
+      <span class="dot-indicator green-dot"></span>
+    </div>
+    <div class="card-value">{{ stats.deliveredCount }}</div>
+    <div class="card-subtext">Taux de réussite: {{ stats.deliveredSuccessRate }}</div>
+  </div>
+
+  <!-- Card 5: Annulées / Litiges -->
+  <div
+    class="stat-card"
+    [class.active-card]="selectedTab === 'ANNULEES'"
+    (click)="onCardClick('ANNULEES')"
+  >
+    <div class="card-title-row">
+      <span class="card-title">ANNULÉES / LITIGES</span>
+      <span class="dot-indicator red-dot"></span>
+    </div>
+    <div class="card-value">{{ stats.canceledCount }}</div>
+    <div class="card-subtext">{{ stats.canceledAuditRate }}</div>
+  </div>
+</div>

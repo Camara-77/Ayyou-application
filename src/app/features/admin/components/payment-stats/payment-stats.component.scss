@@ -1,0 +1,91 @@
+.payment-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat-card {
+  background: #FFFFFF;
+  border: 1px solid #F3F4F6;
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+
+  .card-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: #757575;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 8px;
+
+    .stat-number {
+      font-size: 22px;
+      font-weight: 800;
+      color: #1A1A1A;
+      letter-spacing: -0.5px;
+    }
+
+    .currency-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: #757575;
+    }
+  }
+
+  .badge-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .trend-badge {
+      font-size: 11px;
+      font-weight: 800;
+      color: #16A34A;
+    }
+
+    .dot-indicator {
+      font-size: 10px;
+
+      &.green-dot { color: #16A34A; }
+      &.orange-dot { color: #EA580C; }
+    }
+
+    .sub-text {
+      font-size: 11px;
+      color: #757575;
+      font-weight: 500;
+    }
+
+    &.text-green .sub-text {
+      color: #757575;
+    }
+
+    &.text-orange .sub-text {
+      color: #EA580C;
+      font-weight: 700;
+    }
+  }
+}

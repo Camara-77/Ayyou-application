@@ -1,0 +1,173 @@
+:host {
+  display: block;
+
+  @media (min-width: 992px) {
+    width: 250px;
+    flex-shrink: 0;
+  }
+}
+
+.admin-sidebar {
+  width: 250px;
+  background: #FFFFFF;
+  border-right: 1px solid #EFEFEF;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1100;
+  padding: 24px 16px;
+  box-sizing: border-box;
+
+  @media (max-width: 991px) {
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+
+    &.open-mobile {
+      transform: translateX(0);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 0 8px;
+
+    .brand-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      .logo-text {
+        font-size: 22px;
+        font-weight: 800;
+        color: #1A1A1A;
+        letter-spacing: -0.5px;
+      }
+
+      .badge-pro {
+        background: #E51B2A;
+        color: #FFFFFF;
+        font-size: 10px;
+        font-weight: 800;
+        padding: 2px 7px;
+        border-radius: 6px;
+      }
+    }
+
+    .badge-admin {
+      font-size: 9px;
+      font-weight: 800;
+      color: #757575;
+      letter-spacing: 0.8px;
+    }
+  }
+
+  .platform-location-tag {
+    font-size: 9px;
+    font-weight: 800;
+    color: #757575;
+    letter-spacing: 0.6px;
+    padding: 0 8px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    overflow-y: auto;
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      text-decoration: none;
+      padding: 12px 14px;
+      border-radius: 12px;
+      transition: all 0.15s ease;
+
+      svg {
+        color: #757575;
+        transition: color 0.15s ease;
+      }
+
+      &:hover {
+        background: #F8F9FA;
+        color: #E51B2A;
+
+        svg {
+          color: #E51B2A;
+        }
+      }
+
+      &.active {
+        background: #E51B2A;
+        color: #FFFFFF;
+        font-weight: 800;
+
+        svg {
+          color: #FFFFFF;
+        }
+      }
+    }
+  }
+
+  .sidebar-profile-box {
+    border-top: 1px solid #F3F4F6;
+    padding-top: 16px;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .profile-info {
+      padding: 0 8px;
+
+      .admin-name {
+        font-size: 14px;
+        font-weight: 800;
+        color: #1A1A1A;
+        display: block;
+      }
+
+      .admin-role {
+        font-size: 11px;
+        color: #757575;
+        display: block;
+      }
+    }
+
+    .btn-logout-gray {
+      background: #F8F9FA;
+      border: 1px solid #E5E7EB;
+      color: #374151;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+
+      &:hover {
+        background: #FFF1F2;
+        color: #E51B2A;
+        border-color: #FECDD3;
+      }
+    }
+  }
+}

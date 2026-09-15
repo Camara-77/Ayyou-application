@@ -1,0 +1,261 @@
+<div class="page-container">
+  <!-- Top Global Header -->
+  <app-header></app-header>
+
+  <!-- Success Modal Overlay matching media_1789289604565.png -->
+  <div class="modal-overlay" *ngIf="paymentSuccess">
+    <div class="success-modal">
+      <button class="btn-close-modal" (click)="closeModal()" aria-label="Fermer">✕</button>
+
+      <!-- Top Green Checkmark Circle -->
+      <div class="success-icon-wrapper">
+        <div class="success-icon-inner">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 6L9 17L4 12" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Payment Method Verified Pill -->
+      <div class="payment-badge-pill">
+        <span class="pill-text">Paiement {{ selectedPaymentId === 'wave' ? 'Wave' : 'Orange Money' }} validé</span>
+      </div>
+
+      <!-- Title & Subtitle -->
+      <h3 class="modal-title">Paiement validé avec succès !</h3>
+      <p class="modal-subtitle">
+        Votre commande a bien été enregistrée et transmise en cuisine chez <strong>{{ restaurant?.name || 'Chez Loutcha' }}</strong>.
+      </p>
+
+      <!-- Details Summary Card -->
+      <div class="summary-details-card">
+        <div class="summary-row">
+          <span class="sum-label">Référence commande</span>
+          <strong class="sum-val ref-code">#AY-9482</strong>
+        </div>
+
+        <div class="summary-row">
+          <span class="sum-label">Moyen de règlement</span>
+          <span class="pay-method-tag">
+            <span class="method-name">{{ selectedPaymentId === 'wave' ? 'Wave Sénégal' : 'Orange Money' }}</span>
+          </span>
+        </div>
+
+        <div class="summary-row">
+          <span class="sum-label">Montant total payé</span>
+          <strong class="sum-val red-price">11 500 FCFA</strong>
+        </div>
+      </div>
+
+      <!-- Delivery ETA Row -->
+      <div class="eta-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="9" stroke="#10B981" stroke-width="2"/>
+          <path d="M12 7V12L15 15" stroke="#10B981" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>Livraison estimée : <strong>25 – 35 min</strong></span>
+      </div>
+
+      <!-- Action Buttons -->
+      <button class="btn-track-order" (click)="trackOrder()">
+        Suivre ma commande &rarr;
+      </button>
+
+      <button class="btn-view-receipt" (click)="viewInvoice()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14 2V8H20" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="16" y1="13" x2="8" y2="13" stroke="#374151" stroke-width="2" stroke-linecap="round"/>
+          <line x1="16" y1="17" x2="8" y2="17" stroke="#374151" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Voir ma facture & reçu
+      </button>
+    </div>
+  </div>
+
+  <main class="checkout-content">
+    <!-- Page Header Row: Back button + Centered Title -->
+    <div class="checkout-page-header">
+      <a routerLink="/cart" class="btn-back-circle" aria-label="Retour au panier">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 19L8 12L15 5" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <h1 class="page-title">Récapitulatif de la commande</h1>
+      <div class="header-spacer"></div>
+    </div>
+
+    <!-- Search Bar in /checkout -->
+    <div class="checkout-search-container">
+      <div class="search-input-wrapper">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="11" cy="11" r="7" stroke="#757575" stroke-width="2"/>
+          <path d="M20 20L16 16" stroke="#757575" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input
+          #addrInput
+          type="text"
+          class="search-input"
+          placeholder="Rechercher une adresse de livraison..."
+          [(ngModel)]="addressQuery"
+          (input)="onAddressSearchInput()"
+          (focus)="onAddressSearchInput()"
+        />
+      </div>
+
+      <!-- Address Suggestions Dropdown -->
+      <div class="address-suggestions-dropdown" *ngIf="showAddressSuggestions && placePredictions.length > 0">
+        <div
+          class="suggestion-item"
+          *ngFor="let pred of placePredictions"
+          (click)="selectPrediction(pred)"
+        >
+          <div class="addr-text-group">
+            <span class="addr-main">{{ pred.mainText }}</span>
+            <span class="addr-sub">{{ pred.secondaryText }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivery Address Card -->
+    <div class="section-card delivery-card">
+      <div class="delivery-header-row">
+        <div class="pin-badge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" fill="#FFEAEA"/>
+            <path d="M12 17C14.5 13.8 17 11.2 17 8.5C17 5.74 14.76 3.5 12 3.5C9.24 3.5 7 5.74 7 8.5C7 11.2 9.5 13.8 12 17Z" fill="#E51A29"/>
+            <circle cx="12" cy="8.5" r="2.5" fill="#FFFFFF"/>
+          </svg>
+        </div>
+        <div class="delivery-text-group">
+          <span class="delivery-label">ADRESSE DE LIVRAISON</span>
+          <h4 class="delivery-address-main">{{ deliveryAddressMain }}</h4>
+          <span class="delivery-address-sub">{{ deliveryAddressSub }}</span>
+        </div>
+        <button class="btn-modify-link" (click)="addrInput.focus()">Modifier</button>
+      </div>
+    </div>
+
+    <!-- Ordered Items Section -->
+    <div class="section-card items-card">
+      <div class="items-header-row">
+        <h4 class="card-title">ARTICLES COMMANDÉS</h4>
+        <span class="count-badge">{{ cartItems.length }}</span>
+      </div>
+
+      <div class="items-list">
+        <div class="checkout-item-card" *ngFor="let item of cartItems">
+          <div class="item-top-row">
+            <img [src]="item.dish.imageUrl" [alt]="item.dish.name" class="item-thumb" />
+            <div class="item-info">
+              <div class="title-price-row">
+                <h5 class="dish-name">{{ item.dish.name }}</h5>
+                <span class="dish-price">{{ formatPrice(item.dish.price) }}</span>
+              </div>
+              <p class="dish-desc" *ngIf="item.dish.description">{{ item.dish.description }}</p>
+
+              <div class="item-bottom-row">
+                <span class="qty-label">Quantité : {{ item.quantity }}</span>
+                <app-quantity-selector
+                  [quantity]="item.quantity"
+                  (quantityChange)="updateQuantity(item.dish.id, $event)"
+                ></app-quantity-selector>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Banner -->
+    <div class="security-banner">
+      <span class="shield-icon">🛡️</span>
+      <span class="security-text">Paiement 100% sécurisé et chiffré</span>
+    </div>
+
+    <!-- Billing Breakdown Card -->
+    <div class="section-card billing-card">
+      <h4 class="billing-header-title">DÉTAIL DE LA FACTURATION</h4>
+      <div class="bill-row">
+        <span>Sous-total des plats</span>
+        <span class="val">{{ formatPrice(cartService.getSubtotal()) }}</span>
+      </div>
+      <div class="bill-row">
+        <span>Livraison standard (Plateau)</span>
+        <span class="val">{{ formatPrice(cartService.getDeliveryFee()) }}</span>
+      </div>
+      <div class="bill-divider"></div>
+      <div class="bill-row bill-total">
+        <div class="total-label-group">
+          <span class="total-title">Total à payer</span>
+          <span class="tax-note">Toutes taxes et livraison incluses</span>
+        </div>
+        <span class="val highlight">{{ formatPrice(cartService.getTotal()) }}</span>
+      </div>
+    </div>
+
+    <!-- Payment Methods Selector -->
+    <div class="payment-section">
+      <h4 class="payment-header-title">MÉTHODE DE PAIEMENT</h4>
+      <div class="payment-options">
+        <!-- Wave -->
+        <div
+          class="payment-option"
+          [class.active]="selectedPaymentId === 'wave'"
+          (click)="selectPaymentMethod('wave')"
+        >
+          <div class="payment-logo wave-logo">
+            <div class="wave-icon-box">
+              <span class="wave-w">W</span>
+            </div>
+            <div class="pay-text">
+              <span class="pay-name">Wave</span>
+              <span class="pay-sub">Paiement instantané mobile</span>
+            </div>
+          </div>
+          <div class="radio-circle">
+            <div class="radio-inner" *ngIf="selectedPaymentId === 'wave'"></div>
+          </div>
+        </div>
+
+        <!-- Orange Money -->
+        <div
+          class="payment-option"
+          [class.active]="selectedPaymentId === 'orange_money'"
+          (click)="selectPaymentMethod('orange_money')"
+        >
+          <div class="payment-logo om-logo">
+            <div class="om-icon-box">
+              <span class="om-text">OM</span>
+            </div>
+            <div class="pay-text">
+              <span class="pay-name">Orange Money</span>
+              <span class="pay-sub">Paiement sécurisé par code secret</span>
+            </div>
+          </div>
+          <div class="radio-circle">
+            <div class="radio-inner" *ngIf="selectedPaymentId === 'orange_money'"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Sticky Bottom Payment Action CTA -->
+  <div class="sticky-checkout-bar">
+    <button
+      class="btn-pay-now"
+      (click)="confirmPayment()"
+      [disabled]="isProcessingPayment || cartItems.length === 0 || !selectedPaymentId"
+    >
+      <span *ngIf="!isProcessingPayment">Payer {{ formatPrice(cartService.getTotal()) }} &rarr;</span>
+      <span *ngIf="isProcessingPayment">Traitement en cours...</span>
+    </button>
+    <button class="btn-cancel-order" (click)="cancelOrder()">
+      Annuler la commande
+    </button>
+  </div>
+
+  <app-chatbot-floating></app-chatbot-floating>
+</div>

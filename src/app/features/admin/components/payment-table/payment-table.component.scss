@@ -1,0 +1,228 @@
+.payment-table-card {
+  background: #FFFFFF;
+  border: 1px solid #F3F4F6;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .ayyou-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+
+    thead {
+      background: #FAFAFA;
+      border-bottom: 1px solid #F3F4F6;
+
+      th {
+        padding: 14px 18px;
+        font-size: 10px;
+        font-weight: 800;
+        color: #757575;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid #F9FAFB;
+        cursor: pointer;
+        transition: background 0.15s ease;
+
+        &:hover {
+          background: #F9FAFB;
+        }
+
+        &.selected-row {
+          background: #F3F4F6;
+        }
+
+        td {
+          padding: 14px 18px;
+          vertical-align: middle;
+        }
+      }
+
+      /* Col ID & Date */
+      .col-id-date {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        .payment-ref {
+          font-size: 14px;
+          font-weight: 800;
+          color: #1A1A1A;
+        }
+
+        .payment-date {
+          font-size: 11px;
+          color: #757575;
+          font-weight: 500;
+        }
+      }
+
+      /* Col Beneficiary */
+      .col-beneficiary {
+        .beneficiary-cell {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+
+          .avatar-circle {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #F3F4F6;
+            color: #1A1A1A;
+            font-size: 13px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            &.avatar-cl { background: #FCE8E6; color: #E51B2A; }
+            &.avatar-bb { background: #E5E7EB; color: #1A1A1A; }
+            &.avatar-is { background: #E0E7FF; color: #3730A3; }
+            &.avatar-tp { background: #F3F4F6; color: #4B5563; }
+            &.avatar-lt { background: #FEE2E2; color: #DC2626; }
+          }
+
+          .beneficiary-info {
+            display: flex;
+            flex-direction: column;
+
+            .name {
+              font-size: 13px;
+              font-weight: 800;
+              color: #1A1A1A;
+            }
+
+            .sub {
+              font-size: 11px;
+              color: #757575;
+              font-weight: 500;
+            }
+          }
+        }
+      }
+
+      /* Col Operation */
+      .col-operation {
+        .operation-text {
+          font-size: 13px;
+          font-weight: 600;
+          color: #1A1A1A;
+        }
+      }
+
+      /* Col Amount */
+      .col-amount {
+        .amount-val {
+          font-size: 14px;
+          font-weight: 800;
+          color: #1A1A1A;
+        }
+      }
+
+      /* Col Channel */
+      .col-channel {
+        .channel-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 12px;
+          font-weight: 700;
+          color: #1A1A1A;
+
+          .channel-dot {
+            font-size: 10px;
+
+            &.dot-blue { color: #00A3E0; }
+            &.dot-orange { color: #FF6600; }
+            &.dot-gray { color: #6B7280; }
+          }
+        }
+      }
+
+      .empty-cell {
+        text-align: center;
+        padding: 32px;
+        color: #757575;
+        font-size: 13px;
+      }
+    }
+  }
+
+  /* Footer Pagination */
+  .table-pagination-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    border-top: 1px solid #F3F4F6;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .pagination-info {
+      font-size: 12px;
+      color: #757575;
+      font-weight: 500;
+    }
+
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      .page-nav-btn,
+      .page-num-btn {
+        min-width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: 1px solid #E5E7EB;
+        background: #FFFFFF;
+        color: #1A1A1A;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s ease;
+
+        &:hover:not(:disabled) {
+          background: #F3F4F6;
+        }
+
+        &.active {
+          background: #E51B2A;
+          color: #FFFFFF;
+          border-color: #E51B2A;
+        }
+
+        &:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+      }
+
+      .page-ellipsis {
+        font-size: 12px;
+        color: #757575;
+        padding: 0 4px;
+      }
+    }
+  }
+}

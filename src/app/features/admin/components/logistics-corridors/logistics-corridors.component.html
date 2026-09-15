@@ -1,0 +1,27 @@
+<div class="corridors-card">
+  <div class="card-header-row">
+    <div class="title-with-dot">
+      <span class="red-dot">●</span>
+      <h3 class="section-title">Pression logistique par corridor Dakar</h3>
+    </div>
+    <span class="live-update-text">MISE À JOUR TEMPS RÉEL</span>
+  </div>
+
+  <div class="corridors-grid">
+    <div *ngFor="let c of corridors" class="corridor-box">
+      <div class="corridor-top-row">
+        <span class="corridor-name">{{ c.name }}</span>
+        <span class="deliveries-badge"><strong>{{ c.deliveriesCount }}</strong> livraisons</span>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="progress-track">
+        <div class="progress-fill" [style.width.%]="c.deliveriesCount * 3"></div>
+      </div>
+
+      <div class="corridor-bottom-row">
+        <span class="avg-time-text">Temps moyen coursier: {{ c.averageTimeMinutes }} min</span>
+      </div>
+    </div>
+  </div>
+</div>

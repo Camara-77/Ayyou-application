@@ -1,0 +1,58 @@
+<div class="payments-page-container">
+  <!-- Header Breadcrumb & Title Section -->
+  <div class="page-title-wrap">
+    <h1 class="main-title">Paiements & Abonnements</h1>
+    <p class="subtitle">
+      Supervision des flux de trésorerie, règlements marchands & livreurs (Wave, Orange Money), gestion des souscriptions aux forfaits AYYOU Pro (0% de commission).
+    </p>
+  </div>
+
+  <!-- Stats KPI Grid -->
+  <div class="mt-20">
+    <app-payment-stats
+      *ngIf="statsSummary$ | async as stats"
+      [stats]="stats"
+      [selectedTab]="(activeTab$ | async) || 'ALL'"
+      (selectTab)="onTabChange($event)"
+    ></app-payment-stats>
+  </div>
+
+  <!-- Filter Pills + Search Row -->
+  <div class="mt-24">
+    <app-payment-filters
+      [selectedTab]="(activeTab$ | async) || 'ALL'"
+      [totalCount]="1840"
+      [subscriptionsCount]="127"
+      [restaurantsCount]="780"
+      [couriersCount]="910"
+      [disputesCount]="23"
+      (tabChange)="onTabChange($event)"
+      (searchChange)="onSearchChange($event)"
+      (methodChange)="onMethodChange($event)"
+      (periodChange)="onPeriodChange($event)"
+      (statusChange)="onStatusChange($event)"
+    ></app-payment-filters>
+  </div>
+
+  <!-- Main Grid (2/3 Table on Left, 1/3 Details Panel on Right) -->
+  <div class="payments-main-grid mt-24">
+    <div class="table-column">
+      <app-payment-table
+        *ngIf="payments$ | async as payments"
+        [payments]="payments"
+        [selectedPayment]="selectedPayment$ | async"
+        (selectPayment)="onSelectPayment($event)"
+      ></app-payment-table>
+    </div>
+
+    <!-- Right Side Details Column -->
+    <div class="details-column" *ngIf="selectedPayment$ | async as selectedPayment">
+      <app-payment-details-panel
+        [payment]="selectedPayment"
+        (closePanel)="onClosePanel()"
+        (verifyPayment)="onVerifyPayment($event)"
+        (reminderPartner)="onReminderPartner($event)"
+      ></app-payment-details-panel>
+    </div>
+  </div>
+</div>

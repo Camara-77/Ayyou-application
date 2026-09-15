@@ -1,0 +1,121 @@
+.pro-header {
+  height: 60px;
+  background: #ffffff;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #EFEFEF;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .btn-back-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 1px solid #EFEFEF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    .pro-identity-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .pro-avatar-circle {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 1px solid #EFEFEF;
+
+        .avatar-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+
+      .pro-name-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        .pro-name {
+          font-size: 15px;
+          font-weight: 800;
+          color: #1A1A1A;
+          margin: 0;
+        }
+
+        .status-badge-green {
+          font-size: 11px;
+          font-weight: 800;
+          color: #2E7D32;
+        }
+
+        .status-badge-red {
+          font-size: 11px;
+          font-weight: 800;
+          color: #E51A29;
+        }
+      }
+    }
+  }
+
+  .header-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    .page-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1A1A1A;
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1A1A1A;
+      line-height: 1.1;
+    }
+  }
+
+  .header-right {
+    .btn-bell-circle {
+      position: relative;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 1px solid #EFEFEF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+
+      .notif-badge-dot {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #E51A29;
+        border: 1.5px solid #FFFFFF;
+      }
+    }
+  }
+}

@@ -1,0 +1,79 @@
+<div class="page-container">
+  <!-- Top Global Header -->
+  <app-header></app-header>
+
+  <main class="history-content">
+    <!-- Sub-header Row -->
+    <div class="history-page-header">
+      <a routerLink="/profile" class="btn-back-circle" aria-label="Retour">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 19L8 12L15 5" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <h1 class="page-title">Historique des commandes</h1>
+      <div class="header-spacer"></div>
+    </div>
+
+    <!-- Orders Cards List -->
+    <div class="orders-list">
+      <div class="order-card" *ngFor="let order of orders">
+        <!-- Card Header Row -->
+        <div class="order-card-header">
+          <div class="restaurant-group">
+            <div class="icon-circle" [class.food-bg]="order.restaurantIconType === 'food'" [class.store-bg]="order.restaurantIconType === 'store'">
+              <!-- Fork icon for food -->
+              <svg *ngIf="order.restaurantIconType === 'food'" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 3V11M9 3V11M6 11C6 12.6569 7.34315 14 9 14V21M15 3V21M15 3C17.5 3 19 4.5 19 7C19 9.5 17.5 11 15 11" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <!-- Store icon for store -->
+              <svg *ngIf="order.restaurantIconType === 'store'" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 9L4.5 4H19.5L21 9M3 9V20C3 20.5523 3.44772 21 4 21H20C20.5523 21 21 20.5523 21 20V9M3 9H21" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="restaurant-text">
+              <h4 class="restaurant-name">{{ order.restaurantName }}</h4>
+              <span class="order-date">{{ order.dateText }}</span>
+            </div>
+          </div>
+
+          <span class="status-badge" [class.status-delivered]="order.status === 'Livrée'" [class.status-in-progress]="order.status === 'En cours'">
+            {{ order.status }}
+          </span>
+        </div>
+
+        <!-- Items Breakdown List -->
+        <div class="items-breakdown">
+          <div class="item-row" *ngFor="let item of order.items">
+            <span class="item-name">{{ item.quantity }}× {{ item.name }}</span>
+            <span class="item-price">{{ formatPrice(item.price) }}</span>
+          </div>
+
+          <div class="item-row delivery-row">
+            <span class="item-name sub-label">Frais de livraison</span>
+            <span class="item-price sub-val">{{ formatPrice(order.deliveryFee) }}</span>
+          </div>
+        </div>
+
+        <div class="card-divider"></div>
+
+        <!-- Card Footer Row -->
+        <div class="order-card-footer">
+          <span class="total-label">Total</span>
+          <span class="total-price">{{ formatPrice(order.totalPrice) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load Full History Button -->
+    <button class="btn-load-more" (click)="loadFullHistory()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Charger l'historique complet</span>
+    </button>
+  </main>
+
+  <app-chatbot-floating></app-chatbot-floating>
+  <app-footer></app-footer>
+  <app-bottom-nav activeTab="profile"></app-bottom-nav>
+</div>

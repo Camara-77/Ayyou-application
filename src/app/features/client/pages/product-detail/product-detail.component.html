@@ -1,0 +1,153 @@
+<div class="page-container" *ngIf="product">
+  <!-- Hero Image Header with Overlays -->
+  <div class="product-hero-container">
+    <img [src]="product.imageUrl" [alt]="product.name" class="hero-img" />
+    
+    <!-- Top Back Arrow -->
+    <a routerLink="/home" class="btn-back-hero" aria-label="Retour">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M15 19L8 12L15 5" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+
+    <!-- Bottom Overlays -->
+    <div class="hero-bottom-overlay">
+      <div class="stock-badge">
+        <span class="green-dot"></span>
+        <span>{{ product.stockInfo }} • {{ product.preparationTime }}</span>
+      </div>
+      <div class="img-counter">1/4</div>
+    </div>
+  </div>
+
+  <main class="product-content">
+    <!-- Title & Price Row -->
+    <div class="title-price-row">
+      <h1 class="product-name">{{ product.name }}</h1>
+      <span class="product-price">{{ formatPrice(product.price) }}</span>
+    </div>
+
+    <!-- Description -->
+    <p class="product-desc">{{ product.description }}</p>
+
+    <!-- Restaurant Card -->
+    <div class="restaurant-mini-card">
+      <div class="rest-avatar">
+        <span>{{ product.restaurant.initials || 'CL' }}</span>
+      </div>
+      <div class="rest-info">
+        <h4 class="rest-name">{{ product.restaurant.name }}</h4>
+        <span class="rest-sub">{{ product.restaurant.subtitle }}</span>
+      </div>
+      <a [routerLink]="['/restaurant', product.restaurant.id]" class="btn-view-profile">
+        Voir le profil
+      </a>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Section 1: Format / Variante -->
+    <div class="options-section">
+      <div class="section-header">
+        <h3 class="section-title">1. CHOISIR LE FORMAT / VARIANTE</h3>
+        <span class="required-badge">REQUIS</span>
+      </div>
+
+      <div class="variant-list">
+        <div
+          *ngFor="let variant of product.variants"
+          class="option-card"
+          [class.selected]="selectedVariantId === variant.id"
+          (click)="selectVariant(variant.id)"
+        >
+          <div class="option-radio">
+            <div class="radio-outer" [class.checked]="selectedVariantId === variant.id">
+              <div class="radio-inner" *ngIf="selectedVariantId === variant.id"></div>
+            </div>
+          </div>
+          <div class="option-text">
+            <h4 class="option-title">{{ variant.title }}</h4>
+            <span class="option-subtitle">{{ variant.subtitle }}</span>
+          </div>
+          <span class="option-price">{{ formatOffset(variant.priceOffset) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Sauce Traditionnelle -->
+    <div class="options-section">
+      <div class="section-header">
+        <h3 class="section-title">2. SAUCE TRADITIONNELLE</h3>
+        <span class="hint-label">1 au choix</span>
+      </div>
+
+      <div class="sauce-grid">
+        <div
+          *ngFor="let sauce of product.sauces"
+          class="sauce-card"
+          [class.selected]="selectedSauceId === sauce.id"
+          (click)="selectSauce(sauce.id)"
+        >
+          <div class="sauce-top">
+            <h4 class="sauce-title">{{ sauce.title }}</h4>
+            <div class="radio-outer" [class.checked]="selectedSauceId === sauce.id">
+              <div class="radio-inner" *ngIf="selectedSauceId === sauce.id"></div>
+            </div>
+          </div>
+          <p class="sauce-sub">{{ sauce.subtitle }}</p>
+          <span class="included-tag">Inclus</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Suppléments Gourmands -->
+    <div class="options-section">
+      <div class="section-header">
+        <h3 class="section-title">3. SUPPLÉMENTS GOURMANDS</h3>
+        <span class="hint-label">Optionnel</span>
+      </div>
+
+      <div class="supplement-list">
+        <div
+          *ngFor="let sup of product.supplements"
+          class="supplement-row"
+          [class.selected]="isSupplementSelected(sup.id)"
+          (click)="toggleSupplement(sup.id)"
+        >
+          <div class="checkbox-outer" [class.checked]="isSupplementSelected(sup.id)">
+            <svg *ngIf="isSupplementSelected(sup.id)" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17L4 12" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="sup-title">{{ sup.title }}</span>
+          <span class="sup-price">{{ formatOffset(sup.priceOffset) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Instructions Spéciales -->
+    <div class="options-section">
+      <h3 class="section-title text-upper">INSTRUCTIONS SPÉCIALES POUR LA CUISINE</h3>
+      <textarea
+        class="instructions-textarea"
+        placeholder="Ex: Piment servi à part, bien doré, sans trop d'huile..."
+        [(ngModel)]="specialInstructions"
+        rows="3"
+      ></textarea>
+    </div>
+  </main>
+
+  <!-- Sticky Bottom Bar -->
+  <div class="sticky-bottom-bar">
+    <button class="btn-commander-primary" (click)="addToCartAndCheckout()">
+      Commander 🛒
+    </button>
+    <button class="btn-cart-secondary" (click)="addToCartOnly()" aria-label="Ajouter au panier">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 2L3 6V20C3 20.5523 3.44772 21 4 21H20C20.5523 21 21 20.5523 21 20V6L18 2H6Z" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3 6H21" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M16 10C16 12.2091 14.2091 14 12 14C9.79086 14 8 12.2091 8 10" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</div>

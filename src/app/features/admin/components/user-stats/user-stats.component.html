@@ -1,0 +1,51 @@
+<div class="user-stats-grid">
+  <!-- Card 1: Total Comptes -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">TOTAL COMPTES</span>
+      <span class="dot-indicator gray-dot"></span>
+    </div>
+    <span class="card-value">{{ (stats?.total || 24580) | number:'1.0-0' }}</span>
+    <span class="card-subtext text-gray">Accès globaux Dakar</span>
+  </div>
+
+  <!-- Card 2: Clients -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">CLIENTS</span>
+      <span class="dot-indicator blue-dot"></span>
+    </div>
+    <span class="card-value">{{ (stats?.clients || 24140) | number:'1.0-0' }}</span>
+    <span class="card-subtext text-gray">Acheteurs AYYOU</span>
+  </div>
+
+  <!-- Card 3: Professionnels -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">PROFESSIONNELS</span>
+      <span class="dot-indicator orange-dot"></span>
+    </div>
+    <span class="card-value">{{ (stats?.professionals || 440) | number:'1.0-0' }}</span>
+    <span class="card-subtext text-gray">Marchands & Livreurs</span>
+  </div>
+
+  <!-- Card 4: Actifs -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">ACTIFS</span>
+      <span class="dot-indicator green-dot"></span>
+    </div>
+    <span class="card-value text-green">{{ (stats?.active || 24395) | number:'1.0-0' }}</span>
+    <span class="card-subtext text-green">Comptes validés</span>
+  </div>
+
+  <!-- Card 5: Désactivés -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">DÉSACTIVÉS</span>
+      <span class="dot-indicator red-dot"></span>
+    </div>
+    <span class="card-value text-red">{{ (stats?.disabled || 185) | number:'1.0-0' }}</span>
+    <span class="card-subtext text-red">Suspendus ou fermés</span>
+  </div>
+</div>

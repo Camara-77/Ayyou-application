@@ -1,0 +1,244 @@
+<div class="page-container">
+  <!-- Top Global Header -->
+  <app-header></app-header>
+
+  <main class="notifications-content">
+    <!-- Sub-header Row -->
+    <div class="notifications-page-header">
+      <a routerLink="/profile" class="btn-back-circle" aria-label="Retour">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 19L8 12L15 5" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <h1 class="page-title">Notifications</h1>
+      <div class="header-spacer"></div>
+    </div>
+
+    <!-- Search Bar in /notifications -->
+    <div class="notifications-search-container">
+      <div class="search-input-wrapper">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="11" cy="11" r="7" stroke="#757575" stroke-width="2"/>
+          <path d="M20 20L16 16" stroke="#757575" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Plat, restaurant, burger, artisan..."
+          [(ngModel)]="searchQuery"
+        />
+      </div>
+    </div>
+
+    <!-- Section Header -->
+    <div class="section-header-row">
+      <span class="section-title">ACTIVITÉ RÉCENTE</span>
+      <span class="live-badge">
+        <span class="live-dot"></span>
+        En direct
+      </span>
+    </div>
+
+    <!-- Notifications List Cards -->
+    <div class="notifications-list">
+
+      <!-- Card 1: Chez Loutcha (Commande Prête) -->
+      <div class="notif-card">
+        <div class="notif-top">
+          <div class="sender-info">
+            <div class="icon-circle-avatar food-bg">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 3V11M9 3V11M6 11C6 12.6569 7.34315 14 9 14V21M15 3V21M15 3C17.5 3 19 4.5 19 7C19 9.5 17.5 11 15 11" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="sender-text">
+              <div class="sender-name-row">
+                <h4 class="sender-name">Chez Loutcha</h4>
+                <span class="status-dot-green"></span>
+              </div>
+              <span class="sub-info">Commande #AY-9482 • En cours</span>
+            </div>
+          </div>
+          <span class="time-ago">À l'instant</span>
+        </div>
+
+        <div class="message-box">
+          <span class="bullet-dot"></span>
+          <p class="msg-text">Votre commande est prête au comptoir de retrait.</p>
+        </div>
+
+        <div class="notif-actions">
+          <span class="pickup-limit">À retirer avant 13h15</span>
+          <a routerLink="/order-validation/ov1" class="btn-qr-code">
+            Voir le QR Code
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="#FFFFFF" stroke-width="2"/>
+              <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="#FFFFFF" stroke-width="2"/>
+              <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="#FFFFFF" stroke-width="2"/>
+              <rect x="14" y="14" width="3" height="3" fill="#FFFFFF"/>
+              <rect x="18" y="18" width="3" height="3" fill="#FFFFFF"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card 2: La Fourchette Dakar (Message Clientèle) -->
+      <div class="notif-card">
+        <div class="notif-top">
+          <div class="sender-info">
+            <div class="avatar-black">
+              <span>LF</span>
+            </div>
+            <div class="sender-text">
+              <h4 class="sender-name">La Fourchette Dakar</h4>
+              <span class="sub-info">Service Relations Clientèle</span>
+            </div>
+          </div>
+          <span class="time-ago">Hier, 20h25</span>
+        </div>
+
+        <div class="message-box quote-box">
+          <p class="msg-text">« Merci pour votre fidélité Moussa ! Votre commande spéciale a été préparée avec soin. Nous espérons vous revoir très bientôt sur l'application AYYOU. »</p>
+        </div>
+
+        <div class="notif-actions">
+          <span class="badge-delivered">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17L4 12" stroke="#2E7D32" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Livré à l'habitation
+          </span>
+          <button class="btn-contact-link">Contacter &gt;</button>
+        </div>
+      </div>
+
+      <!-- Card 3: Click & Collect #AY-9482 (Validé) -->
+      <div class="notif-card">
+        <div class="notif-top">
+          <div class="sender-info">
+            <div class="icon-circle-avatar pink-bg">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 11V7A4 4 0 0 0 8 7V11M5 9H19L20 21H4L5 9Z" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="sender-text">
+              <h4 class="sender-name">Click & Collect #AY-9482</h4>
+              <span class="status-validated">Validé</span>
+            </div>
+          </div>
+          <span class="time-ago">13h15</span>
+        </div>
+
+        <p class="simple-text">Votre code de retrait a été validé au comptoir de <strong>Chez Loutcha</strong>. Facture archivée automatiquement.</p>
+
+        <div class="notif-actions-right">
+          <button class="btn-receipt-link" (click)="openInvoice('AY-9482')">
+            Voir reçu ↗
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Invoice / Facture Modal Overlay -->
+  <div class="invoice-modal-overlay" *ngIf="showInvoiceModal">
+    <div class="invoice-modal">
+      <button class="btn-close-invoice" (click)="closeInvoice()" aria-label="Fermer">✕</button>
+
+      <!-- Invoice Header -->
+      <div class="invoice-header">
+        <div class="brand-logo-badge">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" fill="#E51A29"/>
+            <path d="M14 2V8H20" fill="#B91C1C"/>
+          </svg>
+        </div>
+        <div class="invoice-title-col">
+          <h3 class="invoice-title">REÇU OFFICIEL DE PAIEMENT</h3>
+          <span class="invoice-ref">N° #{{ activeInvoiceRef }}</span>
+        </div>
+      </div>
+
+      <!-- Invoice Body Info -->
+      <div class="invoice-body">
+        <div class="invoice-meta-row">
+          <span>Date : <strong>12 Septembre 2026 • 13:45</strong></span>
+          <span class="status-badge-green">✔ Payé</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="merchant-client-grid">
+          <div class="grid-col">
+            <span class="col-label">ÉTABLISSEMENT</span>
+            <strong class="col-val">Chez Loutcha</strong>
+            <span class="col-sub">Plateau, Dakar</span>
+          </div>
+          <div class="grid-col">
+            <span class="col-label">CLIENT</span>
+            <strong class="col-val">Alia Ndiaye</strong>
+            <span class="col-sub">Dakar, Sénégal</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Items Table Breakdown -->
+        <div class="items-table">
+          <div class="table-row head">
+            <span>Article</span>
+            <span>Montant</span>
+          </div>
+          <div class="table-row">
+            <span>1x Thiéboudienne Rouge Royale</span>
+            <span>4 500 F</span>
+          </div>
+          <div class="table-row">
+            <span>1x Yassa au Poulet Braisé</span>
+            <span>4 500 F</span>
+          </div>
+          <div class="table-row">
+            <span>2x Bissap Royal Menthe Fraîche</span>
+            <span>1 500 F</span>
+          </div>
+          <div class="table-row">
+            <span>Frais de livraison standard</span>
+            <span>1 000 F</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="invoice-total-row">
+          <div class="pay-info">
+            <span class="pay-type">Paiement via Wave Sénégal</span>
+            <span class="txn-id">ID Txn: #WAVE-89421-SN</span>
+          </div>
+          <div class="total-col">
+            <span class="total-lbl">Total réglé</span>
+            <strong class="total-amt">11 500 FCFA</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Download Action -->
+      <div class="invoice-actions">
+        <button class="btn-download-pdf" (click)="downloadInvoicePdf()" [disabled]="isDownloadingInvoice">
+          <span *ngIf="!isDownloadingInvoice">📥 Télécharger la facture (.pdf)</span>
+          <span *ngIf="isDownloadingInvoice">Génération du fichier...</span>
+        </button>
+        <span class="download-success-tag" *ngIf="downloadSuccessMessage">
+          ✔ Facture téléchargée dans vos fichiers !
+        </span>
+      </div>
+
+      <div class="certified-note">
+        🔒 Document fiscal certifié AYYOU SAS • Conforme CDP Sénégal
+      </div>
+    </div>
+  </div>
+
+  <app-chatbot-floating></app-chatbot-floating>
+  <app-bottom-nav activeTab="profile"></app-bottom-nav>
+</div>

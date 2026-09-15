@@ -1,0 +1,660 @@
+.page-container {
+  max-width: 440px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: #F8F9FA;
+  padding-bottom: 110px;
+  position: relative;
+}
+
+.tracking-main-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Map Mock Header */
+.map-mock-container {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  background: #E8F3F5;
+  overflow: hidden;
+
+  .real-dakar-map {
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .map-tags-row {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    right: 14px;
+    z-index: 500;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+
+    .map-tag {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(4px);
+      color: #1A1A1A;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 14px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+
+      &.green {
+        color: #2E7D32;
+      }
+    }
+  }
+}
+
+/* Slidable Sheet Card */
+.tracking-sheet-card {
+  background: #ffffff;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  margin-top: -24px;
+  position: relative;
+  z-index: 10;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+
+  .drag-handle {
+    width: 36px;
+    height: 4px;
+    background: #E0E0E0;
+    border-radius: 2px;
+    margin: 0 auto 4px auto;
+  }
+}
+
+/* Restaurant Row */
+.rest-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  .rest-left {
+    display: flex;
+    gap: 12px;
+
+    .rest-avatar-img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #FFE0E0;
+      color: #E51A29;
+      font-weight: 800;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .rest-text {
+      display: flex;
+      flex-direction: column;
+
+      .name-status-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .rest-name {
+          font-size: 16px;
+          font-weight: 800;
+          color: #1A1A1A;
+          margin: 0;
+        }
+
+        .status-green {
+          font-size: 11px;
+          font-weight: 800;
+          color: #2E7D32;
+        }
+      }
+
+      .rest-sub {
+        font-size: 12px;
+        color: #757575;
+        margin-top: 1px;
+      }
+
+      .rest-addr {
+        font-size: 11px;
+        color: #9CA3AF;
+        margin-top: 1px;
+      }
+    }
+  }
+
+  .btn-heart {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+}
+
+/* ETA Box */
+.eta-box {
+  background: #FFF0F1;
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .eta-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .red-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #E51A29;
+      box-shadow: 0 0 6px #E51A29;
+      flex-shrink: 0;
+    }
+
+    .eta-text {
+      display: flex;
+      flex-direction: column;
+
+      .eta-title {
+        font-size: 13px;
+        color: #1A1A1A;
+
+        strong {
+          color: #E51A29;
+          font-weight: 800;
+        }
+      }
+
+      .eta-sub {
+        font-size: 11px;
+        color: #757575;
+        margin-top: 1px;
+      }
+    }
+  }
+
+  .eta-badge-red {
+    border: 1px solid #E51A29;
+    color: #E51A29;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: #ffffff;
+  }
+}
+
+/* Timeline Stepper */
+.timeline-stepper {
+  position: relative;
+  padding: 10px 0;
+
+  .stepper-track {
+    position: absolute;
+    top: 19px;
+    left: 20px;
+    right: 20px;
+    height: 3px;
+    background: #EFEFEF;
+    z-index: 1;
+
+    .stepper-progress {
+      height: 100%;
+      background: #E51A29;
+      border-radius: 2px;
+    }
+  }
+
+  .steps-row {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+
+    .step-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+
+      .step-circle {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #EFEFEF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #ffffff;
+      }
+
+      .step-label {
+        font-size: 11px;
+        color: #9CA3AF;
+        font-weight: 600;
+      }
+
+      &.completed {
+        .step-circle {
+          background: #E51A29;
+        }
+        .step-label {
+          color: #1A1A1A;
+          font-weight: 700;
+        }
+      }
+
+      &.active {
+        .step-circle {
+          background: #E51A29;
+          box-shadow: 0 0 0 4px rgba(229, 26, 41, 0.2);
+        }
+        .step-label {
+          color: #E51A29;
+          font-weight: 800;
+        }
+      }
+    }
+  }
+}
+
+/* Metrics Grid */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+
+  .metric-card {
+    background: #F8F9FA;
+    border: 1px solid #EFEFEF;
+    border-radius: 14px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+
+    .metric-label {
+      font-size: 10px;
+      color: #9CA3AF;
+      font-weight: 600;
+    }
+
+    .metric-val {
+      font-size: 13px;
+      font-weight: 800;
+      color: #1A1A1A;
+
+      &.red {
+        color: #E51A29;
+      }
+      &.green {
+        color: #2E7D32;
+      }
+    }
+  }
+}
+
+/* Driver Card */
+.driver-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #F8F9FA;
+  border-radius: 16px;
+  padding: 12px 14px;
+  border: 1px solid #EFEFEF;
+
+  .driver-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .driver-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #EFEFEF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .driver-info {
+      display: flex;
+      flex-direction: column;
+
+      .driver-name-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        .driver-name {
+          font-size: 14px;
+          font-weight: 800;
+          color: #1A1A1A;
+          margin: 0;
+        }
+
+        .driver-badge {
+          background: #FFF0F1;
+          color: #E51A29;
+          font-size: 9px;
+          font-weight: 800;
+          padding: 2px 6px;
+          border-radius: 6px;
+        }
+      }
+
+      .driver-sub {
+        font-size: 11px;
+        color: #757575;
+        margin-top: 2px;
+      }
+    }
+  }
+
+  .driver-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .btn-action-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+
+      &.green-btn {
+        background: #E8F5E9;
+      }
+      &.grey-btn {
+        background: #EFEFEF;
+      }
+    }
+  }
+}
+
+/* Articles Section */
+.section-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .section-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .sec-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: #9CA3AF;
+      letter-spacing: 0.5px;
+    }
+
+    .sec-ref {
+      font-size: 11px;
+      font-weight: 800;
+      color: #E51A29;
+    }
+  }
+
+  .items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .item-name {
+        font-size: 13px;
+        color: #1A1A1A;
+
+        .qty-red {
+          color: #E51A29;
+          font-weight: 800;
+        }
+      }
+
+      .item-price {
+        font-size: 13px;
+        font-weight: 800;
+        color: #1A1A1A;
+      }
+    }
+  }
+
+  .total-pay-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 6px;
+    border-top: 1px dashed #EFEFEF;
+
+    .total-pay-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #757575;
+    }
+
+    .total-pay-val {
+      font-size: 14px;
+      font-weight: 800;
+      color: #E51A29;
+    }
+  }
+}
+
+/* Address Card */
+.address-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  background: #F8F9FA;
+  border-radius: 16px;
+  padding: 12px 14px;
+  border: 1px solid #EFEFEF;
+
+  .address-left {
+    display: flex;
+    gap: 10px;
+
+    .pin-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #FFF0F1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .address-text {
+      display: flex;
+      flex-direction: column;
+
+      .addr-title {
+        font-size: 13px;
+        font-weight: 800;
+        color: #1A1A1A;
+        margin: 0;
+      }
+
+      .addr-val {
+        font-size: 12px;
+        color: #4B5563;
+        margin-top: 2px;
+      }
+
+      .addr-instr {
+        font-size: 11px;
+        color: #9CA3AF;
+        margin-top: 2px;
+      }
+    }
+  }
+
+  .tag-badge-green {
+    font-size: 10px;
+    font-weight: 800;
+    color: #2E7D32;
+    background: #E8F5E9;
+    padding: 3px 8px;
+    border-radius: 8px;
+  }
+}
+
+/* Security Code Card */
+.security-code-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #F8F9FA;
+  border-radius: 16px;
+  padding: 12px 14px;
+  border: 1px dashed #E51A29;
+
+  .sec-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .qr-thumbnail {
+      width: 32px;
+      height: 32px;
+      background: #1A1A1A;
+      border-radius: 6px;
+    }
+
+    .sec-text {
+      display: flex;
+      flex-direction: column;
+
+      .sec-title {
+        font-size: 11px;
+        font-weight: 800;
+        color: #E51A29;
+        margin: 0;
+        letter-spacing: 0.5px;
+      }
+
+      .sec-sub {
+        font-size: 10px;
+        color: #757575;
+        margin-top: 1px;
+      }
+    }
+  }
+
+  .sec-code-num {
+    font-size: 16px;
+    font-weight: 800;
+    color: #1A1A1A;
+    letter-spacing: 1px;
+  }
+}
+
+/* Track Live Button */
+.btn-track-live {
+  width: 100%;
+  height: 48px;
+  background-color: #E51A29;
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(229, 26, 41, 0.3);
+  margin-top: 4px;
+}
+
+:host ::ng-deep {
+  .leaflet-container {
+    width: 100%;
+    height: 100%;
+    font-family: inherit;
+  }
+
+  .custom-map-pin {
+    background: transparent;
+    border: none;
+
+    .pin-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+      border: 2.5px solid #FFFFFF;
+
+      &.rest-badge {
+        background-color: #E51A29;
+      }
+
+      &.client-badge {
+        background-color: #1A1A1A;
+      }
+    }
+
+    &.courier-pin {
+      .courier-marker-box {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: #E51A29;
+        color: #FFFFFF;
+        padding: 4px 10px;
+        border-radius: 20px;
+        box-shadow: 0 4px 14px rgba(229, 26, 41, 0.4);
+        border: 2px solid #FFFFFF;
+        white-space: nowrap;
+
+        .moto-icon {
+          font-size: 13px;
+        }
+
+        .badge-text {
+          font-size: 11px;
+          font-weight: 800;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,59 @@
+<div class="establishment-filters-row">
+  <!-- Left Pill Tabs -->
+  <div class="filter-tabs-pill">
+    <button
+      type="button"
+      class="tab-pill-btn"
+      [class.active]="activeTab === 'ALL'"
+      (click)="selectTab('ALL')"
+    >
+      Tous (259)
+    </button>
+
+    <button
+      type="button"
+      class="tab-pill-btn"
+      [class.active]="activeTab === 'RESTAURANTS'"
+      (click)="selectTab('RESTAURANTS')"
+    >
+      Restaurants (185)
+    </button>
+
+    <button
+      type="button"
+      class="tab-pill-btn"
+      [class.active]="activeTab === 'VENDEURS'"
+      (click)="selectTab('VENDEURS')"
+    >
+      Commerces & Vendeurs (74)
+    </button>
+
+    <button
+      type="button"
+      class="tab-pill-btn tab-pending"
+      [class.active]="activeTab === 'PENDING'"
+      (click)="selectTab('PENDING')"
+    >
+      <span class="orange-dot"></span>
+      <span>En attente</span>
+    </button>
+  </div>
+
+  <!-- Right Neighborhood Filter Dropdown -->
+  <div class="neighborhood-filter-wrap">
+    <div class="select-pill-container">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pin-icon">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+        <circle cx="12" cy="10" r="3"/>
+      </svg>
+      <select
+        class="neighborhood-select"
+        [(ngModel)]="selectedNeighborhood"
+        (change)="onNeighborhoodSelect()"
+      >
+        <option value="ALL">Tous les quartiers</option>
+        <option *ngFor="let n of neighborhoods" [value]="n">{{ n }}</option>
+      </select>
+    </div>
+  </div>
+</div>

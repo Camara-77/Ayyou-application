@@ -1,0 +1,16 @@
+<div class="dish-card" [class.compact]="compact" *ngIf="dish" (click)="onCardClick()" style="cursor: pointer;">
+  <div class="dish-img-wrapper">
+    <img [src]="dish.imageUrl" [alt]="dish.name" class="dish-img" />
+  </div>
+
+  <div class="dish-info">
+    <h4 class="dish-title">{{ dish.name }}</h4>
+    <p class="dish-desc" *ngIf="!compact && dish.description">{{ dish.description }}</p>
+    <div class="dish-bottom">
+      <span class="dish-price">{{ formatPrice(dish.price) }}</span>
+      <button class="btn-see-more" (click)="onAdd($event)" aria-label="Voir plus">
+        Voir plus <span class="arrow">&gt;</span>
+      </button>
+    </div>
+  </div>
+</div>

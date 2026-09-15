@@ -1,0 +1,185 @@
+<div class="page-container" *ngIf="validationData">
+  <!-- Top Global Header -->
+  <app-header></app-header>
+
+  <main class="validation-main-content">
+    <!-- Sub-header Row -->
+    <div class="validation-page-header">
+      <a routerLink="/notifications" class="btn-back-circle" aria-label="Retour">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 19L8 12L15 5" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <div class="header-center-title">
+        <h1 class="page-title">CLICK & COLLECT</h1>
+        <span class="order-ref-sub">N° {{ validationData.orderRef }}</span>
+      </div>
+      <span class="badge-priority">
+        <span class="red-dot"></span>
+        {{ validationData.priorityText }}
+      </span>
+    </div>
+
+    <!-- Main QR Code Display Card -->
+    <div class="qr-card">
+      <span class="client-code-label">CODE CLIENT PRIORITAIRE</span>
+      <h2 class="client-code-val">{{ validationData.clientCode }} 🛡️</h2>
+
+      <!-- Large QR Box -->
+      <div class="qr-box-wrapper">
+        <div class="qr-corner top-left"></div>
+        <div class="qr-corner top-right"></div>
+        <div class="qr-corner bottom-left"></div>
+        <div class="qr-corner bottom-right"></div>
+
+        <!-- Simulated Visual QR Pattern -->
+        <svg class="qr-svg-mock" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Outer Position Detection Patterns -->
+          <rect x="10" y="10" width="40" height="40" rx="6" stroke="#1A1A1A" stroke-width="4"/>
+          <rect x="20" y="20" width="20" height="20" fill="#1A1A1A"/>
+
+          <rect x="110" y="10" width="40" height="40" rx="6" stroke="#1A1A1A" stroke-width="4"/>
+          <rect x="120" y="20" width="20" height="20" fill="#1A1A1A"/>
+
+          <rect x="10" y="110" width="40" height="40" rx="6" stroke="#1A1A1A" stroke-width="4"/>
+          <rect x="20" y="120" width="20" height="20" fill="#1A1A1A"/>
+
+          <!-- Accent Red Center Element -->
+          <rect x="70" y="70" width="20" height="20" fill="#E51A29" rx="4"/>
+          <circle cx="80" cy="80" r="4" fill="#FFFFFF"/>
+
+          <!-- Data Grid Pattern Dots -->
+          <rect x="60" y="20" width="10" height="10" fill="#1A1A1A"/>
+          <rect x="80" y="30" width="10" height="10" fill="#E51A29"/>
+          <rect x="90" y="15" width="10" height="10" fill="#1A1A1A"/>
+          <rect x="20" y="60" width="10" height="10" fill="#1A1A1A"/>
+          <rect x="40" y="80" width="10" height="10" fill="#1A1A1A"/>
+          <rect x="110" y="70" width="10" height="10" fill="#1A1A1A"/>
+          <rect x="130" y="90" width="10" height="10" fill="#1A1A1A"/>
+          <rect x="60" y="120" width="10" height="10" fill="#1A1A1A"/>
+          <rect x="90" y="130" width="10" height="10" fill="#1A1A1A"/>
+          <rect x="120" y="120" width="10" height="10" fill="#E51A29"/>
+        </svg>
+
+        <span class="scan-tag">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 7V5A2 2 0 0 1 5 3H7M17 3H19A2 2 0 0 1 21 5V7M21 17V19A2 2 0 0 1 19 21H17M7 21H5A2 2 0 0 1 3 19V17" stroke="#757575" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+          Scan sans contact au comptoir
+        </span>
+      </div>
+
+      <p class="qr-instruction">
+        Présentez ce code ou scannez le QR code directement au comptoir de retrait.
+      </p>
+
+      <!-- Pickup Timer Box -->
+      <div class="pickup-timer-box">
+        <div class="timer-left">
+          <span class="timer-ready">PRÊT DEPUIS {{ validationData.readySinceTime }}</span>
+          <span class="timer-limit">À retirer avant <strong>{{ validationData.pickupLimitTime }}</strong></span>
+        </div>
+        <div class="timer-pill-red">
+          ⏱ {{ validationData.timerRemainingMinutes }} min
+        </div>
+      </div>
+    </div>
+
+    <!-- État de préparation Timeline -->
+    <div class="section-card">
+      <div class="section-title-row">
+        <h3 class="section-title">ÉTAT DE PRÉPARATION</h3>
+        <span class="step-count-badge">Étape {{ validationData.preparationStepCurrent }} sur {{ validationData.preparationStepTotal }}</span>
+      </div>
+
+      <div class="prep-stepper">
+        <div class="prep-track">
+          <div class="prep-progress" style="width: 75%;"></div>
+        </div>
+        <div class="prep-steps">
+          <div
+            *ngFor="let step of validationData.steps"
+            class="prep-step-item"
+            [class.completed]="step.completed"
+            [class.active]="step.active"
+          >
+            <div class="prep-circle">
+              <svg *ngIf="step.completed" width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 6L9 17L4 12" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span class="prep-label">{{ step.label }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map Snippet & Restaurant Details Card -->
+    <div class="map-rest-card">
+      <div class="mini-map-banner">
+        <svg class="mini-map-svg" viewBox="0 0 360 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 0 40 Q 120 20 200 60 T 360 30" stroke="#1DC4EB" stroke-width="5" fill="none"/>
+          <circle cx="180" cy="45" r="10" fill="#E51A29"/>
+          <path d="M176 45L184 45M180 41L180 49" stroke="#FFFFFF" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="rest-row-info">
+        <div class="rest-text-col">
+          <div class="name-status-inline">
+            <h4 class="rest-name">{{ validationData.restaurant.name }}</h4>
+            <span class="status-open">Ouvert</span>
+          </div>
+          <span class="rest-address">📍 {{ validationData.restaurant.address }}</span>
+        </div>
+        <button class="btn-call-outline">
+          📞 Appeler
+        </button>
+      </div>
+    </div>
+
+    <!-- Order Items Details -->
+    <div class="section-card">
+      <div class="section-title-row">
+        <h3 class="section-title">DÉTAILS DE LA COMMANDE</h3>
+        <span class="bag-tag">{{ validationData.itemCount }} articles • Sac {{ validationData.bagNumber }}</span>
+      </div>
+
+      <div class="items-list">
+        <div *ngFor="let item of validationData.items" class="item-detail-row">
+          <div class="item-left">
+            <span class="item-qty">{{ item.quantity }}x</span>
+            <div class="item-name-group">
+              <span class="item-name">{{ item.name }}</span>
+              <span class="item-sub">Plat préparé sur place</span>
+            </div>
+          </div>
+          <span class="item-price">{{ formatPrice(item.price) }}</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="payment-total-row">
+        <span class="payment-tag">Paiement effectué ({{ validationData.paymentMethod }})</span>
+        <div class="total-col">
+          <span class="total-label">Total réglé</span>
+          <span class="total-val">{{ validationData.totalPrice.toLocaleString('fr-FR') }} FCFA</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Action Buttons -->
+    <div class="actions-group">
+      <button class="btn-primary-gps">
+        📍 Ouvrir l'itinéraire GPS
+      </button>
+      <button class="btn-secondary-call">
+        📞 Appeler le restaurant
+      </button>
+    </div>
+
+  </main>
+
+  <app-chatbot-floating></app-chatbot-floating>
+  <app-bottom-nav activeTab="profile"></app-bottom-nav>
+</div>

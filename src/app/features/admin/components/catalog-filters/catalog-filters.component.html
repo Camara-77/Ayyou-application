@@ -1,0 +1,89 @@
+<div class="catalog-filters-wrap">
+  <!-- Top Filter Pills Row -->
+  <div class="filter-pills-row">
+    <button
+      type="button"
+      class="pill-btn"
+      [class.active]="selectedTab === 'ALL'"
+      (click)="onTabSelect('ALL')"
+    >
+      Tous les articles ({{ totalCount | number }})
+    </button>
+
+    <button
+      type="button"
+      class="pill-btn"
+      [class.active]="selectedTab === 'ACTIVE'"
+      (click)="onTabSelect('ACTIVE')"
+    >
+      <span class="dot-indicator green-dot"></span>
+      Actifs en ligne ({{ activeCount | number }})
+    </button>
+
+    <button
+      type="button"
+      class="pill-btn"
+      [class.active]="selectedTab === 'PENDING_VALIDATION'"
+      (click)="onTabSelect('PENDING_VALIDATION')"
+    >
+      <span class="dot-indicator red-dot"></span>
+      En attente de validation ({{ pendingValidationCount }})
+    </button>
+
+    <button
+      type="button"
+      class="pill-btn"
+      [class.active]="selectedTab === 'OUT_OF_STOCK'"
+      (click)="onTabSelect('OUT_OF_STOCK')"
+    >
+      <span class="dot-indicator orange-dot"></span>
+      Rupture de stock ({{ outOfStockCount }})
+    </button>
+
+    <button
+      type="button"
+      class="pill-btn"
+      [class.active]="selectedTab === 'FLAGGED'"
+      (click)="onTabSelect('FLAGGED')"
+    >
+      <span class="dot-indicator red-dot"></span>
+      Signalés pour révision
+    </button>
+  </div>
+
+  <!-- Search & Dropdowns Controls Bar -->
+  <div class="controls-bar">
+    <div class="search-input-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input
+        type="text"
+        placeholder="Rechercher un plat, ingrédient, SKU, commerce..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearchInput()"
+      />
+    </div>
+
+    <div class="dropdown-group">
+      <div class="select-wrapper">
+        <select [(ngModel)]="selectedCategory" (change)="onCategorySelect()">
+          <option value="ALL">Toutes catégories</option>
+          <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+        </select>
+      </div>
+
+      <div class="select-wrapper">
+        <select [(ngModel)]="selectedEstablishment" (change)="onEstablishmentSelect()">
+          <option value="ALL">Tous les établissements</option>
+          <option value="Chez Loutcha">Chez Loutcha (Plateau)</option>
+          <option value="Burger Black Bun">Burger Black Bun (Almadies)</option>
+          <option value="Touba Primeurs">Touba Primeurs (Mermoz)</option>
+          <option value="L'Atelier du Choukouya">L'Atelier du Choukouya (Ouakam)</option>
+          <option value="Chez Tantie Marie">Chez Tantie Marie (Ngor)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>

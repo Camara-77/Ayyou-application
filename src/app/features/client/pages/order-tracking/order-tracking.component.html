@@ -1,0 +1,189 @@
+<div class="page-container" *ngIf="trackingData">
+  <!-- Top Global Header -->
+  <app-header></app-header>
+
+  <main class="tracking-main-content">
+    <!-- Real Dakar Leaflet Map Container -->
+    <div class="map-mock-container">
+      <div id="dakar-map" class="real-dakar-map"></div>
+
+      <!-- Quick Search Bar Overlay inside Map Header -->
+      <div class="map-tags-row">
+        <span class="map-tag">📍 Chez Loutcha, Plateau</span>
+        <span class="map-tag">Sénégalais</span>
+        <span class="map-tag green">● Ouvert</span>
+      </div>
+    </div>
+
+    <!-- Slidable Sheet Details -->
+    <div class="tracking-sheet-card">
+      <div class="drag-handle"></div>
+
+      <!-- Restaurant Info Card Row -->
+      <div class="rest-row">
+        <div class="rest-left">
+          <div class="rest-avatar-img">
+            <span>CL</span>
+          </div>
+          <div class="rest-text">
+            <div class="name-status-row">
+              <h3 class="rest-name">{{ trackingData.restaurant.name }}</h3>
+              <span class="status-green">Ouvert</span>
+            </div>
+            <span class="rest-sub">{{ trackingData.restaurant.subtitle }}</span>
+            <span class="rest-addr">{{ trackingData.restaurant.address }}</span>
+          </div>
+        </div>
+        <button class="btn-heart" aria-label="Favori">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="#9CA3AF" stroke-width="2"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- ETA Notification Box -->
+      <div class="eta-box">
+        <div class="eta-left">
+          <span class="red-dot"></span>
+          <div class="eta-text">
+            <span class="eta-title">Arrivée prévue à <strong>{{ trackingData.etaTime }}</strong></span>
+            <span class="eta-sub">Livreur en approche de votre quartier</span>
+          </div>
+        </div>
+        <div class="eta-badge-red">{{ trackingData.etaRemainingMinutes }} min</div>
+      </div>
+
+      <!-- Progression Timeline Stepper -->
+      <div class="timeline-stepper">
+        <div class="stepper-track">
+          <div class="stepper-progress" style="width: 66%;"></div>
+        </div>
+        <div class="steps-row">
+          <div
+            *ngFor="let step of trackingData.steps"
+            class="step-item"
+            [class.completed]="step.completed"
+            [class.active]="step.active"
+          >
+            <div class="step-circle">
+              <svg *ngIf="step.completed" width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 6L9 17L4 12" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span class="step-label">{{ step.label }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metrics Grid (3 columns) -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <span class="metric-label">Temps restant</span>
+          <span class="metric-val red">{{ trackingData.metrics.remainingTime }}</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Distance</span>
+          <span class="metric-val">{{ trackingData.metrics.distance }}</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Condition</span>
+          <span class="metric-val green">{{ trackingData.metrics.condition }}</span>
+        </div>
+      </div>
+
+      <!-- Driver Card -->
+      <div class="driver-card">
+        <div class="driver-left">
+          <div class="driver-avatar">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="8" r="4" stroke="#757575" stroke-width="2"/>
+              <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="#757575" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="driver-info">
+            <div class="driver-name-row">
+              <h4 class="driver-name">{{ trackingData.driver.name }}</h4>
+              <span class="driver-badge">{{ trackingData.driver.badge }}</span>
+            </div>
+            <span class="driver-sub">{{ trackingData.driver.vehicle }} • ★ {{ trackingData.driver.rating }}</span>
+          </div>
+        </div>
+        <div class="driver-actions">
+          <button class="btn-action-circle green-btn" aria-label="Appeler le livreur">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="#2E7D32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="btn-action-circle grey-btn" aria-label="Envoyer un message">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Articles Section -->
+      <div class="section-container">
+        <div class="section-title-row">
+          <span class="sec-title">ARTICLES DE LA COMMANDE ({{ trackingData.items.length }})</span>
+          <span class="sec-ref">{{ trackingData.orderRef }}</span>
+        </div>
+
+        <div class="items-list">
+          <div *ngFor="let item of trackingData.items" class="item-row">
+            <span class="item-name"><strong class="qty-red">{{ item.quantity }}x</strong> {{ item.name }}</span>
+            <span class="item-price">{{ formatPrice(item.price) }}</span>
+          </div>
+        </div>
+
+        <div class="total-pay-row">
+          <span class="total-pay-label">Total payé en ligne</span>
+          <span class="total-pay-val">{{ trackingData.totalPrice.toLocaleString('fr-FR') }} F CFA</span>
+        </div>
+      </div>
+
+      <!-- Delivery Address Card -->
+      <div class="address-card">
+        <div class="address-left">
+          <div class="pin-circle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 21C16 17.5 19 13.5 19 9.5C19 5.36 15.87 2 12 2C8.13 2 5 5.36 5 9.5C5 13.5 8 17.5 12 21Z" stroke="#E51A29" stroke-width="2"/>
+              <circle cx="12" cy="9.5" r="2.5" fill="#E51A29"/>
+            </svg>
+          </div>
+          <div class="address-text">
+            <h4 class="addr-title">Adresse de livraison</h4>
+            <span class="addr-val">{{ trackingData.deliveryAddress.addressText }}</span>
+            <span class="addr-instr">{{ trackingData.deliveryAddress.instructions }}</span>
+          </div>
+        </div>
+        <span class="tag-badge-green">{{ trackingData.deliveryAddress.tag }}</span>
+      </div>
+
+      <!-- Security Code Block -->
+      <div class="security-code-card">
+        <div class="sec-left">
+          <div class="qr-thumbnail">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="24" height="24" fill="#1A1A1A" rx="4"/>
+            </svg>
+          </div>
+          <div class="sec-text">
+            <h4 class="sec-title">CODE DE REMISE SÉCURISÉ</h4>
+            <span class="sec-sub">Communiquez le code à Amadou pour valider la réception du colis.</span>
+          </div>
+        </div>
+        <span class="sec-code-num">{{ trackingData.securityCode }}</span>
+      </div>
+
+      <!-- Main Action Button -->
+      <button class="btn-track-live">
+        ➜ Suivre en direct sur la carte
+      </button>
+
+    </div>
+  </main>
+
+  <app-chatbot-floating></app-chatbot-floating>
+  <app-bottom-nav activeTab="profile"></app-bottom-nav>
+</div>

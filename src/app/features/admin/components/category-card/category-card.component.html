@@ -1,0 +1,70 @@
+<div class="category-card-item" [class.is-desactivated]="!category.isActive" *ngIf="category">
+  <div class="card-main-row">
+    <!-- Circular Avatar with Dot Badge -->
+    <div class="avatar-circle-wrap">
+      <img
+        [src]="category.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120&auto=format&fit=crop&q=80'"
+        [alt]="category.name"
+        class="circle-img"
+      />
+      <span class="dot-badge" [class.dot-green]="category.isActive" [class.dot-gray]="!category.isActive"></span>
+    </div>
+
+    <!-- Category Details Info -->
+    <div class="category-details">
+      <div class="meta-header-row">
+        <span class="sub-tag-label">
+          {{ category.subCategoryTag || (category.type.toUpperCase() + ' • PRINCIPALE') }}
+        </span>
+        <span class="status-pill" [class.active-pill]="category.isActive" [class.inactive-pill]="!category.isActive">
+          {{ category.isActive ? 'ACTIVE' : 'DÉSACTIVÉE' }}
+        </span>
+      </div>
+
+      <h3 class="cat-title">{{ category.name }}</h3>
+
+      <span class="cat-subtitle" *ngIf="category.isActive">
+        <ng-container *ngIf="category.itemCount > 0">
+          {{ category.itemCount }} {{ category.type === 'Commerce' ? 'références' : 'plats liés' }}
+        </ng-container>
+        <ng-container *ngIf="category.linkedEstCount">
+          • {{ category.linkedEstCount }} {{ category.type === 'Commerce' ? 'commerces' : (category.type === 'Restaurant' ? 'adresses' : 'restaurants') }}
+        </ng-container>
+      </span>
+
+      <span class="cat-subtitle text-muted-italic" *ngIf="!category.isActive">
+        Temporairement masquée du feed
+      </span>
+    </div>
+  </div>
+
+  <!-- Footer Actions Bar -->
+  <div class="card-footer-actions">
+    <div class="left-action-links">
+      <button
+        type="button"
+        class="action-link link-primary-red"
+        (click)="category.isActive ? onEdit() : onToggle()"
+      >
+        {{ category.isActive ? 'Modifier' : 'Réactiver' }}
+      </button>
+
+      <span class="separator">•</span>
+
+      <button
+        type="button"
+        class="action-link link-muted-gray"
+        (click)="category.isActive ? onToggle() : onEdit()"
+      >
+        {{ category.isActive ? 'Désactiver' : 'Modifier' }}
+      </button>
+    </div>
+
+    <button type="button" class="btn-trash-icon" (click)="onDelete()" title="Supprimer la catégorie">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+      </svg>
+    </button>
+  </div>
+</div>

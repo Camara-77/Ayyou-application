@@ -1,0 +1,108 @@
+<div class="pro-app-layout">
+  <!-- Header PRO -->
+  <app-pro-header [title]="'Historique des commandes'" [showBackButton]="true" [backUrl]="'/pro/dashboard'" [rightIcon]="'calendar'"></app-pro-header>
+
+  <main class="pro-main-content">
+
+    <!-- Identification Établissement -->
+    <div class="pro-establishment-bar">
+      <div class="pro-avatar">
+        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=200&q=80" alt="Chez Loutcha" />
+      </div>
+      <div class="pro-details">
+        <h2 class="pro-name">Chez Loutcha</h2>
+        <p class="pro-sub">Dakar Plateau • Espace Pro</p>
+      </div>
+      <span class="badge-total-count">{{ totalCount }} commandes</span>
+    </div>
+
+    <!-- Barre de Recherche -->
+    <div class="search-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="applyFilter()" placeholder="Rechercher par n° de commande, client ou..." />
+    </div>
+
+    <!-- Filtres Pills -->
+    <div class="filters-scroll-row">
+      <button type="button" class="filter-pill" [class.active]="selectedFilter === 'ALL'" (click)="setFilter('ALL')">
+        Toutes ({{ totalCount }})
+      </button>
+      <button type="button" class="filter-pill" [class.active]="selectedFilter === 'LIVREE'" (click)="setFilter('LIVREE')">
+        Livrées ({{ deliveredCount }})
+      </button>
+      <button type="button" class="filter-pill" [class.active]="selectedFilter === 'A_EMPORTER'" (click)="setFilter('A_EMPORTER')">
+        À emporter ({{ pickupCount }})
+      </button>
+    </div>
+
+    <!-- Liste des Groupes de Commandes -->
+    <div class="history-groups-list">
+      <div class="date-group-block" *ngFor="let group of groupedOrders">
+        
+        <!-- En-tête de Groupe Date -->
+        <div class="group-header-row">
+          <h3 class="group-title">{{ group.dateHeader }}</h3>
+          <span class="group-count">{{ group.totalCountText }}</span>
+        </div>
+
+        <!-- Cartes de Commande -->
+        <div class="order-card" *ngFor="let order of group.orders">
+          
+          <!-- Ligne Supérieure (Ref, Heure, Statut) -->
+          <div class="card-header-row">
+            <div class="ref-time">
+              <span class="order-ref">#{{ order.orderRef || order.id }}</span>
+              <span class="dot-separator">•</span>
+              <span class="order-time">{{ order.timeFormatted }}</span>
+            </div>
+            <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+              {{ getStatusLabel(order.status) }}
+            </span>
+          </div>
+
+          <!-- Nom Client -->
+          <h4 class="client-name">{{ order.clientName }}</h4>
+
+          <!-- Résumé des Articles -->
+          <p class="items-summary">{{ order.itemsText }}</p>
+
+          <div class="card-divider"></div>
+
+          <!-- Ligne Inférieure (Paiement, Montant, Action) -->
+          <div class="card-footer-row">
+            <div class="payment-method">
+              <span class="pay-dot" [ngClass]="order.paymentDotClass || 'dot-green'">●</span>
+              <span class="pay-text">{{ order.paymentMethodText }}</span>
+            </div>
+            <div class="price-action">
+              <span class="price-amount">{{ (order.totalPrice || order.totalAmount) | number }} FCFA</span>
+              <button type="button" class="btn-details-link">
+                Détails →
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Etat vide si aucun résultat -->
+      <div *ngIf="groupedOrders.length === 0" class="empty-history-state">
+        <p>Aucune commande ne correspond à votre recherche.</p>
+      </div>
+
+      <!-- Bouton Charger les commandes précédentes -->
+      <div class="load-more-container">
+        <button type="button" class="btn-load-more font-serif">
+          Charger les commandes précédentes
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Bottom Navigation PRO -->
+  <app-pro-bottom-nav></app-pro-bottom-nav>
+</div>

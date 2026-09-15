@@ -1,0 +1,269 @@
+.pro-app-layout {
+  min-height: 100vh;
+  background-color: #F8F9FA;
+  max-width: 440px;
+  margin: 0 auto;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #1A1A1A;
+}
+
+.pro-main-content {
+  padding: 12px 16px 90px 16px;
+}
+
+/* Mode Client Button */
+.mode-client-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.btn-mode-client {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 20px;
+  padding: 7px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: background-color 0.2s, border-color 0.2s;
+
+  &:hover {
+    background-color: #F9FAFB;
+    border-color: #D1D5DB;
+  }
+}
+
+/* Card Section */
+.pro-card-section {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 18px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.section-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+
+  .icon-box-red {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: #FFF1F2;
+    border-radius: 6px;
+  }
+
+  .icon-box-red-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1A1A1A;
+    margin: 0;
+  }
+}
+
+/* Dropzone styling */
+.dropzone-box {
+  border: 1.5px dashed #F87171;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+
+  &:hover {
+    background-color: #FFF8F8;
+    border-color: #E51A29;
+  }
+
+  .dropzone-icon {
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .dropzone-title {
+    font-weight: 700;
+    font-size: 13px;
+    color: #1A1A1A;
+    margin: 0 0 3px 0;
+  }
+
+  .dropzone-sub {
+    font-size: 12px;
+    color: #6B7280;
+    margin: 0;
+
+    .link-underline {
+      color: #E51A29;
+      text-decoration: underline;
+      font-weight: 500;
+    }
+  }
+}
+
+.file-input-hidden {
+  display: none;
+}
+
+/* Form inputs & labels */
+.form-group {
+  margin-bottom: 14px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.field-label {
+  display: block;
+  font-size: 12px;
+  color: #757575;
+  margin-bottom: 6px;
+  font-weight: 400;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #1A1A1A;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: #E51A29;
+    box-shadow: 0 0 0 3px rgba(229, 26, 41, 0.1);
+  }
+}
+
+.font-serif-bold {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.font-serif {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+.form-textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* Opening Hours List */
+.hours-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hours-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hours-day {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.hours-input {
+  width: 140px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #1A1A1A;
+  text-align: center;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: #E51A29;
+  }
+}
+
+/* Action Buttons */
+.action-buttons-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  margin-bottom: 24px;
+}
+
+.btn-cancel {
+  flex: 1;
+  height: 48px;
+  background: #EAEAEA;
+  color: #1A1A1A;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background: #E0E0E0;
+  }
+}
+
+.btn-submit {
+  flex: 1;
+  height: 48px;
+  background: #E51A29;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background: #D01524;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}

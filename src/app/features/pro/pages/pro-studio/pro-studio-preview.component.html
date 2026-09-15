@@ -1,0 +1,81 @@
+<div class="pro-app-layout studio-preview-screen">
+
+  <div class="video-container">
+    <!-- Fullscreen Video / Fallback Image -->
+    <video [src]="video.videoUrl" [poster]="video.thumbnailUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'" autoplay loop muted playsinline class="fullscreen-video"></video>
+
+    <!-- Top Overlay Gradient & Header -->
+    <div class="top-gradient-overlay"></div>
+    
+    <header class="preview-top-header">
+      <a routerLink="/pro/studio" class="btn-back-circle" aria-label="Retour">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5">
+          <path d="M15 19L8 12L15 5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+
+      <h1 class="top-title font-serif">Aperçu de la Vidéo</h1>
+    </header>
+
+    <!-- Bottom Gradient Overlay -->
+    <div class="bottom-gradient-overlay"></div>
+
+    <!-- Right Side Actions Column -->
+    <div class="side-actions-column">
+      <!-- Like Button -->
+      <div class="action-btn-item">
+        <button type="button" class="btn-circle-translucent" [class.liked]="isLiked" (click)="toggleLike()" aria-label="J'aime">
+          <svg width="20" height="20" viewBox="0 0 24 24" [attr.fill]="isLiked ? '#E51A29' : 'none'" [attr.stroke]="isLiked ? '#E51A29' : '#FFFFFF'" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.72-8.72 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </button>
+        <span class="action-label">{{ likesCountFormatted }}</span>
+      </div>
+
+      <!-- Share Button -->
+      <div class="action-btn-item">
+        <button type="button" class="btn-circle-translucent" (click)="shareVideo()" aria-label="Partager">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2">
+            <circle cx="18" cy="5" r="3"/>
+            <circle cx="6" cy="12" r="3"/>
+            <circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+        </button>
+        <span class="action-label">Partager</span>
+      </div>
+    </div>
+
+    <!-- Bottom Left Dish Info Overlay -->
+    <div class="dish-info-overlay">
+      <h2 class="dish-name-line font-serif-bold">
+        {{ video.dishName || video.title }}
+      </h2>
+      <p class="dish-price-line font-serif-bold">
+        {{ (video.priceFcfa || 4500) | number }} FCFA
+      </p>
+    </div>
+
+    <!-- Bottom Fixed Action Bar -->
+    <div class="bottom-fixed-bar">
+      <button type="button" class="btn-commander-red font-serif" (click)="goToOrder()">
+        Commander
+      </button>
+      <a routerLink="/cart" class="btn-cart-square" aria-label="Panier">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2">
+          <path d="M9 20C9 20.5523 8.55228 21 8 21C7.44772 21 7 20.5523 7 20C7 19.4477 7.44772 19 8 19C8.55228 19 9 19.4477 9 20Z"/>
+          <path d="M20 20C20 20.5523 19.5523 21 19 21C18.4477 21 18 20.5523 18 20C18 19.4477 18.4477 19 19 19C19.5523 19 20 19.4477 20 20Z"/>
+          <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+
+    <!-- Mobile Home Indicator -->
+    <div class="home-indicator-bar">
+      <div class="home-indicator"></div>
+    </div>
+
+  </div>
+
+</div>

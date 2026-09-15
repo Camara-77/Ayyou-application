@@ -1,0 +1,28 @@
+<div class="driver-login-page">
+  <div class="split-container">
+    <!-- Left Hero Banner Column -->
+    <div class="banner-column">
+      <app-driver-login-banner></app-driver-login-banner>
+    </div>
+
+    <!-- Right Form Column -->
+    <div class="form-column">
+      <app-driver-login-form-card
+        [isLoading]="isLoading"
+        [errorMessage]="loginErrorMessage"
+        [initialIdentifier]="initialIdentifier"
+        (submitForm)="onLoginSubmit($event)"
+        (openRecovery)="onOpenRecovery()"
+      ></app-driver-login-form-card>
+    </div>
+  </div>
+
+  <!-- Password Recovery Modal -->
+  <app-driver-password-recovery-modal
+    *ngIf="showRecoveryModal"
+    [isLoading]="isLoading"
+    [errorMessage]="recoveryErrorMessage"
+    (requestRecovery)="onRequestRecovery($event)"
+    (closeModal)="onCloseRecovery()"
+  ></app-driver-password-recovery-modal>
+</div>

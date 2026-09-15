@@ -1,0 +1,170 @@
+<div class="delivery-app-layout">
+  <!-- Top Navigation Header -->
+  <header class="delivery-header">
+    <button class="btn-header-square" (click)="goBack()" aria-label="Retour">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+    </button>
+    
+    <h1 class="header-title">Détail Course</h1>
+
+    <button class="btn-header-square rel" aria-label="Notifications">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      </svg>
+      <span class="notification-dot-red"></span>
+    </button>
+  </header>
+
+  <!-- Main Scrollable Content -->
+  <main class="delivery-content">
+    <!-- Confirmation Header Section -->
+    <div class="confirmation-section">
+      <div class="confirmation-outer-box">
+        <div class="confirmation-inner-red">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+      </div>
+
+      <h2 class="confirmation-title">Livraison terminée !</h2>
+      <p class="confirmation-sub">Félicitations pour cette course menée avec succès.</p>
+
+      <!-- Course Identification Capsule -->
+      <div class="course-capsule">
+        {{ course.orderRef }} • {{ course.completionTime }} · {{ course.deliveryLocationShort }}
+      </div>
+    </div>
+
+    <!-- Remuneration Card -->
+    <div class="remuneration-card">
+      <!-- Total Instantane Gray Box -->
+      <div class="total-box">
+        <div class="total-top-line">
+          <span class="label-gray">Total instantané</span>
+          <span class="credited-pill">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+            </svg>
+            CRÉDITÉ
+          </span>
+        </div>
+        <div class="total-amount">{{ course.instantTotalFcfa }}</div>
+      </div>
+
+      <!-- Net Gain Row -->
+      <div class="gain-row">
+        <span class="gain-label">Gain net de course</span>
+        <span class="gain-value">{{ course.netGainFcfa }}</span>
+      </div>
+
+      <!-- Payment Method Box -->
+      <div class="payment-box">
+        <div class="payment-left">
+          <div class="phone-icon-bg">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+              <line x1="12" y1="18" x2="12.01" y2="18"></line>
+            </svg>
+          </div>
+          <span class="payment-name">{{ course.paymentMethod }}</span>
+        </div>
+        <div class="payment-right">
+          <span class="dot-red-small"></span>
+          <span class="payment-status">{{ course.paymentStatus }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Itinerary Details Card -->
+    <div class="itinerary-card">
+      <div class="itinerary-header">
+        <span class="section-title-label">DÉTAILS DE L'ITINÉRAIRE</span>
+        <span class="qr-validated-badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+            <rect x="14" y="14" width="3" height="3"></rect>
+          </svg>
+          {{ course.validationMethod }}
+        </span>
+      </div>
+
+      <!-- Vertical Timeline -->
+      <div class="timeline-container">
+        <!-- Pickup Node -->
+        <div class="timeline-step">
+          <div class="node-col">
+            <div class="node-circle dot-grey"></div>
+            <div class="line-connector"></div>
+          </div>
+          <div class="step-info">
+            <span class="step-label">PRISE EN CHARGE</span>
+            <span class="step-name">{{ course.pickupLocation.name }}</span>
+            <span class="step-address">{{ course.pickupLocation.address }}</span>
+          </div>
+        </div>
+
+        <!-- Dropoff Node -->
+        <div class="timeline-step">
+          <div class="node-col">
+            <div class="node-circle dot-red"></div>
+          </div>
+          <div class="step-info">
+            <span class="step-label label-red">LIVRÉ À</span>
+            <span class="step-name">{{ course.dropoffLocation.name }}</span>
+            <span class="step-address">{{ course.dropoffLocation.address }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Duration & Distance Box -->
+      <div class="stats-box">
+        <div class="stat-item">
+          <div class="stat-icon-circle">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <div class="stat-text-col">
+            <span class="stat-label">DURÉE</span>
+            <span class="stat-value">{{ course.durationMinutes }}</span>
+          </div>
+        </div>
+
+        <div class="stat-item">
+          <div class="stat-icon-circle">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6L6 18"></path>
+              <path d="M8 6h10v10"></path>
+            </svg>
+          </div>
+          <div class="stat-text-col">
+            <span class="stat-label">DISTANCE</span>
+            <span class="stat-value">{{ course.distanceKm }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Final Action Button -->
+  <footer class="delivery-footer">
+    <button class="btn-next-course" (click)="readyForNextCourse()">
+      <span>Prêt pour une nouvelle course</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+      </svg>
+    </button>
+  </footer>
+
+  <!-- Bottom Navigation Bar -->
+  <app-delivery-bottom-nav activeTab="deliveries"></app-delivery-bottom-nav>
+</div>

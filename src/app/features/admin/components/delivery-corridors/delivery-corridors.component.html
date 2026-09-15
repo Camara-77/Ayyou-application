@@ -1,0 +1,45 @@
+<div class="corridors-card">
+  <!-- Card Header Row -->
+  <div class="card-header-row">
+    <div class="title-group">
+      <h3 class="section-title">Corridors & Flux Urbains</h3>
+      <span class="telemetry-sub">• Capteurs GPS télémétrie active</span>
+    </div>
+    <span class="axes-tag">3 AXES CRITIQUES</span>
+  </div>
+
+  <!-- 3 Corridor Cards Grid -->
+  <div class="corridors-grid">
+    <div *ngFor="let c of corridors" class="corridor-box">
+      <div class="corridor-top">
+        <span class="corridor-name">{{ c.name }}</span>
+        <span class="traffic-tag" [ngClass]="'traffic-' + c.color">
+          ● {{ c.trafficLabel }}
+        </span>
+      </div>
+
+      <div class="metrics-row">
+        <div class="metric-unit">
+          <span class="unit-label">VOLUME</span>
+          <span class="unit-val">{{ c.volumeCount }}</span>
+        </div>
+        <div class="metric-unit">
+          <span class="unit-label">TEMPS MOYEN</span>
+          <span class="unit-val">{{ c.avgTimeMinutes }} min</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Dakar Peninsula Leaflet Map -->
+  <div class="map-visual-container">
+    <div #mapContainer class="leaflet-dakar-map"></div>
+
+    <!-- Map Legend Bar Overlay -->
+    <div class="map-legend-bar">
+      <span class="legend-item text-green">● Corniche Ouest (Fluide)</span>
+      <span class="legend-item text-orange">● Almadies & Ngor (Modéré)</span>
+      <span class="legend-item text-red">● VDN & Patte d'Oie (Ralentissements)</span>
+    </div>
+  </div>
+</div>

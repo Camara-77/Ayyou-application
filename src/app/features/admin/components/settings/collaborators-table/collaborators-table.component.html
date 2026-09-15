@@ -1,0 +1,83 @@
+<div class="collaborators-table-card">
+  <div class="card-top-header">
+    <div class="title-wrap">
+      <h2 class="section-title">Collaborateurs autorisés sur la Console AYYOU Pro</h2>
+      <p class="section-subtitle">
+        Attribution des accès d'administration et état des comptes de l'état-major.
+      </p>
+    </div>
+
+    <div class="actions-wrap">
+      <div class="search-input-box">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          type="text"
+          placeholder="Rechercher un membre, email, rôle..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearchInput()"
+        />
+      </div>
+
+      <button type="button" class="btn-primary-red" (click)="openInviteModal.emit()">
+        + Inviter un collaborateur
+      </button>
+    </div>
+  </div>
+
+  <div class="table-container mt-16">
+    <table class="collaborators-table">
+      <thead>
+        <tr>
+          <th>COLLABORATEUR</th>
+          <th>RÔLE SYSTÈME</th>
+          <th>PÉRIMÈTRE ACCORDÉ</th>
+          <th>DERNIÈRE CONNEXION</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let col of collaborators">
+          <!-- Collaborateur Avatar & Name -->
+          <td class="col-user">
+            <div class="user-row">
+              <div class="avatar-circle">
+                {{ col.initials }}
+              </div>
+              <div class="user-details">
+                <span class="user-name">
+                  <strong>{{ col.name }}</strong>
+                  <span class="user-sub" *ngIf="col.subtitle"> {{ col.subtitle }}</span>
+                </span>
+                <span class="user-email">{{ col.email }}</span>
+              </div>
+            </div>
+          </td>
+
+          <!-- Rôle système -->
+          <td class="col-role">
+            <span class="role-title" [class.is-superadmin]="col.role === 'Super Administrateur'">
+              {{ col.role }}
+            </span>
+          </td>
+
+          <!-- Périmètre accordé -->
+          <td class="col-scope">
+            <span class="scope-text">{{ col.scope }}</span>
+          </td>
+
+          <!-- Dernière connexion / Status -->
+          <td class="col-status">
+            <div class="status-indicator">
+              <span class="dot-online" *ngIf="col.isOnline"></span>
+              <span class="last-conn-text" [class.text-online]="col.isOnline">
+                {{ col.lastConnection }}
+              </span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

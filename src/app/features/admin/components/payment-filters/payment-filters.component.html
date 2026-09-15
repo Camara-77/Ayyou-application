@@ -1,0 +1,97 @@
+<div class="payment-filters-wrap">
+  <!-- Top Pill Tabs Row -->
+  <div class="filter-pills-row">
+    <button
+      type="button"
+      class="pill-btn"
+      [class.active]="selectedTab === 'ALL'"
+      (click)="onTabSelect('ALL')"
+    >
+      Tous les flux ({{ totalCount }})
+    </button>
+
+    <button
+      type="button"
+      class="pill-btn"
+      [class.active]="selectedTab === 'ABONNEMENTS'"
+      (click)="onTabSelect('ABONNEMENTS')"
+    >
+      Abonnements AYYOU Pro ({{ subscriptionsCount }})
+    </button>
+
+    <button
+      type="button"
+      class="pill-btn"
+      [class.active]="selectedTab === 'VERSEMENTS_RESTAURANTS'"
+      (click)="onTabSelect('VERSEMENTS_RESTAURANTS')"
+    >
+      Versements Restaurants ({{ restaurantsCount }})
+    </button>
+
+    <button
+      type="button"
+      class="pill-btn"
+      [class.active]="selectedTab === 'REMUNERATIONS_LIVREURS'"
+      (click)="onTabSelect('REMUNERATIONS_LIVREURS')"
+    >
+      Rémunérations Livreurs ({{ couriersCount }})
+    </button>
+
+    <button
+      type="button"
+      class="pill-btn"
+      [class.active]="selectedTab === 'ECARTS_LITIGES'"
+      (click)="onTabSelect('ECARTS_LITIGES')"
+    >
+      Écarts & Litiges de paie ({{ disputesCount }})
+    </button>
+  </div>
+
+  <!-- Search & Dropdowns Controls Bar -->
+  <div class="controls-bar">
+    <div class="search-input-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input
+        type="text"
+        placeholder="Rechercher transaction, ID Wave, commerçant, livreur..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearchInput()"
+      />
+    </div>
+
+    <div class="dropdown-group">
+      <div class="select-wrapper">
+        <span class="select-label">Méthode :</span>
+        <select [(ngModel)]="selectedMethod" (change)="onMethodSelect()">
+          <option value="ALL">Toutes (Wave, OM, CB)</option>
+          <option value="WAVE">Wave</option>
+          <option value="ORANGE_MONEY">Orange Money</option>
+          <option value="PRELEVEMENT_CB">Prélèvement CB</option>
+        </select>
+      </div>
+
+      <div class="select-wrapper">
+        <span class="select-label">Période :</span>
+        <select [(ngModel)]="selectedPeriod" (change)="onPeriodSelect()">
+          <option value="MAY_2024">Ce mois (Mai 2024)</option>
+          <option value="APRIL_2024">Mois dernier (Avril 2024)</option>
+          <option value="YEAR_2024">Année 2024</option>
+        </select>
+      </div>
+
+      <div class="select-wrapper">
+        <span class="select-label">Statut :</span>
+        <select [(ngModel)]="selectedStatus" (change)="onStatusSelect()">
+          <option value="ALL">Tous les statuts</option>
+          <option value="RECONCILIE">Réconcilié</option>
+          <option value="PAYE">Payé</option>
+          <option value="EN_ATTENTE">En attente / À vérifier</option>
+          <option value="ECHEANCE_PROCHE">Échéance proche</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>

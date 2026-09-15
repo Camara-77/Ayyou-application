@@ -1,0 +1,45 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="onClose()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="title-wrap">
+        <h3 class="modal-title">RÉORDONNER LES CATÉGORIES CLIENT (FEED HOME)</h3>
+        <span class="sub-label">Définissez l'ordre d'affichage dans le carrousel de découverte de l'application AYYOU</span>
+      </div>
+      <button type="button" class="btn-close-circle" (click)="onClose()">✕</button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body-scroll">
+      <div class="reorder-list">
+        <div *ngFor="let cat of orderedCategories; let i = index" class="reorder-item">
+          <div class="order-badge">#{{ i + 1 }}</div>
+
+          <img [src]="cat.imageUrl" [alt]="cat.name" class="cat-thumb" />
+
+          <div class="cat-meta">
+            <span class="c-name">{{ cat.name }}</span>
+            <span class="c-type">{{ cat.type }} • {{ cat.subCategoryTag || 'PRINCIPALE' }}</span>
+          </div>
+
+          <div class="arrow-buttons">
+            <button type="button" class="btn-arrow" [disabled]="i === 0" (click)="moveUp(i)" title="Monter">
+              ▲
+            </button>
+            <button type="button" class="btn-arrow" [disabled]="i === orderedCategories.length - 1" (click)="moveDown(i)" title="Descendre">
+              ▼
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="modal-footer">
+      <button type="button" class="btn-cancel" (click)="onClose()">Annuler</button>
+      <button type="button" class="btn-save-red" (click)="onSave()">
+        💾 Enregistrer la priorité du feed client
+      </button>
+    </div>
+  </div>
+</div>

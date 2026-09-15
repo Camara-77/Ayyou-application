@@ -1,0 +1,57 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="onClose()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="title-wrap">
+        <h3 class="modal-title">Journal d'Audit Système & Traces d'Accès</h3>
+        <p class="modal-subtitle">Historique des actions administratives effectuées sur la plateforme AYYOU PRO Dakar</p>
+      </div>
+
+      <button type="button" class="btn-close-x" (click)="onClose()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="logs-table-container">
+        <table class="logs-table">
+          <thead>
+            <tr>
+              <th>HORODATAGE</th>
+              <th>ADMINISTRATEUR</th>
+              <th>ACTION EFFECTUÉE</th>
+              <th>RESSOURCE CIBLE</th>
+              <th>ADRESSE IP</th>
+              <th>RÉSULTAT</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let log of auditLogs">
+              <td class="col-time">{{ log.timestampText }}</td>
+              <td class="col-admin">
+                <strong>{{ log.administratorName }}</strong>
+                <span class="admin-email">{{ log.adminEmail }}</span>
+              </td>
+              <td class="col-action">
+                <span class="action-tag">{{ log.action }}</span>
+              </td>
+              <td class="col-target">{{ log.targetResource }}</td>
+              <td class="col-ip"><code>{{ log.ipAddress }}</code></td>
+              <td class="col-status">
+                <span
+                  class="status-badge"
+                  [class.badge-success]="log.status === 'SUCCESS'"
+                  [class.badge-warning]="log.status === 'WARNING'"
+                  [class.badge-failed]="log.status === 'FAILED'"
+                >
+                  {{ log.statusLabel }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-close-gray" (click)="onClose()">Fermer</button>
+    </div>
+  </div>
+</div>

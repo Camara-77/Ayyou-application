@@ -1,0 +1,135 @@
+.catalog-filters-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .filter-pills-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .pill-btn {
+      background: #F3F4F6;
+      border: none;
+      border-radius: 12px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #555555;
+      cursor: pointer;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+
+      .dot-indicator {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block;
+
+        &.green-dot { background-color: #16A34A; }
+        &.red-dot { background-color: #E51B2A; }
+        &.orange-dot { background-color: #F59E0B; }
+      }
+
+      &:hover {
+        background: #E5E7EB;
+        color: #1A1A1A;
+      }
+
+      &.active {
+        background: #1A1A1A;
+        color: #FFFFFF;
+
+        .dot-indicator {
+          background-color: #FFFFFF;
+        }
+      }
+    }
+  }
+
+  .controls-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    @media (max-width: 992px) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .search-input-box {
+      flex: 1;
+      background: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      padding: 9px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      svg {
+        color: #9CA3AF;
+        flex-shrink: 0;
+      }
+
+      input {
+        border: none;
+        background: transparent;
+        width: 100%;
+        font-size: 13px;
+        color: #1A1A1A;
+        font-weight: 500;
+
+        &::placeholder {
+          color: #9CA3AF;
+        }
+
+        &:focus {
+          outline: none;
+        }
+      }
+    }
+
+    .dropdown-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      @media (max-width: 768px) {
+        flex-wrap: wrap;
+      }
+
+      .select-wrapper {
+        background: #F9FAFB;
+        border: 1px solid #E5E7EB;
+        border-radius: 12px;
+        padding: 6px 12px;
+        display: flex;
+        align-items: center;
+
+        select {
+          border: none;
+          background: transparent;
+          font-size: 13px;
+          font-weight: 700;
+          color: #1A1A1A;
+          cursor: pointer;
+          padding-right: 4px;
+
+          &:focus {
+            outline: none;
+          }
+        }
+      }
+    }
+  }
+}

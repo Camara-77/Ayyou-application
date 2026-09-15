@@ -1,0 +1,125 @@
+.dish-card {
+  display: flex;
+  gap: 12px;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 10px;
+  border: 1px solid #F0F0F0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+
+  .dish-img-wrapper {
+    width: 90px;
+    height: 90px;
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    .dish-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .dish-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .dish-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1A1A1A;
+      margin: 0 0 4px;
+      line-height: 1.3;
+    }
+
+    .dish-desc {
+      font-size: 12px;
+      color: #757575;
+      margin: 0 0 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.3;
+    }
+
+    .dish-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .dish-price {
+        font-size: 14px;
+        font-weight: 800;
+        color: #E51A29;
+      }
+
+      .btn-see-more {
+        padding: 6px 14px;
+        border-radius: 20px;
+        background-color: #FFFFFF;
+        color: #E51A29;
+        border: 1px solid #E0E0E0;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+        transition: all 0.2s ease;
+
+        .arrow {
+          font-size: 13px;
+          font-weight: 700;
+          color: #E51A29;
+          transition: transform 0.15s ease;
+        }
+
+        &:hover {
+          border-color: #E51A29;
+          background-color: #FFF5F5;
+
+          .arrow {
+            transform: translateX(2px);
+          }
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+    }
+  }
+
+  &.compact {
+    flex-direction: column;
+    width: 140px;
+    padding: 8px;
+
+    .dish-img-wrapper {
+      width: 100%;
+      height: 100px;
+    }
+
+    .dish-info {
+      .dish-title {
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .dish-bottom {
+        margin-top: 6px;
+        .dish-price {
+          font-size: 13px;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+<div
+  class="chatbot-wrapper"
+  [style.left.px]="posX"
+  [style.top.px]="posY"
+  [class.dragging]="isDragging"
+>
+  <button
+    class="chatbot-btn"
+    (mousedown)="onMouseDown($event)"
+    (touchstart)="onTouchStart($event)"
+    (click)="toggleChat($event)"
+    aria-label="Assistant AYYOU AI"
+  >
+    <div class="icon-container">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C6.477 2 2 6.477 2 12C2 13.82 2.487 15.525 3.337 17L2 22L7 20.663C8.475 21.513 10.18 22 12 22C17.523 22 22 17.523 22 12C22 6.477 17.523 2 12 2Z" fill="#FFFFFF"/>
+        <path d="M8 11H16M8 15H13" stroke="#E51A29" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <span *ngIf="badgeCount > 0" class="badge">{{ badgeCount }}</span>
+  </button>
+
+  <!-- Popover when clicked -->
+  <div class="chat-popover" *ngIf="isOpen">
+    <div class="popover-header">
+      <span>Assistant AYYOU AI 🤖</span>
+      <button class="close-btn" (click)="toggleChat($event)">✕</button>
+    </div>
+    <div class="popover-body">
+      <p>Bonjour ! Je suis votre assistant AYYOU. Comment puis-je vous aider aujourd'hui ?</p>
+    </div>
+  </div>
+</div>

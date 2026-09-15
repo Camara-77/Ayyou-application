@@ -1,0 +1,59 @@
+<div class="delivery-stats-grid" *ngIf="stats">
+  <!-- Card 1: Courses en cours -->
+  <div
+    class="stat-card"
+    [class.active-card]="selectedTab === 'ALL'"
+    (click)="onCardClick('ALL')"
+  >
+    <div class="card-title-row">
+      <span class="card-title">Courses en cours</span>
+      <i class="ri-swap-line card-icon"></i>
+    </div>
+    <div class="card-value">{{ stats.activeCoursesCount }}</div>
+    <div class="card-subtext">Sur la route en ce moment</div>
+  </div>
+
+  <!-- Card 2: Temps moyen de livraison -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">Temps moyen de livraison</span>
+      <i class="ri-timer-flash-line card-icon"></i>
+    </div>
+    <div class="card-value">{{ stats.avgDeliveryTimeMinutes }} <span class="unit">min</span></div>
+    <div class="card-subtext">Objectif &lt; 28 min à Dakar</div>
+  </div>
+
+  <!-- Card 3: Taux de ponctualité -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">Taux de ponctualité</span>
+      <span class="dot-indicator green-dot"></span>
+    </div>
+    <div class="card-value">{{ stats.punctualityRate }}</div>
+    <div class="card-subtext">Conforme aux standards</div>
+  </div>
+
+  <!-- Card 4: Incidents / Retards signalés -->
+  <div
+    class="stat-card incident-card"
+    [class.active-card]="selectedTab === 'INCIDENTS'"
+    (click)="onCardClick('INCIDENTS')"
+  >
+    <div class="card-title-row">
+      <span class="card-title">Incidents / Retards signalés</span>
+      <span class="dot-indicator red-dot"></span>
+    </div>
+    <div class="card-value text-red">{{ stats.incidentsCount }}</div>
+    <div class="card-subtext text-red font-bold">À traiter immédiatement</div>
+  </div>
+
+  <!-- Card 5: Vitesse moyenne flotte -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">Vitesse moyenne flotte</span>
+      <i class="ri-dashboard-3-line card-icon"></i>
+    </div>
+    <div class="card-value">{{ stats.avgSpeedKmH }} <span class="unit">km/h</span></div>
+    <div class="card-subtext">Trafic fluide sur VDN & Corniche</div>
+  </div>
+</div>

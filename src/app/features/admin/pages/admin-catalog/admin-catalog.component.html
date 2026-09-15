@@ -1,0 +1,73 @@
+<div class="catalog-page-container">
+  <!-- Top Header Section with Title & Action Buttons -->
+  <div class="page-header-row">
+    <div class="title-wrap">
+      <h1 class="main-title">Catalogue & Articles</h1>
+      <p class="subtitle">
+        Gestion globale de l'inventaire marchand, modération des fiches produits, validation des contenus photos/vidéos et conformité tarifaire.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="btn-primary-red" (click)="onOpenAddCategoryModal()">
+        + Ajouter une categorie
+      </button>
+
+      <button type="button" class="btn-primary-red" (click)="onViewCategories()" routerLink="/admin/categories">
+        Voir les categories
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Stats Block -->
+  <div class="mt-20">
+    <app-catalog-stats
+      *ngIf="statsSummary$ | async as stats"
+      [stats]="stats"
+    ></app-catalog-stats>
+  </div>
+
+  <!-- Filter Pills + Search Row -->
+  <div class="mt-24">
+    <app-catalog-filters
+      [selectedTab]="(activeTab$ | async) || 'ALL'"
+      [categories]="(categories$ | async) || []"
+      (tabChange)="onTabChange($event)"
+      (searchChange)="onSearchChange($event)"
+      (categoryChange)="onCategoryChange($event)"
+      (establishmentChange)="onEstablishmentChange($event)"
+    ></app-catalog-filters>
+  </div>
+
+  <!-- Main Grid (2/3 Table on Left, 1/3 Details Panel on Right) -->
+  <div class="catalog-main-grid mt-24">
+    <div class="table-column">
+      <app-catalog-table
+        *ngIf="articles$ | async as articles"
+        [articles]="articles"
+        [selectedArticle]="selectedArticle$ | async"
+        (selectArticle)="onSelectArticle($event)"
+      ></app-catalog-table>
+    </div>
+
+    <!-- Right Side Details Column -->
+    <div class="details-column" *ngIf="selectedArticle$ | async as selectedArticle">
+      <app-catalog-details-panel
+        [article]="selectedArticle"
+        (closePanel)="onClosePanel()"
+        (updateModeration)="onUpdateModeration($event)"
+        (updateStock)="onUpdateStock($event)"
+      ></app-catalog-details-panel>
+    </div>
+  </div>
+
+  <!-- Category Management & Edit Modal -->
+  <app-category-management-modal
+    [isOpen]="isCategoryModalOpen"
+    [categories]="(categories$ | async) || []"
+    [editingCategory]="editingCategory"
+    (closeModal)="onCloseCategoryModal()"
+    (saveCategory)="onSaveCategory($event)"
+    (deleteCategory)="onDeleteCategory($event)"
+  ></app-category-management-modal>
+</div>

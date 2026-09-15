@@ -1,0 +1,260 @@
+<div class="settings-page-container">
+  <!-- Top Header Section -->
+  <div class="page-header-row">
+    <div class="title-wrap">
+      <h1 class="main-title">Paramètres & Administration</h1>
+      <p class="subtitle">
+        Gestion des rôles et permissions des administrateurs, configuration de la grille tarifaire de livraison et découpage géographique de Dakar.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="btn-outline-gray" (click)="onOpenAuditModal()">
+        Journal d'audit système
+      </button>
+
+      <button
+        type="button"
+        class="btn-primary-red"
+        [class.has-changes]="hasUnsavedChanges"
+        (click)="onSaveSettings()"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span>Enregistrer les modifications</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Summary Cards Grid -->
+  <div class="summary-cards-grid mt-24" *ngIf="summaryCards$ | async as cards">
+    <div class="summary-card" *ngFor="let card of cards">
+      <span class="card-title-tag">{{ card.title }}</span>
+      <h3 class="card-main-val">{{ card.mainValue }}</h3>
+      <div class="card-sub-row">
+        <span class="dot-indicator" [ngClass]="'dot-' + card.dotColor"></span>
+        <span class="card-subtext">{{ card.subtext }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Tabs Row -->
+  <div class="settings-tabs-bar mt-24">
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab === 'EQUIPE'"
+      (click)="onTabSelect('EQUIPE')"
+    >
+      Équipe & Rôles d'accès
+    </button>
+
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab === 'ZONES'"
+      (click)="onTabSelect('ZONES')"
+    >
+      Zones géographiques & Corridors
+    </button>
+
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab === 'PRICING'"
+      (click)="onTabSelect('PRICING')"
+    >
+      Tarification & Frais de course
+    </button>
+
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab === 'PAYMENTS'"
+      (click)="onTabSelect('PAYMENTS')"
+    >
+      Intégrations & Passerelles de paiement
+    </button>
+
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab === 'SECURITY'"
+      (click)="onTabSelect('SECURITY')"
+    >
+      Sécurité
+    </button>
+  </div>
+
+  <!-- Tab Content Views -->
+  <div class="tab-content-area mt-20">
+    <!-- Tab 1: Équipe & Rôles d'accès -->
+    <div class="team-grid-layout" *ngIf="activeTab === 'EQUIPE'">
+      <div class="table-column">
+        <app-collaborators-table
+          [collaborators]="(collaborators$ | async) || []"
+          (openInviteModal)="onOpenInviteModal()"
+          (searchQueryChange)="onSearchCollaborators($event)"
+        ></app-collaborators-table>
+      </div>
+
+      <div class="panel-column">
+        <app-role-permissions-panel
+          [roleConfig]="rolePermissions$ | async"
+          (togglePermission)="onTogglePermission($event)"
+        ></app-role-permissions-panel>
+      </div>
+    </div>
+
+    <!-- Tab 2: Zones géographiques & Corridors -->
+    <div class="zones-tab-view" *ngIf="activeTab === 'ZONES'">
+      <div class="view-header-card">
+        <div class="header-info">
+          <h2 class="view-title">Découpage Territorial & Corridors Dakar</h2>
+          <p class="view-subtitle">Gestion des 12 zones de livraison et des règles d'attribution des livreurs sur la presqu'île du Cap-Vert.</p>
+        </div>
+      </div>
+
+      <div class="zones-grid mt-16" *ngIf="zones$ | async as zones">
+        <div class="zone-card" *ngFor="let z of zones">
+          <div class="zone-top">
+            <span class="zone-badge">ZONE ACTIVE</span>
+            <h3 class="zone-name">{{ z.name }}</h3>
+          </div>
+          <div class="zone-details">
+            <span class="detail-item"><strong>{{ z.districtsCount }}</strong> quartiers associés</span>
+            <span class="detail-item"><strong>{{ z.corridorsCount }}</strong> corridors de livraison</span>
+            <span class="detail-item">Tarif socle : <strong>{{ z.baseDeliveryFee }} FCFA</strong></span>
+          </div>
+          <div class="districts-tags mt-10">
+            <span class="tag-chip" *ngFor="let d of z.districtsList">{{ d }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Tarification & Frais de course -->
+    <div class="pricing-tab-view" *ngIf="activeTab === 'PRICING'">
+      <div class="view-header-card">
+        <div class="header-info">
+          <h2 class="view-title">Grille Tarifaire Kilométrique</h2>
+          <p class="view-subtitle">Barème de calcul automatisé des frais de livraison AYYOU en fonction de la distance, des tranches et des majorations météo/nuit.</p>
+        </div>
+      </div>
+
+      <div class="table-card mt-16">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>TRANCHE DE DISTANCE</th>
+              <th>DISTANCES (KM)</th>
+              <th>TARIF SOCLE (FCFA)</th>
+              <th>MAJORATION NUIT (+22H)</th>
+              <th>MAJORATION MÉTÉO (PLUIE)</th>
+              <th>STATUT</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let tier of pricingTiers$ | async">
+              <td class="font-bold">{{ tier.distanceLabel }}</td>
+              <td>{{ tier.minDistanceKm }} km - {{ tier.maxDistanceKm }} km</td>
+              <td class="font-bold text-red">{{ tier.priceFcfa }} FCFA</td>
+              <td>+{{ tier.nightSurchargeFcfa }} FCFA</td>
+              <td>+{{ tier.weatherSurchargeFcfa }} FCFA</td>
+              <td><span class="status-pill green">ACTIF</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 4: Intégrations & Passerelles de paiement -->
+    <div class="payments-tab-view" *ngIf="activeTab === 'PAYMENTS'">
+      <div class="view-header-card">
+        <div class="header-info">
+          <h2 class="view-title">Intégrations & Passerelles de Paiement Sénégal</h2>
+          <p class="view-subtitle">État opérationnel et synchronisation des APIs Wave, Orange Money et virements bancaires SEPA pour les payouts marchands.</p>
+        </div>
+      </div>
+
+      <div class="gateways-grid mt-16" *ngIf="paymentGateways$ | async as gateways">
+        <div class="gateway-card" *ngFor="let gw of gateways">
+          <div class="gw-header">
+            <h3 class="gw-name">{{ gw.name }}</h3>
+            <span class="gw-badge-green">{{ gw.statusLabel }}</span>
+          </div>
+          <div class="gw-body mt-12">
+            <div class="gw-metric">
+              <span class="m-label">Disponibilité API</span>
+              <span class="m-val text-green">{{ gw.uptimePercentage }}</span>
+            </div>
+            <div class="gw-metric">
+              <span class="m-label">Frais de traitement</span>
+              <span class="m-val">{{ gw.merchantFeePercentage }}%</span>
+            </div>
+            <div class="gw-metric">
+              <span class="m-label">Dernière vérification</span>
+              <span class="m-val">{{ gw.lastPingText }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 5: Sécurité -->
+    <div class="security-tab-view" *ngIf="activeTab === 'SECURITY'">
+      <div class="view-header-card">
+        <div class="header-info">
+          <h2 class="view-title">Paramètres de Sécurité & Conformité Console</h2>
+          <p class="view-subtitle">Politiques de contrôle d'accès, double authentification (2FA), timeouts de session et restriction d'adresse IP.</p>
+        </div>
+      </div>
+
+      <div class="security-settings-card mt-16">
+        <div class="setting-row">
+          <div class="row-info">
+            <h4 class="row-title">Double Authentification Obligatoire (2FA)</h4>
+            <p class="row-desc">Exiger la validation 2FA via SMS ou TOTP pour tous les comptes administrateurs.</p>
+          </div>
+          <span class="toggle-pill active">ACTIVÉ</span>
+        </div>
+
+        <div class="setting-row">
+          <div class="row-info">
+            <h4 class="row-title">Expiration Inactivité Session (30 min)</h4>
+            <p class="row-desc">Déconnexion automatique des sessions inactives après 30 minutes d'inactivité.</p>
+          </div>
+          <span class="toggle-pill active">ACTIVÉ</span>
+        </div>
+
+        <div class="setting-row">
+          <div class="row-info">
+            <h4 class="row-title">Filtrage & Restriction par Adresse IP</h4>
+            <p class="row-desc">Autoriser la connexion à la console uniquement depuis le Siège Almadies et le VPN AYYOU.</p>
+          </div>
+          <span class="toggle-pill active">ACTIVÉ</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification when saving settings -->
+  <div class="toast-saved-notification" *ngIf="showSavedToast">
+    ✓ Modifications des paramètres enregistrées avec succès sur les serveurs AYYOU
+  </div>
+
+  <!-- Invite Collaborator Modal -->
+  <app-invite-collaborator-modal
+    [isOpen]="isInviteModalOpen"
+    (closeModal)="onCloseInviteModal()"
+    (sendInvite)="onSendInvite($event)"
+  ></app-invite-collaborator-modal>
+
+  <!-- Audit Log Modal -->
+  <app-audit-log-modal
+    [isOpen]="isAuditModalOpen"
+    [auditLogs]="(auditLogs$ | async) || []"
+    (closeModal)="onCloseAuditModal()"
+  ></app-audit-log-modal>
+</div>

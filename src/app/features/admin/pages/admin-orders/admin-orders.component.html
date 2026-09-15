@@ -1,0 +1,85 @@
+<div class="orders-page-container">
+  <!-- Top Page Header -->
+  <div class="page-title-wrap">
+    <div class="title-left-block">
+      <h1 class="main-title">Commandes</h1>
+      <p class="subtitle">
+        Suivi en temps réel des commandes, ventilation multi-vendeurs et traçabilité des livraisons.
+      </p>
+    </div>
+
+    <div class="top-action-buttons">
+      <button class="btn-top-sobriety" (click)="onExportCsv()">
+        <i class="ri-download-line"></i> Exporter le relevé (CSV)
+      </button>
+      <button class="btn-top-sobriety" (click)="onReconciliation()">
+        <i class="ri-bank-line"></i> Rapprochement bancaire
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Block -->
+  <div class="mt-20">
+    <app-orders-stats
+      *ngIf="statsSummary$ | async as stats"
+      [stats]="stats"
+      [selectedTab]="(activeTab$ | async) || 'ALL'"
+      (selectTab)="onTabChange($event)"
+    ></app-orders-stats>
+  </div>
+
+  <!-- Filter Pills + Search Row -->
+  <div class="mt-24">
+    <app-orders-filters
+      *ngIf="statsSummary$ | async as stats"
+      [selectedTab]="(activeTab$ | async) || 'ALL'"
+      [totalCount]="stats.todayCount"
+      [inProgressCount]="stats.deliveringCount + stats.preparingCount"
+      [preparingCount]="stats.preparingCount"
+      [readyCount]="14"
+      [inDeliveryCount]="stats.deliveringCount"
+      [deliveredCount]="stats.deliveredCount"
+      [cancelledCount]="stats.canceledCount"
+      (tabChange)="onTabChange($event)"
+      (searchChange)="onSearchChange($event)"
+      (paymentStatusChange)="onPaymentStatusChange($event)"
+      (corridorChange)="onCorridorChange($event)"
+    ></app-orders-filters>
+  </div>
+
+  <!-- Main Grid (2/3 Table on Left, 1/3 Order Details Panel on Right) -->
+  <div class="orders-main-grid mt-24">
+    <div class="table-column">
+      <app-orders-table
+        *ngIf="orders$ | async as orders"
+        [orders]="orders"
+        [selectedOrder]="selectedOrder$ | async"
+        [totalOrders]="1240"
+        [currentPage]="currentPage"
+        [pageSize]="pageSize"
+        (selectOrder)="onSelectOrder($event)"
+        (pageChange)="onPageChange($event)"
+        (assignDriver)="onAssignDriver($event)"
+        (updateStatus)="onUpdateStatus($event)"
+      ></app-orders-table>
+
+      <!-- Logistics Corridors Block below table -->
+      <div class="mt-24">
+        <app-logistics-corridors
+          *ngIf="logisticsCorridors$ | async as corridors"
+          [corridors]="corridors"
+        ></app-logistics-corridors>
+      </div>
+    </div>
+
+    <!-- Right Side Details Column -->
+    <div class="details-column" *ngIf="selectedOrder$ | async as selectedOrder">
+      <app-order-details-panel
+        [order]="selectedOrder"
+        (closePanel)="onClosePanel()"
+        (assignDriver)="onAssignDriver($event)"
+        (updateStatus)="onUpdateStatus($event)"
+      ></app-order-details-panel>
+    </div>
+  </div>
+</div>

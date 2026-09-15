@@ -1,0 +1,43 @@
+<nav class="pro-bottom-nav">
+  <!-- Onglet 1: Accueil / Dashboard -->
+  <a routerLink="/pro/dashboard" class="nav-item" [class.active]="activeTab === 'dashboard'">
+    <div class="icon-wrapper">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 9.5L12 3L21 9.5V20C21 20.5523 20.5523 21 20 21H15V14H9V21H4C3.44772 21 3 20.5523 3 20V9.5Z" [attr.stroke]="activeTab === 'dashboard' ? '#E51A29' : '#757575'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [attr.fill]="activeTab === 'dashboard' ? '#E51A29' : 'none'" fill-opacity="0.12"/>
+      </svg>
+    </div>
+    <span class="nav-label">Accueil</span>
+  </a>
+
+  <!-- Onglet 2: Statistiques -->
+  <a routerLink="/pro/statistics" class="nav-item" [class.active]="activeTab === 'statistics'">
+    <div class="icon-wrapper">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 20V10M12 20V4M6 20V14" [attr.stroke]="activeTab === 'statistics' ? '#E51A29' : '#757575'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <span class="nav-label">Statistiques</span>
+  </a>
+
+  <!-- Onglet 3: Vidéos (AYYOU Studio) -->
+  <a routerLink="/pro/studio" class="nav-item" [class.active]="activeTab === 'studio'">
+    <div class="icon-wrapper">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M23 7L16 12L23 17V7Z" [attr.stroke]="activeTab === 'studio' ? '#E51A29' : '#757575'" [attr.fill]="activeTab === 'studio' ? '#E51A29' : 'none'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="1" y="5" width="15" height="14" rx="2" [attr.stroke]="activeTab === 'studio' ? '#E51A29' : '#757575'" stroke-width="2"/>
+      </svg>
+    </div>
+    <span class="nav-label">Vidéos</span>
+  </a>
+
+  <!-- Onglet 4: Profil Pro -->
+  <a routerLink="/pro/profile" class="nav-item" [class.active]="activeTab === 'profile'">
+    <div class="icon-wrapper">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" [attr.stroke]="activeTab === 'profile' ? '#E51A29' : '#757575'" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="12" cy="7" r="4" [attr.stroke]="activeTab === 'profile' ? '#E51A29' : '#757575'" [attr.fill]="activeTab === 'profile' ? '#E51A29' : 'none'" fill-opacity="0.12" stroke-width="2"/>
+      </svg>
+    </div>
+    <span class="nav-label">Profil</span>
+  </a>
+</nav>

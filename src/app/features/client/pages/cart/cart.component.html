@@ -1,0 +1,177 @@
+<div class="page-container">
+  <!-- Top Global Header -->
+  <app-header></app-header>
+
+  <main class="cart-content">
+    <!-- Page Header Row: Back button + Centered Title -->
+    <div class="cart-page-header">
+      <a routerLink="/home" class="btn-back-circle" aria-label="Retour">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 19L8 12L15 5" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <h1 class="page-title">Mon panier</h1>
+      <div class="header-spacer"></div>
+    </div>
+
+    <!-- Search Bar in /cart -->
+    <div class="cart-search-container">
+      <div class="search-input-wrapper">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="11" cy="11" r="7" stroke="#757575" stroke-width="2"/>
+          <path d="M20 20L16 16" stroke="#757575" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Plat, restaurant, burger, artisan..."
+          [(ngModel)]="searchQuery"
+        />
+      </div>
+    </div>
+
+    <!-- Empty Cart State -->
+    <div class="empty-cart" *ngIf="cartItems.length === 0">
+      <div class="empty-icon">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 3.5h3.2l2.4 10.4a1 1 0 0 0 1 .8h10.8a1 1 0 0 0 1-.8L22 7H7.5" stroke="#E51A29" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14 7.5v5M11.5 10h5" stroke="#E51A29" stroke-width="1.8" stroke-linecap="round"/>
+          <circle cx="9.5" cy="19.5" r="1.8" fill="#E51A29"/>
+          <circle cx="17.5" cy="19.5" r="1.8" fill="#E51A29"/>
+        </svg>
+      </div>
+      <h3 class="empty-title">Votre panier est vide</h3>
+      <p class="empty-subtitle">Explorez nos délicieux plats et ajoutez-les à votre commande.</p>
+      <a routerLink="/home" class="btn-explore">Découvrir le menu</a>
+    </div>
+
+    <!-- Cart Items List -->
+    <div *ngIf="cartItems.length > 0" class="cart-main">
+      <!-- Selection Toolbar -->
+      <div class="cart-selection-bar">
+        <label class="custom-checkbox-label">
+          <input
+            type="checkbox"
+            class="custom-checkbox-input"
+            [checked]="isAllSelected()"
+            (change)="toggleSelectAll($event)"
+          />
+          <span class="custom-checkbox-mark"></span>
+          <span class="select-all-text">Tout sélectionner</span>
+        </label>
+        <span class="selection-status-badge active-badge" *ngIf="hasExplicitSelection()">
+          {{ getSelectedCount() }} / {{ cartItems.length }} sélectionné(s)
+        </span>
+        <span class="selection-status-badge default-badge" *ngIf="!hasExplicitSelection()">
+          Tout le panier inclus
+        </span>
+      </div>
+
+      <div class="cart-items-list">
+        <div class="cart-item-card" *ngFor="let item of cartItems" [class.is-selected]="item.selected">
+          <label class="item-checkbox-wrapper" (click)="$event.stopPropagation()">
+            <input
+              type="checkbox"
+              class="custom-checkbox-input"
+              [checked]="item.selected || false"
+              (change)="toggleItemSelection(item.dish.id)"
+            />
+            <span class="custom-checkbox-mark"></span>
+          </label>
+
+          <img [src]="item.dish.imageUrl" [alt]="item.dish.name" class="item-img" />
+
+          <div class="item-details">
+            <div class="item-header">
+              <div class="title-and-desc">
+                <h4 class="item-name">{{ item.dish.name }}</h4>
+                <p class="item-desc" *ngIf="item.dish.description">{{ item.dish.description }}</p>
+              </div>
+              <button class="btn-trash" (click)="removeItem(item.dish.id)" aria-label="Supprimer">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3 6H5H21" stroke="#BDC3C7" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M19 6V20C19 20.5523 18.5523 21 18 21H6C5.44772 21 5 20.5523 5 20V6M8 6V4C8 3.44772 8.44772 3 9 3H15C15.5523 3 16 3.44772 16 4V6" stroke="#BDC3C7" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="item-footer">
+              <span class="unit-price">{{ formatPrice(item.dish.price * item.quantity) }}</span>
+              <app-quantity-selector
+                [quantity]="item.quantity"
+                (quantityChange)="updateQuantity(item.dish.id, $event)"
+              ></app-quantity-selector>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommendations Section (VOUS POURRIEZ AUSSI AIMER) -->
+      <div class="recommendations-section" *ngIf="recommendations.length > 0">
+        <div class="rec-section-header">
+          <div class="rec-title-group">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 21V14M4 10V3M12 21V12M12 8V3M20 21V16M20 12V3M1 14H7M9 8H15M17 16H23" stroke="#757575" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <h3 class="section-title">VOUS POURRIEZ AUSSI AIMER</h3>
+          </div>
+          <span class="extra-link">Extra</span>
+        </div>
+
+        <div class="recommendations-scroll">
+          <div class="rec-card" *ngFor="let dish of recommendations">
+            <div class="rec-img-wrapper">
+              <img [src]="dish.imageUrl" [alt]="dish.name" class="rec-img" />
+              <button class="btn-add-circle" (click)="addRecommendation(dish)" aria-label="Ajouter au panier">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 5V19M5 12H19" stroke="#E51A29" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <h4 class="rec-name">{{ dish.name }}</h4>
+            <span class="rec-price">{{ formatPrice(dish.price) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Totals Breakdown (DÉTAIL DU MONTANT) -->
+      <div class="totals-card">
+        <div class="totals-header-row">
+          <h4 class="totals-header-title">DÉTAIL DU MONTANT</h4>
+          <span class="totals-sub-badge" *ngIf="hasExplicitSelection()">({{ getSelectedCount() }} retenu(s))</span>
+        </div>
+        <div class="row">
+          <span class="label">Sous-total</span>
+          <span class="value">{{ formatPrice(cartService.getSubtotal()) }}</span>
+        </div>
+        <div class="row">
+          <span class="label">
+            Frais de livraison
+            <svg class="info-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="9" stroke="#9CA3AF" stroke-width="1.8"/>
+              <path d="M12 7V12L15 14" stroke="#9CA3AF" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="value">{{ formatPrice(cartService.getDeliveryFee()) }}</span>
+        </div>
+        <div class="divider"></div>
+        <div class="row total-row">
+          <span class="label">Total</span>
+          <div class="total-price-group">
+            <span class="value">{{ formatPrice(cartService.getTotal()) }}</span>
+            <span class="tax-note">TVA & taxes incluses</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Primary Checkout CTA Button -->
+      <button class="btn-checkout-primary" (click)="proceedToCheckout()">
+        <span class="btn-label">Passer la commande</span>
+        <span class="total-badge">{{ formatPrice(cartService.getTotal()) }} &rarr;</span>
+      </button>
+    </div>
+  </main>
+
+  <app-chatbot-floating></app-chatbot-floating>
+  <app-bottom-nav activeTab="cart"></app-bottom-nav>
+</div>

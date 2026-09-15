@@ -1,0 +1,41 @@
+<div class="businesses-page-container">
+  <!-- Header Title Wrap -->
+  <div class="page-title-wrap">
+    <h1 class="main-title">Restaurants & Vendeurs</h1>
+    <p class="subtitle">
+      Gestion des établissements partenaires, validation des dossiers d'adhésion et suivi des performances à Dakar.
+    </p>
+  </div>
+
+  <!-- Stats Cards Grid -->
+  <div class="mt-20">
+    <app-establishment-stats [stats]="stats$ | async"></app-establishment-stats>
+  </div>
+
+  <!-- Filter Pills & Neighborhood Dropdown -->
+  <div class="mt-24">
+    <app-establishment-filters
+      (tabChange)="onTabChange($event)"
+      (neighborhoodChange)="onNeighborhoodChange($event)"
+    ></app-establishment-filters>
+  </div>
+
+  <!-- Main Grid (2/3 List Left, 1/3 Details Panel Right) -->
+  <div class="businesses-main-grid mt-24">
+    <div class="list-column">
+      <app-establishment-list
+        [establishments]="(establishments$ | async) || []"
+        [selectedEstablishment]="selectedEstablishment$ | async"
+        (selectEstablishment)="onSelectEstablishment($event)"
+      ></app-establishment-list>
+    </div>
+
+    <div class="details-column">
+      <app-establishment-details-panel
+        [establishment]="selectedEstablishment$ | async"
+        (approve)="onApproveEstablishment($event)"
+        (reject)="onRejectEstablishment($event)"
+      ></app-establishment-details-panel>
+    </div>
+  </div>
+</div>

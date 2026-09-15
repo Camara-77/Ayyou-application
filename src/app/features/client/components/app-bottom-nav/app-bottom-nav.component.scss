@@ -1,0 +1,73 @@
+.app-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 900;
+  background: #ffffff;
+  border-top: 1px solid #EFEFEF;
+  padding: 8px 16px 12px;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05);
+
+  .nav-container {
+    max-width: 440px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    gap: 4px;
+    transition: transform 0.15s ease;
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    .icon-wrapper {
+      position: relative;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .nav-badge {
+        position: absolute;
+        top: -4px;
+        right: -6px;
+        background-color: #E51A29;
+        color: #ffffff;
+        font-size: 10px;
+        font-weight: 700;
+        min-width: 16px;
+        height: 16px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 4px;
+        box-sizing: border-box;
+      }
+    }
+
+    .label {
+      font-size: 11px;
+      font-weight: 500;
+      color: #757575;
+      transition: color 0.2s ease;
+    }
+
+    &.active {
+      .label {
+        color: #E51A29;
+        font-weight: 700;
+      }
+    }
+  }
+}

@@ -1,0 +1,663 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+  background: #f8f9fa;
+  color: #1a1a1a;
+}
+
+.delivery-page {
+  width: 100%;
+  min-height: 100dvh;
+  background: #f8f9fa;
+  padding-bottom: 82px;
+}
+
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+.delivery-header {
+  height: 72px;
+  display: grid;
+  grid-template-columns: 48px 1fr 48px;
+  align-items: center;
+  padding: 8px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.header-back,
+.notification-button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: #f7f7f7;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.header-back {
+  font-size: 27px;
+  font-weight: 400;
+}
+
+.notification-button {
+  position: relative;
+  justify-self: end;
+}
+
+.notification-icon {
+  font-size: 21px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e51a29;
+  top: 9px;
+  right: 10px;
+}
+
+.brand {
+  text-align: center;
+}
+
+.brand-name {
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 20px;
+}
+
+.brand-pro {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 7px;
+  margin-left: 3px;
+  border-radius: 8px;
+  background: #ffd9dc;
+  color: #1a1a1a;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.online-status {
+  margin-top: 3px;
+  font-size: 11px;
+  color: #333333;
+}
+
+.online-dot,
+.ready-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e51a29;
+}
+
+
+/* =====================================================
+   CONTENU
+   ===================================================== */
+
+.delivery-content {
+  width: min(100%, 440px);
+  margin: 0 auto;
+  padding: 24px 16px 24px;
+}
+
+
+/* =====================================================
+   PROFIL
+   ===================================================== */
+
+.driver-summary {
+  min-height: 102px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid #eeeeee;
+  border-radius: 16px;
+}
+
+.driver-avatar {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eeeeee;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.driver-information {
+  flex: 1;
+}
+
+.driver-information h1 {
+  margin: 0;
+  font-size: 16px;
+  line-height: 19px;
+  font-weight: 800;
+}
+
+.driver-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+  color: #686868;
+  font-size: 12px;
+}
+
+.rating {
+  padding: 3px 7px;
+  border-radius: 10px;
+  background: #eeeeee;
+  color: #222222;
+  font-weight: 700;
+}
+
+.ready-dot {
+  background: #e51a29;
+}
+
+.driver-role {
+  align-self: center;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: #ffdfe1;
+  color: #1a1a1a;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+
+/* =====================================================
+   COURSE ASSIGNÉE
+   ===================================================== */
+
+.assigned-card {
+  margin-top: 24px;
+  padding: 16px;
+  background: #e51a29;
+  color: #ffffff;
+  border-radius: 18px 18px 0 0;
+}
+
+.assigned-card.expired {
+  background: #8c8c8c;
+}
+
+.assigned-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.assigned-header strong {
+  font-size: 14px;
+  letter-spacing: 0.2px;
+}
+
+.order-reference {
+  padding: 8px 11px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.assigned-card h2 {
+  margin: 18px 0;
+  max-width: 280px;
+  font-size: 19px;
+  line-height: 23px;
+  font-weight: 800;
+}
+
+.timer-box {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 13px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.17);
+}
+
+.timer-label {
+  font-size: 12px;
+}
+
+.timer-value {
+  font-size: 20px;
+  white-space: nowrap;
+}
+
+.timer-progress {
+  height: 5px;
+  margin-top: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.timer-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #ffffff;
+  transition: width 1s linear;
+}
+
+
+/* =====================================================
+   DETAILS COURSE
+   ===================================================== */
+
+.assigned-details {
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #eeeeee;
+  border-top: 0;
+  border-radius: 0 0 18px 18px;
+}
+
+.earnings-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 12px;
+  background: #f5f4f4;
+  border-radius: 10px;
+}
+
+.small-label {
+  display: block;
+  margin-bottom: 6px;
+  color: #686868;
+  font-size: 10px;
+  letter-spacing: 0.6px;
+}
+
+.earning-value {
+  display: block;
+  color: #e51a29;
+  font-size: 24px;
+  line-height: 25px;
+}
+
+.earning-value small,
+.course-price small {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.kitchen-time {
+  text-align: right;
+}
+
+.kitchen-time strong {
+  display: block;
+  font-size: 13px;
+}
+
+.route-block {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding: 20px 0 10px;
+}
+
+.route-icon {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #eeeeee;
+  color: #e51a29;
+}
+
+.route-icon.client {
+  background: #ffdfe1;
+}
+
+.route-information {
+  min-width: 0;
+  flex: 1;
+}
+
+.route-label {
+  display: block;
+  color: #686868;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+
+.route-information strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 16px;
+}
+
+.route-information > span:last-child {
+  display: block;
+  margin-top: 4px;
+  color: #6b6b6b;
+  font-size: 12px;
+}
+
+.items-badge {
+  align-self: flex-start;
+  padding: 7px 9px;
+  border-radius: 12px;
+  background: #eeeeee;
+  color: #555555;
+  font-size: 10px;
+}
+
+.route-line {
+  width: 1px;
+  height: 24px;
+  margin-left: 16px;
+  background: #d9d9d9;
+}
+
+.delivery-label-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.distance {
+  color: #e51a29 !important;
+  white-space: nowrap;
+}
+
+
+/* =====================================================
+   ACTIONS
+   ===================================================== */
+
+.assigned-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.primary-action,
+.secondary-action,
+.available-action {
+  min-height: 56px;
+  border: 0;
+  border-radius: 13px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-action {
+  background: #e51a29;
+  color: #ffffff;
+}
+
+.secondary-action {
+  background: #f3f3f3;
+  color: #222222;
+}
+
+.primary-action:disabled,
+.secondary-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.action-check {
+  margin-right: 4px;
+}
+
+
+/* =====================================================
+   COURSES DISPONIBLES
+   ===================================================== */
+
+.available-section {
+  margin-top: 28px;
+}
+
+.available-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.available-heading h2 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 22px;
+}
+
+.count {
+  display: inline-flex;
+  min-width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+  border-radius: 50%;
+  background: #eeeeee;
+  color: #777777;
+  font-size: 11px;
+  vertical-align: middle;
+}
+
+.available-heading p {
+  max-width: 230px;
+  margin: 7px 0 0;
+  color: #777777;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.proximity-filter {
+  border: 0;
+  padding: 9px 10px;
+  background: #eeeeee;
+  color: #666666;
+  font-family: inherit;
+  font-size: 9px;
+  line-height: 16px;
+}
+
+.available-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.available-card {
+  position: relative;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #eeeeee;
+  border-radius: 17px;
+}
+
+.available-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.course-id {
+  padding: 7px 10px;
+  border-radius: 12px;
+  background: #eeeeee;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.course-price {
+  font-size: 21px;
+}
+
+.available-restaurant,
+.available-client {
+  display: flex;
+  gap: 11px;
+  margin-top: 18px;
+}
+
+.small-red-icon,
+.small-location-icon {
+  flex: 0 0 20px;
+  color: #e51a29;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.available-restaurant strong,
+.available-client strong {
+  display: block;
+  font-size: 14px;
+}
+
+.available-restaurant span,
+.available-client span {
+  display: block;
+  margin-top: 5px;
+  color: #707070;
+  font-size: 12px;
+}
+
+.insulated-badge {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #eeeeee;
+  color: #555555;
+  font-size: 10px;
+}
+
+.available-action {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 18px;
+  background: #f3f3f3;
+  color: #e51a29;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+
+/* =====================================================
+   BOTTOM NAVIGATION
+   ===================================================== */
+
+.delivery-bottom-nav {
+  position: fixed;
+  z-index: 20;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: min(100%, 440px);
+  height: 72px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: #ffffff;
+  border-top: 1px solid #eeeeee;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 0;
+  background: transparent;
+  color: #6b6b6b;
+  font-family: inherit;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.nav-icon {
+  font-size: 20px;
+  line-height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-item.active {
+  color: #e51a29;
+  font-weight: 700;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (min-width: 441px) {
+  .delivery-page {
+    max-width: 440px;
+    margin: 0 auto;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .delivery-bottom-nav {
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04);
+  }
+}
+
+@media (max-width: 360px) {
+  .delivery-content {
+    padding-inline: 12px;
+  }
+
+  .assigned-card h2 {
+    font-size: 17px;
+  }
+
+  .earning-value {
+    font-size: 21px;
+  }
+
+  .driver-role {
+    display: none;
+  }
+}

@@ -1,0 +1,111 @@
+<div class="order-details-card" *ngIf="order">
+  <!-- Top Control Banner -->
+  <div class="panel-header-banner">
+    <div class="top-row">
+      <span class="control-label">FEUILLE DE CONTRÔLE DIRECTE</span>
+      <span class="status-live-tag" [ngClass]="'status-' + order.statusDotColor">
+        ● {{ order.delivery.statusText }}
+      </span>
+    </div>
+    <h2 class="panel-title">DÉTAIL DE COMMANDE {{ order.reference }}</h2>
+    <span class="panel-meta-time">
+      Passée à {{ order.createdTime }} • Livraison estimée {{ order.estimatedTime }}
+    </span>
+  </div>
+
+  <!-- Sub-card 1: Client Info -->
+  <div class="info-box-card">
+    <div class="row-flex">
+      <span class="name-bold">{{ order.client.name }}</span>
+      <span class="phone-sub">• {{ order.client.phone }}</span>
+    </div>
+    <p class="address-text">{{ order.client.deliveryAddress }}</p>
+  </div>
+
+  <!-- Sub-card 2: Establishment Info -->
+  <div class="info-box-card">
+    <div class="row-flex">
+      <span class="name-bold">{{ order.establishmentName }}</span>
+      <span class="type-badge">{{ order.subOrders[0].establishmentTypeLabel }}</span>
+    </div>
+    <p class="address-text">
+      {{ order.subOrders[0].address }} • Tél: {{ order.subOrders[0].phone }}
+    </p>
+  </div>
+
+  <!-- Sub-card 3: Articles Commandés -->
+  <div class="info-box-card">
+    <span class="box-section-title">ARTICLES COMMANDÉS ({{ order.articlesCount }})</span>
+    <div class="articles-list">
+      <div *ngFor="let item of order.subOrders[0]?.items" class="article-item-row">
+        <div class="art-top-row">
+          <span class="art-name"><strong>{{ item.quantity }}x</strong> {{ item.name }}</span>
+          <span class="art-price">{{ item.priceFormatted }}</span>
+        </div>
+        <p class="art-desc" *ngIf="item.description">{{ item.description }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sub-card 4: Frais & Rapprochement AYYOU -->
+  <div class="info-box-card">
+    <span class="box-section-title">FRAIS & RAPPROCHEMENT AYYOU</span>
+    <div class="fin-list">
+      <div class="fin-row">
+        <span>Sous-total articles</span>
+        <span>{{ order.payment.subtotalFormatted }}</span>
+      </div>
+      <div class="fin-row">
+        <span>Frais de livraison (Zone {{ order.establishmentDistrict }} ➔ Almadies)</span>
+        <span>{{ order.payment.deliveryFeeFormatted }}</span>
+      </div>
+
+      <div class="fin-line"></div>
+
+      <div class="fin-row total-row">
+        <span>Total payé par le client</span>
+        <span class="total-red-val">{{ order.payment.totalPaidFormatted }}</span>
+      </div>
+
+      <div class="green-status-line">
+        {{ order.payment.statusText }}
+      </div>
+
+      <div class="fin-row sub-payout-row">
+        <span>Rémunération nette livreur:</span>
+        <span>{{ order.payment.driverPayoutFormatted }}</span>
+      </div>
+      <div class="fin-row sub-payout-row">
+        <span>Part restaurant {{ order.establishmentName }}:</span>
+        <span>{{ order.payment.merchantPayoutFormatted }}</span>
+      </div>
+
+      <div class="commission-note">
+        {{ order.payment.commissionNote }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Sub-card 5: Livreur Assigné -->
+  <div class="info-box-card">
+    <div class="box-header-row">
+      <span class="box-section-title">LIVREUR ASSIGNÉ</span>
+      <span class="distance-link" *ngIf="order.delivery.distanceFromClientText">
+        {{ order.delivery.distanceFromClientText }}
+      </span>
+    </div>
+
+    <div *ngIf="order.delivery.driverName; else noDriverTpl" class="driver-box">
+      <span class="driver-name-bold">{{ order.delivery.driverName }}</span>
+      <span class="driver-details-text">
+        {{ order.delivery.driverPhone }} • {{ order.delivery.driverVehicle }}
+      </span>
+    </div>
+
+    <ng-template #noDriverTpl>
+      <div class="no-driver-text">
+        <span>Aucun livreur assigné</span>
+      </div>
+    </ng-template>
+  </div>
+</div>

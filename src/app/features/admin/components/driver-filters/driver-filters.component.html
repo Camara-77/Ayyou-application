@@ -1,0 +1,67 @@
+<div class="driver-filters-row">
+  <!-- Left Pill Tabs -->
+  <div class="filter-tabs-pill">
+    <button
+      type="button"
+      class="tab-pill-btn"
+      [class.active]="activeTab === 'ALL'"
+      (click)="selectTab('ALL')"
+    >
+      Tous (190)
+    </button>
+
+    <button
+      type="button"
+      class="tab-pill-btn"
+      [class.active]="activeTab === 'DISPONIBLE'"
+      (click)="selectTab('DISPONIBLE')"
+    >
+      Disponibles (52)
+    </button>
+
+    <button
+      type="button"
+      class="tab-pill-btn"
+      [class.active]="activeTab === 'EN_LIVRAISON'"
+      (click)="selectTab('EN_LIVRAISON')"
+    >
+      En livraison (96)
+    </button>
+
+    <button
+      type="button"
+      class="tab-pill-btn"
+      [class.active]="activeTab === 'HORS_LIGNE'"
+      (click)="selectTab('HORS_LIGNE')"
+    >
+      Hors ligne (42)
+    </button>
+  </div>
+
+  <!-- Right Dropdown Selects -->
+  <div class="selects-group-row">
+    <!-- Zone Select -->
+    <div class="select-pill-container">
+      <select
+        class="filter-select"
+        [(ngModel)]="selectedZone"
+        (change)="onZoneSelect()"
+      >
+        <option value="ALL">Toutes les zones</option>
+        <option *ngFor="let z of zones" [value]="z">{{ z }}</option>
+      </select>
+    </div>
+
+    <!-- Vehicle Select -->
+    <div class="select-pill-container">
+      <select
+        class="filter-select"
+        [(ngModel)]="selectedVehicle"
+        (change)="onVehicleSelect()"
+      >
+        <option value="ALL">Type de véhicule (Tous)</option>
+        <option *ngFor="let v of vehicleTypes" [value]="v">{{ v }}</option>
+      </select>
+    </div>
+  </div>
+</div>

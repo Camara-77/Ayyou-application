@@ -1,0 +1,242 @@
+.pro-app-layout.studio-preview-screen {
+  max-width: 440px;
+  margin: 0 auto;
+  height: 100vh;
+  background-color: #000000;
+  position: relative;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.video-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #000000;
+}
+
+.fullscreen-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Gradients Overlays */
+.top-gradient-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.bottom-gradient-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 240px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Header */
+.preview-top-header {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  z-index: 10;
+
+  .btn-back-circle {
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    text-decoration: none;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  .top-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0;
+    white-space: nowrap;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* Right Side Actions Column */
+.side-actions-column {
+  position: absolute;
+  right: 16px;
+  bottom: 110px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+
+  .action-btn-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+
+    .btn-circle-translucent {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(8px);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s, transform 0.15s;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.65);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+
+    .action-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #FFFFFF;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+  }
+}
+
+/* Bottom Left Dish Info */
+.dish-info-overlay {
+  position: absolute;
+  left: 16px;
+  bottom: 110px;
+  z-index: 10;
+  max-width: 250px;
+  text-align: left;
+
+  .dish-name-line {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: #FFFFFF;
+    line-height: 1.25;
+    margin: 0 0 6px 0;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+  }
+
+  .dish-price-line {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 16px;
+    font-weight: 800;
+    color: #FFFFFF;
+    margin: 0;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+  }
+}
+
+/* Bottom Fixed Action Bar */
+.bottom-fixed-bar {
+  position: absolute;
+  bottom: 24px;
+  left: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  .btn-commander-red {
+    flex: 1;
+    height: 48px;
+    background: #E51A29;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(229, 26, 41, 0.3);
+    transition: background-color 0.2s;
+
+    &:hover {
+      background: #D01524;
+    }
+  }
+
+  .btn-cart-square {
+    width: 48px;
+    height: 48px;
+    background: rgba(20, 20, 20, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background: rgba(40, 40, 40, 0.9);
+    }
+  }
+}
+
+/* Home Indicator */
+.home-indicator-bar {
+  position: absolute;
+  bottom: 6px;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+
+  .home-indicator {
+    width: 120px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 2px;
+  }
+}
+
+.font-serif-bold {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 800;
+}
+
+.font-serif {
+  font-family: 'Playfair Display', Georgia, serif;
+}

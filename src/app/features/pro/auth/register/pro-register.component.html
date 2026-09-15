@@ -1,0 +1,612 @@
+<!-- STICKY HEADER NAVBAR -->
+<header class="pro-header-sticky">
+  <div class="container header-content">
+    <div class="brand-logo-wrap">
+      <span class="logo-text">AYYOU</span>
+      <span class="badge-pro">PRO</span>
+    </div>
+
+    <nav class="nav-desktop">
+      <a routerLink="/pro">Accueil</a>
+      <a routerLink="/pro">Nos services</a>
+      <a routerLink="/pro">Restaurants & vendeurs</a>
+      <a routerLink="/pro">Livraison</a>
+      <a routerLink="/pro">À propos</a>
+    </nav>
+
+    <div class="header-actions">
+      <a routerLink="/pro/login" class="btn-login-outline">Se connecter</a>
+      <a routerLink="/pro/register" class="btn-register-red">S'inscrire</a>
+      
+      <div class="user-profile-circle">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>
+
+      <button class="mobile-toggle-btn" (click)="toggleMobileMenu()" aria-label="Toggle menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-menu-drawer" [class.open]="isMobileMenuOpen">
+    <a routerLink="/pro">Accueil</a>
+    <a routerLink="/pro">Nos services</a>
+    <a routerLink="/pro">Restaurants & vendeurs</a>
+    <a routerLink="/pro">Livraison</a>
+    <a routerLink="/pro">À propos</a>
+    <div class="mobile-menu-btns">
+      <a routerLink="/pro/login" class="btn-login-outline">Se connecter</a>
+      <a routerLink="/pro/register" class="btn-register-red">S'inscrire</a>
+    </div>
+  </div>
+</header>
+
+<div class="pro-register-container">
+  <div class="container">
+    <!-- TOP PILL TAG -->
+    <div class="top-tag-wrap">
+      <span class="pill-red-dot">
+        <span class="red-dot"></span> ESPACE PARTENAIRES • DAKAR
+      </span>
+    </div>
+
+    <!-- PAGE TITLE HEADER -->
+    <div class="page-title-block">
+      <h1>Rejoignez AYYOU</h1>
+      <p class="register-subtitle">
+        {{ selectedType === 'LIVREUR' ? 'Devenez coursier partenaire à Dakar et profitez des meilleurs revenus du secteur.' : 'Choisissez votre type de compte professionnel et commencez à digitaliser vos opérations en toute simplicité.' }}
+      </p>
+    </div>
+
+    <!-- PROFILE TYPE SELECTOR TABS -->
+    <div class="account-type-tabs">
+      <button 
+        type="button" 
+        class="tab-btn" 
+        [class.active]="selectedType === 'RESTAURANT'" 
+        (click)="selectType('RESTAURANT')"
+      >
+        RESTAURANT
+      </button>
+
+      <button 
+        type="button" 
+        class="tab-btn" 
+        [class.active]="selectedType === 'VENDEUR'" 
+        (click)="selectType('VENDEUR')"
+      >
+        VENDEUR / COMMERCE
+      </button>
+
+      <button 
+        type="button" 
+        class="tab-btn" 
+        [class.active]="selectedType === 'LIVREUR'" 
+        (click)="selectType('LIVREUR')"
+      >
+        LIVREUR / FLOTTE
+      </button>
+    </div>
+
+    <!-- MAIN TWO-COLUMN LAYOUT -->
+    <div class="register-grid">
+      <!-- LEFT COLUMN: FORM -->
+      <div class="register-main-column">
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+          
+          <!-- SECTION 1: INFORMATIONS PERSONNELLES / PROPRIÉTAIRE -->
+          <div class="form-section-card">
+            <div class="section-card-header">
+              <div class="header-left-title">
+                <span class="section-number-badge">1</span>
+                <div class="title-wrap">
+                  <h3>{{ selectedType === 'LIVREUR' ? 'Informations Personnelles' : 'Propriétaire ou Gérant' }}</h3>
+                  <p class="section-sub">{{ selectedType === 'LIVREUR' ? 'Coordonnées du coursier et accès au compte mobile' : 'Informations légales du signataire du compte' }}</p>
+                </div>
+              </div>
+              <span class="tag-badge-red">OBLIGATOIRE</span>
+            </div>
+
+            <div class="form-grid-2col">
+              <div class="form-group">
+                <label>Nom de famille</label>
+                <input type="text" formControlName="lastName" placeholder="Ex: Diop" />
+              </div>
+
+              <div class="form-group">
+                <label>Prénom(s)</label>
+                <input type="text" formControlName="firstName" placeholder="Ex: Moussa" />
+              </div>
+            </div>
+
+            <div class="form-grid-2col mt-12">
+              <div class="form-group">
+                <label>{{ selectedType === 'LIVREUR' ? 'Numéro de téléphone principal' : 'Adresse email professionnelle' }}</label>
+                <div *ngIf="selectedType === 'LIVREUR'" class="phone-prefix-group">
+                  <span class="prefix-code">+221</span>
+                  <input type="text" formControlName="phone" placeholder="77 000 00 00" />
+                </div>
+                <input *ngIf="selectedType !== 'LIVREUR'" type="email" formControlName="email" placeholder="contact@etablissement.sn" />
+              </div>
+
+              <div class="form-group">
+                <label>{{ selectedType === 'LIVREUR' ? 'Adresse email personnelle' : 'Téléphone principal (+221)' }}</label>
+                <input *ngIf="selectedType === 'LIVREUR'" type="email" formControlName="email" placeholder="moussa.diop@gmail.com" />
+                <div *ngIf="selectedType !== 'LIVREUR'" class="phone-prefix-group">
+                  <span class="prefix-code">+221</span>
+                  <input type="text" formControlName="phone" placeholder="77 000 00 00" />
+                </div>
+              </div>
+            </div>
+
+            <!-- LIVREUR PASSWORD FIELDS -->
+            <div *ngIf="selectedType === 'LIVREUR'" class="form-grid-2col mt-12">
+              <div class="form-group">
+                <label>Mot de passe de connexion</label>
+                <input type="password" formControlName="password" placeholder="••••••••••••" />
+              </div>
+
+              <div class="form-group">
+                <label>Confirmation mot de passe</label>
+                <input type="password" formControlName="confirmPassword" placeholder="••••••••••••" />
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 2: DÉTAILS / VÉHICULE & ÉQUIPEMENT -->
+          <div class="form-section-card mt-24">
+            <div class="section-card-header">
+              <div class="header-left-title">
+                <span class="section-number-badge">2</span>
+                <div class="title-wrap">
+                  <h3>{{ selectedType === 'LIVREUR' ? 'Véhicule & Équipement de Livraison' : (selectedType === 'VENDEUR' ? 'Détails du Commerce / Boutique' : 'Détails du Restaurant') }}</h3>
+                  <p class="section-sub">{{ selectedType === 'LIVREUR' ? 'Détails de locomotion et rayon d\'intervention' : (selectedType === 'VENDEUR' ? 'Localisation, point de vente et offre commerciale' : 'Localisation et offre gastronomique') }}</p>
+                </div>
+              </div>
+              <span class="tag-badge-red">{{ selectedType === 'LIVREUR' ? 'SECTORISATION DAKAR' : 'VISIBILITÉ DAKAR' }}</span>
+            </div>
+
+            <!-- LIVREUR SECTION 2 -->
+            <ng-container *ngIf="selectedType === 'LIVREUR'">
+              <div class="form-grid-2col">
+                <div class="form-group">
+                  <label>Type de véhicule</label>
+                  <select formControlName="vehicleType" class="custom-select">
+                    <option *ngFor="let v of vehicleTypesList" [value]="v">{{ v }}</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Marque & Modèle du deux-roues</label>
+                  <input type="text" formControlName="vehicleModel" placeholder="Ex: Yamaha TMAX, Bajaj Boxer, TVS HLX" />
+                </div>
+              </div>
+
+              <div class="form-grid-2col mt-12">
+                <div class="form-group">
+                  <label>Numéro d'immatriculation</label>
+                  <input type="text" formControlName="licensePlate" placeholder="EX : PLAQUE DK-7989-A" />
+                </div>
+
+                <div class="form-group">
+                  <label>Zone principale d'activité souhaitée</label>
+                  <select formControlName="district" class="custom-select">
+                    <option *ngFor="let d of districtsList" [value]="d">{{ d }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- RADIO EQUIPMENT QUESTION -->
+              <div class="equipment-radio-box mt-16">
+                <p class="question-title">Possédez-vous déjà un sac isotherme étanche adapté ?</p>
+                <div class="radio-options-row">
+                  <label class="radio-label">
+                    <input type="radio" name="hasBagRadio" value="own" [(ngModel)]="hasBag" [ngModelOptions]="{standalone: true}" />
+                    <span class="radio-custom"></span>
+                    <span>Oui, j'ai mon propre sac professionnel conforme</span>
+                  </label>
+
+                  <label class="radio-label">
+                    <input type="radio" name="hasBagRadio" value="kit" [(ngModel)]="hasBag" [ngModelOptions]="{standalone: true}" />
+                    <span class="radio-custom"></span>
+                    <span>Besoin du kit officiel AYYOU (Sac + Support smartphone + Veste)</span>
+                  </label>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- VENDEUR & RESTAURANT SECTION 2 -->
+            <ng-container *ngIf="selectedType !== 'LIVREUR'">
+              <div class="form-group">
+                <label>{{ selectedType === 'VENDEUR' ? 'Nom commercial du commerce ou de l\'activité' : 'Nom commercial de l\'établissement' }}</label>
+                <input type="text" formControlName="businessName" [placeholder]="selectedType === 'VENDEUR' ? 'Ex: Épicerie Teranga Gourmande, Délices Dakar Traiteur' : 'Ex: Le Teranga Grill & Saveurs'" />
+              </div>
+
+              <div *ngIf="selectedType === 'VENDEUR'" class="form-grid-2col mt-12">
+                <div class="form-group">
+                  <label>Type de commerce alimentaire</label>
+                  <select formControlName="category" class="custom-select">
+                    <option value="">Sélectionner une catégorie</option>
+                    <option *ngFor="let cat of vendeurCategoriesList" [value]="cat">{{ cat }}</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Zone / Quartier à Dakar</label>
+                  <select formControlName="district" class="custom-select">
+                    <option value="">Sélectionner un quartier</option>
+                    <option *ngFor="let d of districtsList" [value]="d">{{ d }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <div *ngIf="selectedType === 'RESTAURANT'" class="form-grid-2col mt-12">
+                <div class="form-group">
+                  <label>Spécialité culinaire principale</label>
+                  <input type="text" formControlName="speciality" placeholder="Plats Braisés & Grillades (Dibiterie)" />
+                </div>
+
+                <div class="form-group">
+                  <label>Zone / Quartier à Dakar</label>
+                  <input type="text" formControlName="district" placeholder="Dakar-Plateau / Centre-ville" />
+                </div>
+              </div>
+
+              <div class="form-group mt-12">
+                <label>{{ selectedType === 'VENDEUR' ? 'Adresse physique ou point de retrait' : 'Adresse physique précise' }}</label>
+                <input type="text" formControlName="address" [placeholder]="selectedType === 'VENDEUR' ? 'Boulevard de la République, Dakar (repère, numéro de rue ou marché)' : 'Rue, numéro de porte, repère notable (Ex: Près de la Brioche Dorée)'" />
+              </div>
+            </ng-container>
+          </div>
+
+          <!-- SECTION 3: DOCUMENTS ADMINISTRATIFS -->
+          <div class="form-section-card mt-24">
+            <div class="section-card-header">
+              <div class="header-left-title">
+                <span class="section-number-badge">3</span>
+                <div class="title-wrap">
+                  <h3>{{ selectedType === 'LIVREUR' ? 'Documents Administratifs Obligatoires' : 'Documents d\'Enregistrement' }}</h3>
+                  <p class="section-sub">{{ selectedType === 'LIVREUR' ? 'Normes de transport urbain de marchandises et sécurité' : 'Vérification de conformité commerciale sénégalaise' }}</p>
+                </div>
+              </div>
+              <span class="tag-badge-grey">{{ selectedType === 'LIVREUR' ? 'CONFORMITÉ SÉNÉGAL' : 'NORMES AYYOU' }}</span>
+            </div>
+
+            <!-- LIVREUR DOCUMENTS (4 Cards) -->
+            <div *ngIf="selectedType === 'LIVREUR'" class="docs-grid-2col">
+              <!-- CNI -->
+              <div class="doc-upload-box">
+                <div class="doc-info">
+                  <h4 class="doc-title">Pièce d'identité (CNI / Passeport)</h4>
+                  <p class="doc-sub">CNI biométrique CEDEAO ou Passeport</p>
+                </div>
+                <div class="doc-action-row">
+                  <span class="status-dot imported">✓ Validé</span>
+                  <input type="file" id="cniInput" hidden (change)="onDocumentSelected($event, 'cni')" accept=".pdf,.png,.jpg,.jpeg" />
+                  <button type="button" class="btn-import-grey" (click)="triggerFileInput('cniInput')">Remplacer</button>
+                </div>
+              </div>
+
+              <!-- PERMIS -->
+              <div class="doc-upload-box">
+                <div class="doc-info">
+                  <h4 class="doc-title">Permis de Conduire Moto</h4>
+                  <p class="doc-sub">Permis A ou A1 en cours de validité</p>
+                </div>
+                <div class="doc-action-row">
+                  <span class="status-dot imported">✓ Validé</span>
+                  <input type="file" id="permisInput" hidden (change)="onDocumentSelected($event, 'permis')" accept=".pdf,.png,.jpg,.jpeg" />
+                  <button type="button" class="btn-import-grey" (click)="triggerFileInput('permisInput')">Remplacer</button>
+                </div>
+              </div>
+
+              <!-- CASIER -->
+              <div class="doc-upload-box">
+                <div class="doc-info">
+                  <h4 class="doc-title">Extrait de Casier Judiciaire</h4>
+                  <p class="doc-sub">Bulletin n°3 (moins de 3 mois)</p>
+                </div>
+                <div class="doc-action-row">
+                  <span class="status-dot-orange">● En attente d'import</span>
+                  <input type="file" id="casierInput" hidden (change)="onDocumentSelected($event, 'casier')" accept=".pdf,.png,.jpg,.jpeg" />
+                  <button type="button" class="btn-import-grey" (click)="triggerFileInput('casierInput')">Importer</button>
+                </div>
+              </div>
+
+              <!-- CARTE GRISE -->
+              <div class="doc-upload-box">
+                <div class="doc-info">
+                  <h4 class="doc-title">Carte Grise ou Contrat Location</h4>
+                  <p class="doc-sub">Justificatif d'utilisation de l'engin</p>
+                </div>
+                <div class="doc-action-row">
+                  <span class="status-dot-grey">Non fourni</span>
+                  <input type="file" id="carteGriseInput" hidden (change)="onDocumentSelected($event, 'carteGrise')" accept=".pdf,.png,.jpg,.jpeg" />
+                  <button type="button" class="btn-import-grey" (click)="triggerFileInput('carteGriseInput')">Importer</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- RESTAURANT & VENDEUR DOCUMENTS (2 Cards) -->
+            <div *ngIf="selectedType !== 'LIVREUR'" class="docs-grid-2col">
+              <div class="doc-upload-box">
+                <div class="doc-info">
+                  <h4 class="doc-title">Numéro NINEA ou Registre de Commerce</h4>
+                  <p class="doc-sub">PDF, JPG ou PNG (max 5 Mo)</p>
+                </div>
+                <div class="doc-action-row">
+                  <span class="status-dot" [class.imported]="nineaDoc.status === 'IMPORTED'">
+                    ● {{ nineaDoc.file ? nineaDoc.name : 'En attente d\'import' }}
+                  </span>
+                  <input type="file" id="nineaInput" hidden (change)="onDocumentSelected($event, 'ninea')" accept=".pdf,.png,.jpg,.jpeg" />
+                  <button type="button" class="btn-import-grey" (click)="triggerFileInput('nineaInput')">Importer</button>
+                </div>
+              </div>
+
+              <div class="doc-upload-box">
+                <div class="doc-info">
+                  <h4 class="doc-title">{{ selectedType === 'VENDEUR' ? 'Certificat de salubrité ou Déclaration d\'activité' : 'Certificat du Service d\'Hygiène' }}</h4>
+                  <p class="doc-sub">Mention : Facultatif lors de l'inscription</p>
+                </div>
+                <div class="doc-action-row">
+                  <span class="status-dot-grey">
+                    {{ hygieneDoc.file ? hygieneDoc.name : 'Non fourni' }}
+                  </span>
+                  <input type="file" id="hygieneInput" hidden (change)="onDocumentSelected($event, 'hygiene')" accept=".pdf,.png,.jpg,.jpeg" />
+                  <button type="button" class="btn-import-grey" (click)="triggerFileInput('hygieneInput')">Importer</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 4: PHOTOS DU LIEU / PHOTO PROFESSIONNELLE -->
+          <div class="form-section-card mt-24">
+            <div class="section-card-header">
+              <div class="header-left-title">
+                <span class="section-number-badge">4</span>
+                <div class="title-wrap">
+                  <h3>{{ selectedType === 'LIVREUR' ? 'Photo Professionnelle du Livreur' : (selectedType === 'VENDEUR' ? 'Photos de l\'Activité & Produits' : 'Photos du Lieu (Obligatoires)') }}</h3>
+                  <p class="section-sub">{{ selectedType === 'LIVREUR' ? 'Apparaîtra sur l\'application client pour votre identification sécurisée' : (selectedType === 'VENDEUR' ? 'Valorisez vos articles pour déclencher un maximum de commandes' : 'Assurez une validation immédiate de votre standard de service') }}</p>
+                </div>
+              </div>
+              <span class="tag-badge-red">{{ selectedType === 'LIVREUR' ? 'BADGE NUMÉRIQUE' : (selectedType === 'VENDEUR' ? '3 CLICHÉS REQUIS' : '4 CLICHÉS REQUIS') }}</span>
+            </div>
+
+            <!-- Categories Cards for Restaurant/Vendeur -->
+            <div *ngIf="selectedType !== 'LIVREUR'" class="photo-categories-grid" [class.cols-3]="selectedType === 'VENDEUR'">
+              <div *ngFor="let cat of currentPhotoCategories" class="photo-cat-card" (click)="triggerFileInput('photo_' + cat.key)">
+                <input type="file" [id]="'photo_' + cat.key" hidden (change)="onPhotoSelected($event, cat.key)" accept="image/*" />
+                <h4 class="cat-title">{{ cat.title }}</h4>
+                <p class="cat-sub">{{ cat.subtitle }}</p>
+                <div class="cat-action-status">
+                  <span *ngIf="cat.file || cat.previewUrl" class="text-green">✓ Validée</span>
+                  <span *ngIf="!cat.file && !cat.previewUrl" class="text-red">+ Ajouter</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Single Big Avatar Dropzone for Livreur -->
+            <div *ngIf="selectedType === 'LIVREUR'" class="drag-drop-upload-zone avatar-livreur-zone" (click)="triggerFileInput('photo_livreur')">
+              <input type="file" id="photo_livreur" hidden (change)="onPhotoSelected($event, 'livreur')" accept="image/*" />
+              <div class="avatar-circle-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#E51B2A" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+              <p class="drag-text">
+                Glissez-déposez votre photo d'identité ou <span class="link-red">parcourez vos fichiers</span>
+              </p>
+              <p class="format-text">Photo de face, bien cadrée, fond uni et sans lunettes de soleil. Formats JPG, WebP ou PNG (Max 5 Mo).</p>
+            </div>
+
+            <!-- Drag & Drop Zone for Restaurant/Vendeur -->
+            <div *ngIf="selectedType !== 'LIVREUR'" class="drag-drop-upload-zone mt-14" (click)="triggerFileInput('photo_facade')">
+              <div class="cloud-icon-circle">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E51B2A" stroke-width="2">
+                  <path d="M16 16l-4-4-4 4M12 12v9"/>
+                  <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+                </svg>
+              </div>
+              <p class="drag-text">
+                Glissez-déposez vos photos ou <span class="link-red">parcourez vos fichiers</span>
+              </p>
+              <p class="format-text">Formats acceptés : JPG, WebP, PNG haute définition jusqu'à 8 Mo par photo</p>
+            </div>
+          </div>
+
+          <!-- Error message alert -->
+          <div *ngIf="errorMessage" class="error-alert-box mt-16">
+            ⚠️ {{ errorMessage }}
+          </div>
+
+          <!-- SUBMIT FOOTER ROW -->
+          <div class="form-submit-footer-row mt-24">
+            <p class="terms-disclaimer">
+              {{ selectedType === 'LIVREUR' ? 'En validant votre candidature, vous certifiez l\'authenticité de vos documents de conduite et acceptez la charte des coursiers AYYOU.' : 'En soumettant votre dossier, vous acceptez les Conditions d\'Utilisation Partenaires AYYOU.' }}
+            </p>
+            <button type="submit" class="btn-submit-red" [disabled]="isSubmitting">
+              <span *ngIf="!isSubmitting">
+                {{ selectedType === 'LIVREUR' ? 'S\'inscrire comme livreur partenaire →' : (selectedType === 'VENDEUR' ? 'S\'inscrire comme vendeur & commerçant →' : 'S\'inscrire comme restaurant →') }}
+              </span>
+              <span *ngIf="isSubmitting">Inscription en cours...</span>
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- RIGHT COLUMN: INFORMATIONS SIDEBAR -->
+      <div class="register-sidebar-column">
+        <!-- Banner Card -->
+        <div class="sidebar-banner-card">
+          <img [src]="selectedType === 'LIVREUR' ? 'https://images.unsplash.com/photo-1526367790999-0150786686a2?auto=format&fit=crop&w=600&q=80' : (selectedType === 'VENDEUR' ? 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=600&q=80' : 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=600&q=80')" alt="AYYOU Dakar" class="banner-img" />
+          <div class="banner-body">
+            <span class="banner-tag">
+              {{ selectedType === 'LIVREUR' ? 'FLOTTE AYYOU DAKAR • En direct' : (selectedType === 'VENDEUR' ? 'COMMERCES AYYOU DAKAR • Plateau • Almadies • VDN' : 'FLOTTE AYYOU DAKAR • Plateau • Almadies • VDN') }}
+            </span>
+            <h4 class="banner-title">
+              {{ selectedType === 'LIVREUR' ? 'L\'infrastructure de livraison urbaine la plus dynamique et valorisante du Sénégal.' : (selectedType === 'VENDEUR' ? 'L\'infrastructure de vente et livraison de quartier la plus agile du Sénégal.' : 'L\'infrastructure de livraison la plus dynamique du Sénégal.') }}
+            </h4>
+          </div>
+        </div>
+
+        <!-- LIVREUR SIDEBAR CARDS -->
+        <ng-container *ngIf="selectedType === 'LIVREUR'">
+          <!-- Avantages Coursiers Card -->
+          <div class="sidebar-info-card mt-20">
+            <h3>Avantages Coursiers AYYOU</h3>
+            <div class="advantages-bullet-list mt-10">
+              <p>• Tarifs garantis par course effectuée et bonus attractifs lors des heures de pointe à Dakar.</p>
+              <p>• Paiements instantanés et sécurisés via Wave ou Orange Money chaque semaine sans frais cachés.</p>
+              <p>• Assurance accidents de trajet incluse sans franchise pour chaque coursier actif en mission.</p>
+              <p>• Équipement certifié fourni : veste coupe-vent étanche, sac isotherme haute capacité, et support smartphone guidon.</p>
+            </div>
+          </div>
+
+          <!-- Conditions d'admission Card -->
+          <div class="sidebar-info-card mt-20">
+            <h3>Conditions d'admission</h3>
+            <div class="conditions-list mt-10">
+              <p>• Âge minimum requis de 18 ans</p>
+              <p>• Permis de conduire moto valide (A/A1)</p>
+              <p>• Smartphone Android (v8+) ou iOS avec GPS actif</p>
+              <p>• Connaissance générale de la circulation à Dakar</p>
+            </div>
+          </div>
+
+          <!-- Enrolement physique Card -->
+          <div class="sidebar-support-card mt-20">
+            <span class="support-label">CENTRE D'ENRÔLEMENT PHYSIQUE</span>
+            <h4 class="enrolement-agency-title mt-4">Agence AYYOU Flotte, Almadies Dakar</h4>
+            <p class="address-sub-text">Face station Total VDN, Dakar, Sénégal</p>
+
+            <div class="direct-support-box mt-14">
+              <div class="support-row-flex">
+                <span class="support-mini-label">SUPPORT COURSIERS DIRECT</span>
+                <span class="schedule-pill">Lun - Sam : 8h - 20h</span>
+              </div>
+              <p class="phone-big-red mt-4">+221 33 800 00 00</p>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- RESTAURANT / VENDEUR SIDEBAR CARDS -->
+        <ng-container *ngIf="selectedType !== 'LIVREUR'">
+          <!-- Validation Process Block -->
+          <div class="sidebar-info-card mt-20">
+            <h3>Processus de Validation</h3>
+            <p class="info-desc">
+              Chaque dossier est examiné sous <strong>24h à 48h ouvrées</strong> par l'équipe commerciale locale AYYOU Dakar.
+            </p>
+
+            <div class="validation-steps-list">
+              <div class="val-step">
+                <strong>Dépôt & Pré-contrôle</strong>
+                <p>Validation de l'exactitude de votre NINEA et CNI</p>
+              </div>
+              <div class="val-step">
+                <strong>{{ selectedType === 'VENDEUR' ? 'Paramétrage catalogue produits' : 'Appel de Confirmation' }}</strong>
+                <p>{{ selectedType === 'VENDEUR' ? 'Configuration des stocks, prix et disponibilités' : 'Paramétrage du terminal et signature du contrat' }}</p>
+              </div>
+              <div class="val-step">
+                <strong>Mise en ligne sur AYYOU Client</strong>
+                <p>Visibilité immédiate et premières commandes livrées</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Zero Commission Block -->
+          <div class="sidebar-info-card mt-20">
+            <h3>Zéro Commission</h3>
+            <p class="info-desc">
+              Pour les {{ selectedType === 'VENDEUR' ? 'vendeurs et commerces' : 'restaurants et marchands' }} : <strong>0% de commission</strong> sur vos ventes directes via notre formule d'abonnement mensuel transparent et fixe.
+            </p>
+            <div class="wave-pill-badge mt-10">
+              <span>Gains marchands :</span> <strong class="text-red">Versement instantané Wave / Orange Money</strong>
+            </div>
+          </div>
+
+          <!-- Support Assistance Card -->
+          <div class="sidebar-support-card mt-20">
+            <span class="support-label">BESOIN D'ACCOMPAGNEMENT ?</span>
+            <div class="phone-row mt-8">
+              <div class="phone-icon-circle">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFFFFF">
+                  <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.27c1.21.49 2.53.76 3.88.76a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.35.27 2.67.76 3.88a1 1 0 01-.27 1.11l-2.2 2.2z"/>
+                </svg>
+              </div>
+              <span class="phone-number">+221 33 800 00 00</span>
+            </div>
+            <p class="schedule-text mt-4">Lundi au Samedi : 8h00 - 20h00 GMT</p>
+            <p class="address-text mt-8">Notre bureau support est situé Avenue Cheikh Anta Diop, Dakar.</p>
+          </div>
+        </ng-container>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="pro-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand-col">
+      <div class="brand-logo-wrap">
+        <span class="logo-text">AYYOU</span>
+        <span class="badge-pro">PRO</span>
+      </div>
+      <p class="footer-brand-desc">
+        L'infrastructure B2B moderne dédiée aux restaurateurs, commerces de bouche et coursiers professionnels. Fluidité, précision opérationnelle et rayonnement culinaire.
+      </p>
+    </div>
+
+    <div class="footer-links-col">
+      <h4>NAVIGATION</h4>
+      <ul>
+        <li><a routerLink="/pro">Accueil</a></li>
+        <li><a routerLink="/pro">Nos services</a></li>
+        <li><a routerLink="/pro">À propos</a></li>
+        <li><a routerLink="/pro">Actualités & Presse</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-links-col">
+      <h4>PROFESSIONNELS</h4>
+      <ul>
+        <li><a routerLink="/pro">Restaurants partenaires</a></li>
+        <li><a routerLink="/pro">Flotte & Coursiers</a></li>
+        <li><a routerLink="/pro">AYYOU Terminal POS</a></li>
+        <li><a routerLink="/pro">Grille tarifaire</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-links-col">
+      <h4>SUPPORT</h4>
+      <ul>
+        <li><a routerLink="/pro">Centre d'assistance</a></li>
+        <li><a routerLink="/pro">Guide d'intégration</a></li>
+        <li><a routerLink="/pro">État du réseau</a></li>
+        <li><a routerLink="/pro">Contacter l'équipe</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom-bar">
+    <div class="container bottom-bar-content">
+      <p>© 2026 AYYOU Technologies Inc. Tous droits réservés.</p>
+      <div class="legal-links">
+        <a routerLink="/terms">Mentions légales</a>
+        <a routerLink="/privacy">Confidentialité</a>
+        <a routerLink="/terms">Conditions Générales</a>
+        <a routerLink="/privacy">Gestion des cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>

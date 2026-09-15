@@ -1,0 +1,123 @@
+<div class="delivery-details-card" *ngIf="delivery">
+  <!-- Top Control Banner -->
+  <div class="panel-header-banner">
+    <div class="top-row">
+      <span class="control-label">FEUILLE DE ROUTE LOGISTIQUE</span>
+      <span class="status-live-tag" [ngClass]="'status-' + delivery.statusDotColor">
+        ● {{ delivery.incidentReason || delivery.statusText }}
+      </span>
+    </div>
+    <div class="title-row">
+      <h2 class="panel-title">{{ delivery.reference }}</h2>
+      <button class="btn-close-icon" (click)="onClose()" title="Fermer">✕</button>
+    </div>
+  </div>
+
+  <!-- Courier Identity Card Box -->
+  <div class="identity-card-box">
+    <div class="courier-initials-avatar">{{ delivery.courierInitials }}</div>
+    <div class="identity-details">
+      <h3 class="courier-name">{{ delivery.courierName }}</h3>
+      <span class="meta-phone">{{ delivery.courierPhone }}</span>
+    </div>
+    <button class="btn-call-phone" (click)="onCallCourierClick()" title="Appeler coursier">
+      <i class="ri-phone-fill"></i>
+    </button>
+  </div>
+
+  <!-- Courier Telemetry Metrics Grid -->
+  <div class="telemetry-grid">
+    <div class="metric-item">
+      <span class="item-label">VÉHICULE</span>
+      <span class="item-value bold">{{ delivery.courierVehicle }}</span>
+      <span class="item-sub">{{ delivery.courierPlate }}</span>
+    </div>
+
+    <div class="metric-item">
+      <span class="item-label">SIGNAL GPS</span>
+      <span class="item-value bold text-green" style="text-transform: capitalize;">Signal {{ delivery.courierSignalStatus }}</span>
+      <span class="item-sub">Suivi en direct</span>
+    </div>
+
+    <div class="metric-item">
+      <span class="item-label">VITESSE</span>
+      <span class="item-value bold">{{ delivery.courierSpeedKmH }} km/h</span>
+      <span class="item-sub">Rond-point</span>
+    </div>
+  </div>
+
+  <!-- Trajet Timeline Section -->
+  <div class="info-card-block">
+    <span class="box-section-title">CHRONOLOGIE DU TRAJET</span>
+    <div class="timeline-list">
+      <div *ngFor="let ev of timelineEvents" class="timeline-item">
+        <span class="timeline-dot" [ngClass]="ev.dotColor + '-dot'"></span>
+        <div class="timeline-content">
+          <div class="timeline-title-row">
+            <span class="ev-time">{{ ev.time }}</span>
+            <span class="ev-title" [class.text-orange]="ev.isHighlight">{{ ev.title }}</span>
+          </div>
+          <span class="ev-sub">{{ ev.subtitle }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AYYOU IA Logistique Information Box -->
+  <div class="ia-logistique-box">
+    <div class="ia-header-row">
+      <i class="ri-cpu-line ia-icon"></i>
+      <span class="ia-title">AYYOU IA LOGISTIQUE</span>
+    </div>
+    <p class="ia-message">
+      Le système a notifié le client avec un délai ajusté de +8 minutes. Notification SMS automatique envoyée.
+    </p>
+  </div>
+
+  <!-- Admin Actions Stack -->
+  <div class="admin-actions-stack">
+    <!-- Main Reassign Action Button -->
+    <button class="btn-admin-primary-red" (click)="onReassignClick()">
+      <i class="ri-repeat-2-line"></i> Réassigner à un coursier relais disponible
+    </button>
+
+    <!-- Secondary Action Buttons Row -->
+    <div class="secondary-actions-row">
+      <button class="btn-secondary-half" (click)="onCallCourierClick()">
+        <i class="ri-phone-line"></i> Appeler coursier
+      </button>
+      <button class="btn-secondary-half" (click)="onContactClientClick()">
+        <i class="ri-message-3-line"></i> Contacter client
+      </button>
+    </div>
+
+    <!-- Final Destructive Action Link -->
+    <button class="btn-close-incident-link" (click)="onCloseIncidentClick()">
+      <i class="ri-checkbox-circle-line"></i> Clôturer l'incident logistique
+    </button>
+  </div>
+
+  <!-- Reassign Courier Modal -->
+  <div class="modal-backdrop" *ngIf="showReassignModal" (click)="showReassignModal = false">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <h3 class="modal-title">Réassigner la course {{ delivery.reference }}</h3>
+      <p class="modal-message">
+        Sélectionner un coursier disponible à proximité du point d'incident pour reprendre la livraison :
+      </p>
+
+      <div class="modal-select-wrap">
+        <select class="modal-select" [(ngModel)]="selectedRelayCourier">
+          <option value="">Choisir un coursier relais...</option>
+          <option *ngFor="let c of relayCouriersList" [value]="c">{{ c }}</option>
+        </select>
+      </div>
+
+      <div class="modal-actions-row">
+        <button class="btn-modal-cancel" (click)="showReassignModal = false">Annuler</button>
+        <button class="btn-modal-confirm btn-red" [disabled]="!selectedRelayCourier" (click)="confirmReassign()">
+          Valider la réassignation
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

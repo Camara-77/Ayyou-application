@@ -1,0 +1,105 @@
+<div class="card-wrapper">
+  <!-- Card Header -->
+  <div class="card-header">
+    <h1 class="card-title">Connexion Livreur Partenaire</h1>
+    <p class="card-subtitle">
+      Accédez à vos missions quotidiennes, votre zone de course et vos revenus en temps réel.
+    </p>
+  </div>
+
+  <!-- Form -->
+  <form class="login-form" (ngSubmit)="onSubmit()">
+    
+    <!-- Field 1: Phone / Email -->
+    <div class="form-group">
+      <label for="driver-identifier" class="form-label">NUMÉRO DE TÉLÉPHONE OU EMAIL PROFESSIONNEL</label>
+      <div class="input-container" [class.error]="identifierTouched && !isIdentifierValid()">
+        <div class="prefix-badge">+221</div>
+        <div class="divider"></div>
+        <input
+          id="driver-identifier"
+          type="text"
+          class="form-input"
+          placeholder="77 123 45 67"
+          [(ngModel)]="identifier"
+          (blur)="identifierTouched = true"
+          name="identifier"
+          required
+          [disabled]="isLoading"
+        />
+      </div>
+      <div *ngIf="identifierTouched && !isIdentifierValid()" class="field-error-text">
+        Veuillez saisir un numéro sénégalais valide (ex: 77 123 45 67) ou un email professionnel.
+      </div>
+    </div>
+
+    <!-- Field 2: Password / PIN -->
+    <div class="form-group mt-20">
+      <div class="label-row">
+        <label for="driver-pin" class="form-label">CODE PIN OU MOT DE PASSE DE SESSION</label>
+        <button type="button" class="link-forgot" (click)="openRecovery.emit()" [disabled]="isLoading">
+          Code oublié ?
+        </button>
+      </div>
+      <div class="input-container" [class.error]="passwordTouched && !isPasswordValid()">
+        <div class="icon-prefix">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#71717A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <input
+          id="driver-pin"
+          [type]="showPassword ? 'text' : 'password'"
+          class="form-input password-input"
+          placeholder="884920"
+          [(ngModel)]="passwordPin"
+          (blur)="passwordTouched = true"
+          name="passwordPin"
+          required
+          [disabled]="isLoading"
+        />
+        <button type="button" class="btn-eye" (click)="togglePasswordVisibility()" [disabled]="isLoading">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+      <div *ngIf="passwordTouched && !isPasswordValid()" class="field-error-text">
+        Veuillez saisir votre code PIN ou mot de passe de session (minimum 4 caractères).
+      </div>
+    </div>
+
+    <!-- Checkbox: Remember me -->
+    <div class="checkbox-group mt-20">
+      <label class="checkbox-label">
+        <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe" class="custom-checkbox" [disabled]="isLoading" />
+        <span class="checkbox-text">Se souvenir de moi sur ce poste</span>
+      </label>
+    </div>
+
+    <!-- Error Banner Alert -->
+    <div *ngIf="errorMessage" class="error-banner mt-20">
+      <span class="error-icon">⚠️</span>
+      <span class="error-text">{{ errorMessage }}</span>
+    </div>
+
+    <!-- Main Submit Action Button -->
+    <div class="actions-group mt-28">
+      <button 
+        type="submit" 
+        class="btn-primary-red" 
+        [disabled]="!isFormValid() || isLoading"
+      >
+        <span *ngIf="!isLoading" class="btn-flex">
+          <span>Se connecter à l'espace Livreur</span>
+          <span class="arrow">→</span>
+        </span>
+        <span *ngIf="isLoading" class="btn-flex">
+          <span>Connexion en cours...</span>
+        </span>
+      </button>
+    </div>
+  </form>
+</div>

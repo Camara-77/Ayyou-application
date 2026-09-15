@@ -1,0 +1,116 @@
+<div class="catalog-details-card" *ngIf="article">
+  <!-- Top Banner Header -->
+  <div class="panel-header-banner">
+    <div class="top-row">
+      <span class="control-label">FICHE ARTICLE & MODÉRATION</span>
+      <span class="status-live-tag" [ngClass]="'status-' + article.moderationStatusColor">
+        ● {{ article.moderationStatusLabel }}
+      </span>
+    </div>
+
+    <div class="title-row">
+      <h2 class="panel-title">{{ article.name }}</h2>
+      <button class="btn-close-icon" (click)="onClose()" title="Fermer">✕</button>
+    </div>
+
+    <span class="panel-subtitle">SKU: {{ article.sku }} • {{ article.categoryName }}</span>
+  </div>
+
+  <!-- Article Hero Visual & Main Price Card -->
+  <div class="article-hero-box">
+    <img [src]="article.imageUrl" [alt]="article.name" class="hero-img" />
+    <div class="hero-details">
+      <div class="price-badge">{{ article.priceFormatted }}</div>
+      <span class="est-tag">
+        <i class="ri-store-2-line"></i> {{ article.establishmentName }} ({{ article.establishmentDistrict }})
+      </span>
+      <span class="partner-type-badge">{{ article.partnerType === 'RESTAURANT' ? 'Restaurant' : 'Vendeur / Épicerie' }}</span>
+    </div>
+  </div>
+
+  <!-- Description Block -->
+  <div class="info-card-box" *ngIf="article.description">
+    <span class="box-label">DESCRIPTION PRODUIT</span>
+    <p class="desc-text">{{ article.description }}</p>
+  </div>
+
+  <!-- Stock & Allocation AYYOU Box -->
+  <div class="info-card-box">
+    <div class="box-header-row">
+      <span class="box-label">GESTION DU STOCK & QUOTA AYYOU</span>
+      <button
+        type="button"
+        class="btn-inline-edit"
+        *ngIf="!isEditingStock"
+        (click)="isEditingStock = true"
+      >
+        Modifier Quota
+      </button>
+    </div>
+
+    <div class="stock-metrics-grid">
+      <div class="metric-item">
+        <span class="m-lbl">STOCK TOTAL</span>
+        <span class="m-val">{{ article.stockTotal }} un.</span>
+      </div>
+
+      <div class="metric-item">
+        <span class="m-lbl">QUOTA ALLOUÉ AYYOU</span>
+        <span class="m-val bold text-red" *ngIf="!isEditingStock">{{ article.stockAyoo }} un.</span>
+        <div class="edit-stock-wrap" *ngIf="isEditingStock">
+          <input type="number" [(ngModel)]="editingStockAyoo" class="input-stock" min="0" />
+          <button type="button" class="btn-save-mini" (click)="onSaveStockAyoo()">✓</button>
+        </div>
+      </div>
+
+      <div class="metric-item">
+        <span class="m-lbl">DISPONIBLE EN DIRECT</span>
+        <span class="m-val bold text-green">{{ article.stockAvailable }} un.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Variants Box (If any) -->
+  <div class="info-card-box" *ngIf="article.variants && article.variants.length > 0">
+    <span class="box-label">VARIANTES & DÉCLINATIONS</span>
+    <div class="variants-list mt-8">
+      <div *ngFor="let v of article.variants" class="variant-item">
+        <span class="v-name">{{ v.name }}</span>
+        <span class="v-price">{{ v.price | number }} FCFA</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Actions Group -->
+  <div class="actions-group mt-12">
+    <button
+      type="button"
+      class="btn-action btn-validate"
+      *ngIf="article.moderationStatus !== 'VALIDE'"
+      (click)="onValidate()"
+    >
+      <i class="ri-checkbox-circle-line"></i>
+      <span>Valider et publier l'article</span>
+    </button>
+
+    <button
+      type="button"
+      class="btn-action btn-correction"
+      *ngIf="article.moderationStatus === 'A_MODERER'"
+      (click)="onRequestCorrection()"
+    >
+      <i class="ri-edit-circle-line"></i>
+      <span>Demander une correction</span>
+    </button>
+
+    <button
+      type="button"
+      class="btn-action btn-danger"
+      *ngIf="article.moderationStatus === 'A_MODERER'"
+      (click)="onReject()"
+    >
+      <i class="ri-close-circle-line"></i>
+      <span>Refuser l'article</span>
+    </button>
+  </div>
+</div>

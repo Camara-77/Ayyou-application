@@ -1,0 +1,53 @@
+<div class="delivery-filters-container">
+  <!-- Row 1: Status Filter Pills -->
+  <div class="filter-tabs-pill">
+    <button
+      *ngFor="let tab of tabs"
+      class="tab-pill-btn"
+      [class.active]="selectedTab === tab.key"
+      (click)="selectTab(tab.key)"
+    >
+      <span *ngIf="tab.dotColor" class="pill-dot" [ngClass]="tab.dotColor + '-dot'"></span>
+      {{ tab.label }} ({{ tab.count }})
+    </button>
+  </div>
+
+  <!-- Row 2: Search Input & Dropdown Selects -->
+  <div class="filter-inputs-row">
+    <!-- Search Field -->
+    <div class="search-input-wrap">
+      <i class="ri-search-line search-icon"></i>
+      <input
+        type="text"
+        class="search-field"
+        placeholder="Rechercher coursier ou course #AYY-XXXX..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearch()"
+      />
+    </div>
+
+    <!-- Corridor Select Pill -->
+    <div class="select-pill-container">
+      <i class="ri-map-pin-line select-icon"></i>
+      <select class="filter-select" [(ngModel)]="selectedCorridor" (change)="onCorridorFilterChange()">
+        <option value="">Tous les corridors</option>
+        <option value="Plateau">Plateau / Corniche Ouest</option>
+        <option value="Almadies">Almadies / Ngor</option>
+        <option value="Mermoz">Mermoz / Ouakam</option>
+        <option value="Fann">Fann / Point E</option>
+      </select>
+    </div>
+
+    <!-- Vehicle Select Pill -->
+    <div class="select-pill-container">
+      <i class="ri-motorbike-line select-icon"></i>
+      <select class="filter-select" [(ngModel)]="selectedVehicle" (change)="onVehicleFilterChange()">
+        <option value="">Tous véhicules</option>
+        <option value="Yamaha">Yamaha (Crypton/125)</option>
+        <option value="Boxer">Boxer 150</option>
+        <option value="Kymco">Kymco Agility</option>
+        <option value="TVS">TVS HLX</option>
+      </select>
+    </div>
+  </div>
+</div>

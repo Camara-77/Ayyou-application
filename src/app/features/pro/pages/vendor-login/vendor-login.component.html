@@ -1,0 +1,29 @@
+<div class="vendor-login-page">
+  <div class="split-container">
+    <!-- Left Hero Banner Column -->
+    <div class="banner-column">
+      <app-vendor-login-banner></app-vendor-login-banner>
+    </div>
+
+    <!-- Right Form Column -->
+    <div class="form-column">
+      <app-vendor-login-form-card
+        [isLoading]="isLoading"
+        [errorMessage]="loginErrorMessage"
+        [initialIdentifier]="initialIdentifier"
+        (submitForm)="onLoginSubmit($event)"
+        (marchandLogin)="onMarchandLogin()"
+        (openRecovery)="onOpenRecovery()"
+      ></app-vendor-login-form-card>
+    </div>
+  </div>
+
+  <!-- Password Recovery Modal -->
+  <app-vendor-password-recovery-modal
+    *ngIf="showRecoveryModal"
+    [isLoading]="isLoading"
+    [errorMessage]="recoveryErrorMessage"
+    (requestRecovery)="onRequestRecovery($event)"
+    (closeModal)="onCloseRecovery()"
+  ></app-vendor-password-recovery-modal>
+</div>

@@ -1,0 +1,83 @@
+<div class="payment-table-card">
+  <div class="table-responsive">
+    <table class="ayyou-table">
+      <thead>
+        <tr>
+          <th>ID & DATE</th>
+          <th>BÉNÉFICIAIRE / ÉTABLISSEMENT</th>
+          <th>TYPE D'OPÉRATION</th>
+          <th>MONTANT BRUT</th>
+          <th>CANAL DE PAIEMENT</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let item of payments"
+          [class.selected-row]="selectedPayment?.id === item.id"
+          (click)="onSelectRow(item)"
+        >
+          <!-- ID & Date -->
+          <td class="col-id-date">
+            <span class="payment-ref">{{ item.reference }}</span>
+            <span class="payment-date">{{ item.dateText }}</span>
+          </td>
+
+          <!-- Beneficiary -->
+          <td class="col-beneficiary">
+            <div class="beneficiary-cell">
+              <div class="avatar-circle" [ngClass]="'avatar-' + item.beneficiaryInitials.toLowerCase()">
+                {{ item.beneficiaryInitials }}
+              </div>
+              <div class="beneficiary-info">
+                <span class="name">{{ item.beneficiaryName }}</span>
+                <span class="sub">{{ item.beneficiarySubtitle }}</span>
+              </div>
+            </div>
+          </td>
+
+          <!-- Operation Type -->
+          <td class="col-operation">
+            <span class="operation-text">{{ item.operationTypeLabel }}</span>
+          </td>
+
+          <!-- Amount -->
+          <td class="col-amount">
+            <span class="amount-val">{{ item.amountFormatted }}</span>
+          </td>
+
+          <!-- Payment Channel -->
+          <td class="col-channel">
+            <div class="channel-pill">
+              <span
+                class="channel-dot"
+                [ngClass]="'dot-' + item.paymentChannelDotColor"
+              >●</span>
+              <span class="channel-label">{{ item.paymentChannelLabel }}</span>
+            </div>
+          </td>
+        </tr>
+
+        <tr *ngIf="payments.length === 0">
+          <td colspan="5" class="empty-cell">
+            Aucun paiement ou abonnement correspondant trouvé.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Table Footer Pagination -->
+  <div class="table-pagination-footer">
+    <span class="pagination-info">Affichage de 1 à {{ payments.length }} sur 1 840 opérations</span>
+
+    <div class="pagination-controls">
+      <button class="page-nav-btn" disabled>‹</button>
+      <button class="page-num-btn active">1</button>
+      <button class="page-num-btn">2</button>
+      <button class="page-num-btn">3</button>
+      <span class="page-ellipsis">...</span>
+      <button class="page-num-btn">307</button>
+      <button class="page-nav-btn">›</button>
+    </div>
+  </div>
+</div>

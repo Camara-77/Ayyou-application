@@ -1,0 +1,93 @@
+<div class="user-table-card">
+  <div class="table-responsive">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>NOM & PRÉNOM</th>
+          <th>EMAIL</th>
+          <th>TÉLÉPHONE</th>
+          <th>TYPE DE COMPTE</th>
+          <th class="text-right">STATUT</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let user of users"
+          [class.active-row]="user.id === selectedUser?.id"
+          (click)="onRowClick(user)"
+        >
+          <td class="col-name">
+            <div class="name-wrap">
+              <span class="full-name">{{ user.firstName }} {{ user.lastName }}</span>
+              <span class="merchant-sub" *ngIf="user.merchantName">{{ user.merchantName }}</span>
+            </div>
+          </td>
+
+          <td class="col-email">
+            <span class="email-text">{{ user.email }}</span>
+          </td>
+
+          <td class="col-phone">
+            <span class="phone-text">{{ user.phone }}</span>
+          </td>
+
+          <td class="col-type">
+            <span class="account-type-text">{{ user.accountTypeLabel }}</span>
+          </td>
+
+          <td class="col-status text-right">
+            <span class="status-indicator" [class.status-active]="user.status === 'ACTIF'" [class.status-disabled]="user.status === 'DESACTIVE'">
+              <span class="status-dot"></span>
+              <span class="status-text">{{ user.status === 'ACTIF' ? 'Actif' : 'Désactivé' }}</span>
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Table Pagination Footer -->
+  <div class="table-pagination-footer">
+    <span class="pagination-info">
+      Affichage 1–{{ users.length }} sur 24 580 utilisateurs
+    </span>
+
+    <div class="pagination-controls">
+      <button
+        type="button"
+        class="btn-page-nav"
+        [disabled]="currentPage === 1"
+        (click)="setPage(currentPage - 1)"
+      >
+        Précédent
+      </button>
+
+      <button
+        type="button"
+        class="btn-page-num"
+        [class.active]="currentPage === 1"
+        (click)="setPage(1)"
+      >
+        1
+      </button>
+
+      <button
+        type="button"
+        class="btn-page-num"
+        [class.active]="currentPage === 2"
+        (click)="setPage(2)"
+      >
+        2
+      </button>
+
+      <button
+        type="button"
+        class="btn-page-nav"
+        [disabled]="currentPage === totalPages"
+        (click)="setPage(currentPage + 1)"
+      >
+        Suivant
+      </button>
+    </div>
+  </div>
+</div>

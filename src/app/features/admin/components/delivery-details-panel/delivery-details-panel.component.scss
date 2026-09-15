@@ -1,0 +1,452 @@
+.delivery-details-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #F3F4F6;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  @media (max-width: 576px) {
+    padding: 14px;
+  }
+
+  /* Header Banner */
+  .panel-header-banner {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .control-label {
+        font-size: 10px;
+        font-weight: 800;
+        color: #757575;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+      }
+
+      .status-live-tag {
+        font-size: 11px;
+        font-weight: 800;
+
+        &.status-orange { color: #EA580C; }
+        &.status-blue { color: #3B82F6; }
+        &.status-green { color: #16A34A; }
+        &.status-red { color: #E51B2A; }
+      }
+    }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .panel-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: #1A1A1A;
+        margin: 0;
+        letter-spacing: -0.5px;
+      }
+
+      .btn-close-icon {
+        background: transparent;
+        border: none;
+        font-size: 16px;
+        color: #757575;
+        cursor: pointer;
+
+        &:hover {
+          color: #1A1A1A;
+        }
+      }
+    }
+  }
+
+  /* Courier Identity Box */
+  .identity-card-box {
+    background: #F9FAFB;
+    border-radius: 14px;
+    padding: 14px 16px;
+    border: 1px solid #F3F4F6;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .courier-initials-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #EDEDED;
+      color: #1A1A1A;
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .identity-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      .courier-name {
+        font-size: 15px;
+        font-weight: 800;
+        color: #1A1A1A;
+        margin: 0;
+      }
+
+      .meta-phone {
+        font-size: 12px;
+        color: #555555;
+        font-weight: 500;
+      }
+    }
+
+    .btn-call-phone {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      color: #1A1A1A;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background: #F3F4F6;
+      }
+    }
+  }
+
+  /* Telemetry Grid */
+  .telemetry-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    background: #F9FAFB;
+    border-radius: 14px;
+    padding: 12px 14px;
+    border: 1px solid #F3F4F6;
+
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+
+      .item-label {
+        font-size: 9px;
+        font-weight: 800;
+        color: #757575;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+      }
+
+      .item-value {
+        font-size: 13px;
+        color: #1A1A1A;
+
+        &.bold {
+          font-weight: 800;
+        }
+      }
+
+      .item-sub {
+        font-size: 10px;
+        color: #757575;
+
+        &.text-green {
+          color: #16A34A;
+          font-weight: 700;
+        }
+      }
+    }
+  }
+
+  /* Info Card Block */
+  .info-card-block {
+    background: #F9FAFB;
+    border-radius: 14px;
+    padding: 14px 16px;
+    border: 1px solid #F3F4F6;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .box-section-title {
+      font-size: 10px;
+      font-weight: 800;
+      color: #757575;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+
+    .timeline-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      padding-left: 12px;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 3px;
+        top: 6px;
+        bottom: 6px;
+        width: 1px;
+        background: #E5E7EB;
+      }
+
+      .timeline-item {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+
+        .timeline-dot {
+          position: absolute;
+          left: -12px;
+          top: 5px;
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+
+          &.gray-dot { background: #9CA3AF; }
+          &.orange-dot { background: #EA580C; }
+          &.green-dot { background: #16A34A; }
+        }
+
+        .timeline-content {
+          display: flex;
+          flex-direction: column;
+
+          .timeline-title-row {
+            display: flex;
+            gap: 6px;
+            font-size: 12px;
+
+            .ev-time {
+              font-weight: 800;
+              color: #1A1A1A;
+            }
+
+            .ev-title {
+              font-weight: 700;
+              color: #1A1A1A;
+
+              &.text-orange {
+                color: #EA580C;
+              }
+            }
+          }
+
+          .ev-sub {
+            font-size: 11px;
+            color: #757575;
+          }
+        }
+      }
+    }
+  }
+
+  /* IA Logistique Box */
+  .ia-logistique-box {
+    background: #FFF5F5;
+    border: 1px solid #FEE2E2;
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    .ia-header-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      .ia-icon {
+        color: #E51B2A;
+        font-size: 14px;
+      }
+
+      .ia-title {
+        font-size: 10px;
+        font-weight: 800;
+        color: #E51B2A;
+        letter-spacing: 0.6px;
+      }
+    }
+
+    .ia-message {
+      font-size: 12px;
+      color: #7F1D1D;
+      margin: 0;
+      line-height: 1.4;
+    }
+  }
+
+  /* Admin Actions Stack */
+  .admin-actions-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 4px;
+
+    .btn-admin-primary-red {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      background: #E51B2A;
+      border: none;
+      font-size: 13px;
+      font-weight: 800;
+      color: #FFFFFF;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.15s ease;
+
+      &:hover {
+        background: #C91424;
+      }
+    }
+
+    .secondary-actions-row {
+      display: flex;
+      gap: 10px;
+
+      .btn-secondary-half {
+        flex: 1;
+        padding: 10px;
+        border-radius: 12px;
+        background: #F8F9FA;
+        border: 1px solid #E5E7EB;
+        font-size: 12px;
+        font-weight: 700;
+        color: #374151;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+
+        &:hover {
+          background: #E5E7EB;
+        }
+      }
+    }
+
+    .btn-close-incident-link {
+      width: 100%;
+      padding: 8px;
+      background: transparent;
+      border: none;
+      font-size: 12px;
+      font-weight: 700;
+      color: #757575;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+
+      &:hover {
+        color: #E51B2A;
+      }
+    }
+  }
+
+  /* Modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 16px;
+
+    .modal-card {
+      background: #FFFFFF;
+      border-radius: 20px;
+      padding: 24px;
+      max-width: 460px;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      .modal-title {
+        font-size: 18px;
+        font-weight: 800;
+        color: #1A1A1A;
+        margin: 0;
+      }
+
+      .modal-message {
+        font-size: 13px;
+        color: #555555;
+        margin: 0;
+      }
+
+      .modal-select-wrap {
+        .modal-select {
+          width: 100%;
+          padding: 10px;
+          border-radius: 12px;
+          border: 1px solid #E5E7EB;
+          font-size: 13px;
+          color: #1A1A1A;
+          outline: none;
+        }
+      }
+
+      .modal-actions-row {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+
+        .btn-modal-cancel {
+          padding: 10px 16px;
+          border-radius: 12px;
+          background: #F3F4F6;
+          border: none;
+          font-size: 12px;
+          font-weight: 700;
+          color: #374151;
+          cursor: pointer;
+        }
+
+        .btn-modal-confirm {
+          padding: 10px 16px;
+          border-radius: 12px;
+          border: none;
+          font-size: 12px;
+          font-weight: 800;
+          color: #FFFFFF;
+          cursor: pointer;
+
+          &.btn-red {
+            background: #E51B2A;
+            &:hover { background: #C91424; }
+          }
+        }
+      }
+    }
+  }
+}

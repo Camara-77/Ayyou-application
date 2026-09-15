@@ -1,0 +1,190 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+
+  .modal-card {
+    background: #FFFFFF;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 580px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #F3F4F6;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+
+      .title-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        .modal-title {
+          font-size: 15px;
+          font-weight: 800;
+          color: #1A1A1A;
+          margin: 0;
+          letter-spacing: -0.3px;
+        }
+
+        .sub-label {
+          font-size: 12px;
+          color: #757575;
+          font-weight: 500;
+        }
+      }
+
+      .btn-close-circle {
+        background: #F3F4F6;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        color: #757575;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+
+        &:hover {
+          background: #E5E7EB;
+          color: #1A1A1A;
+        }
+      }
+    }
+
+    .modal-body-scroll {
+      padding: 20px 24px;
+      overflow-y: auto;
+
+      .reorder-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .reorder-item {
+          background: #F9FAFB;
+          border: 1px solid #F3F4F6;
+          border-radius: 14px;
+          padding: 10px 14px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+
+          .order-badge {
+            font-size: 12px;
+            font-weight: 800;
+            color: #E51B2A;
+            background: #FFF5F5;
+            padding: 4px 8px;
+            border-radius: 8px;
+            min-width: 32px;
+            text-align: center;
+          }
+
+          .cat-thumb {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #E5E7EB;
+          }
+
+          .cat-meta {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+
+            .c-name {
+              font-size: 13px;
+              font-weight: 800;
+              color: #1A1A1A;
+            }
+
+            .c-type {
+              font-size: 11px;
+              color: #757575;
+              font-weight: 500;
+            }
+          }
+
+          .arrow-buttons {
+            display: flex;
+            gap: 4px;
+
+            .btn-arrow {
+              width: 30px;
+              height: 30px;
+              border-radius: 8px;
+              border: 1px solid #E5E7EB;
+              background: #FFFFFF;
+              font-size: 11px;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+
+              &:hover:not(:disabled) {
+                background: #F3F4F6;
+                color: #E51B2A;
+              }
+
+              &:disabled {
+                opacity: 0.3;
+                cursor: not-allowed;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #F3F4F6;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+
+      .btn-cancel {
+        height: 40px;
+        background: #F3F4F6;
+        border: none;
+        border-radius: 12px;
+        padding: 0 18px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #1A1A1A;
+        cursor: pointer;
+      }
+
+      .btn-save-red {
+        height: 40px;
+        background: #E51B2A;
+        border: none;
+        border-radius: 12px;
+        padding: 0 20px;
+        font-size: 13px;
+        font-weight: 800;
+        color: #FFFFFF;
+        cursor: pointer;
+
+        &:hover {
+          background: #C81624;
+        }
+      }
+    }
+  }
+}

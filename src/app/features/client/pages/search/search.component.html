@@ -1,0 +1,226 @@
+<div class="page-container">
+  <!-- Global AYYOU Header with Logo -->
+  <app-header></app-header>
+
+  <main class="search-content">
+    <!-- Sticky Search & Categories Header -->
+    <div class="sticky-search-header">
+      <!-- Search Bar with AYYOU Search & Mic Icons -->
+      <div class="search-bar-container">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="11" cy="11" r="7" stroke="#757575" stroke-width="2"/>
+            <path d="M20 20L16 16" stroke="#757575" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Rechercher un plat, restaurant, vendeur..."
+            [(ngModel)]="searchQuery"
+            (input)="onSearchInput()"
+          />
+
+          <button *ngIf="searchQuery" class="clear-btn" (click)="clearSearch()" aria-label="Effacer">
+            ✕
+          </button>
+
+          <button class="mic-btn" (click)="triggerMicSearch()" aria-label="Recherche vocale (Visuelle)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="12" y1="19" x2="12" y2="23" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Category Cards Horizontal Scroll (Image Top, Name Bottom) -->
+      <div class="categories-section">
+        <div class="categories-scroll">
+          <button
+            *ngFor="let cat of categories"
+            class="cat-item-card"
+            [class.active]="activeCategory === cat.id"
+            (click)="selectCategory(cat.id)"
+          >
+            <div class="cat-img-wrapper">
+              <img [src]="cat.imageUrl" [alt]="cat.name" class="cat-img" />
+            </div>
+            <span class="cat-name">{{ cat.name }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Searches Pills Section -->
+    <div class="recent-section" *ngIf="recentSearches.length > 0 && !searchQuery">
+      <div class="section-header">
+        <h3 class="section-title">Recherches récentes</h3>
+      </div>
+      <div class="recent-pills">
+        <div
+          *ngFor="let term of recentSearches; let i = index"
+          class="recent-pill"
+          (click)="selectRecentSearch(term)"
+        >
+          <span class="term-text">{{ term }}</span>
+          <button class="remove-btn" (click)="removeRecentSearch(i, $event)" aria-label="Supprimer">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result Type Filter Tabs (Without Parentheses) -->
+    <div class="result-type-tabs">
+      <button
+        class="type-tab"
+        [class.active]="activeResultType === 'all'"
+        (click)="setResultType('all')"
+      >
+        Tous {{ totalResultsCount }}
+      </button>
+      <button
+        class="type-tab"
+        [class.active]="activeResultType === 'dishes'"
+        (click)="setResultType('dishes')"
+      >
+        Plats {{ dishes.length }}
+      </button>
+      <button
+        class="type-tab"
+        [class.active]="activeResultType === 'restaurants'"
+        (click)="setResultType('restaurants')"
+      >
+        Restaurants {{ restaurants.length }}
+      </button>
+      <button
+        class="type-tab"
+        [class.active]="activeResultType === 'vendors'"
+        (click)="setResultType('vendors')"
+      >
+        Vendeurs {{ vendors.length }}
+      </button>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="totalResultsCount === 0">
+      <div class="empty-icon">🔍</div>
+      <p class="empty-title">Aucun résultat trouvé</p>
+      <p class="empty-subtitle">Essayez de modifier votre recherche ou sélectionnez une autre catégorie.</p>
+    </div>
+
+    <!-- Results Section: Disher / Plats -->
+    <div
+      class="results-block"
+      *ngIf="(activeResultType === 'all' || activeResultType === 'dishes') && dishes.length > 0"
+    >
+      <h3 class="block-title" *ngIf="activeResultType === 'all'">Plats</h3>
+      <div class="dishes-grid">
+        <app-dish-card
+          *ngFor="let dish of dishes"
+          [dish]="dish"
+          (add)="onAddDishToCart($event)"
+        ></app-dish-card>
+      </div>
+    </div>
+
+    <!-- Results Section: Restaurants -->
+    <div
+      class="results-block"
+      *ngIf="(activeResultType === 'all' || activeResultType === 'restaurants') && restaurants.length > 0"
+    >
+      <h3 class="block-title" *ngIf="activeResultType === 'all'">Restaurants</h3>
+      <div class="restaurants-list">
+        <app-restaurant-card
+          *ngFor="let rest of restaurants"
+          [restaurant]="rest"
+        ></app-restaurant-card>
+      </div>
+    </div>
+
+    <!-- Results Section: Vendeurs -->
+    <div
+      class="results-block"
+      *ngIf="(activeResultType === 'all' || activeResultType === 'vendors') && vendors.length > 0"
+    >
+      <h3 class="block-title" *ngIf="activeResultType === 'all'">Vendeurs</h3>
+      <div class="vendors-list">
+        <div class="vendor-card" *ngFor="let vendor of vendors" (click)="onVendorClick(vendor.id)" style="cursor: pointer;">
+          <div class="vendor-photo-wrapper">
+            <img [src]="vendor.photoUrl" [alt]="vendor.name" class="vendor-photo" />
+            <span class="status-badge" [class.open]="vendor.status === 'open'">
+              <span class="dot"></span>
+              {{ vendor.status === 'open' ? 'Ouvert' : 'Fermé' }}
+            </span>
+          </div>
+
+          <div class="vendor-info">
+            <div class="name-row">
+              <h4 class="vendor-name">{{ vendor.name }}</h4>
+            </div>
+            <p class="vendor-specialty">{{ vendor.specialty }}</p>
+            <p class="vendor-location">{{ vendor.location }}</p>
+            <div class="vendor-footer">
+              <span class="vendor-dishes-count" *ngIf="vendor.dishesCount">{{ vendor.dishesCount }} plats</span>
+              <button class="btn-see-more" aria-label="Voir profil" (click)="onVendorClick(vendor.id)">
+                Voir profil <span class="arrow">&gt;</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Floating Back-to-Top Button -->
+  <button
+    *ngIf="showBackToTop"
+    class="btn-back-to-top"
+    (click)="scrollToTop()"
+    aria-label="Retour en haut"
+  >
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 19V5M5 12L12 5L19 12" stroke="#E51A29" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <!-- AYYOU Voice Search Modal Popup -->
+  <div class="mic-modal-overlay" *ngIf="showMicModal" (click)="closeMicModal($event)">
+    <div class="mic-modal-card" (click)="$event.stopPropagation()">
+      <button class="btn-close-modal" (click)="closeMicModal($event)" aria-label="Fermer">✕</button>
+
+      <div class="mic-animation-wrapper">
+        <div class="mic-pulse-ring" [class.active]="isMicListening"></div>
+        <div class="mic-circle-bg">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="12" y1="19" x2="12" y2="23" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <h3 class="modal-title">Recherche Vocale AYYOU</h3>
+      <p class="modal-status" *ngIf="isMicListening">Parlez maintenant... Nous vous écoutons 🎙️</p>
+
+      <div class="transcript-box" *ngIf="!isMicListening">
+        <span class="transcript-label">Résultat détecté :</span>
+        <p class="transcript-text">"{{ micTranscript }}"</p>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn-confirm" (click)="confirmMicSearch()">
+          Rechercher
+        </button>
+        <button class="modal-btn-cancel" (click)="closeMicModal($event)">
+          Annuler
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Chatbot & Bottom Navigation Bar -->
+  <app-chatbot-floating></app-chatbot-floating>
+  <app-footer></app-footer>
+  <app-bottom-nav activeTab="search"></app-bottom-nav>
+</div>

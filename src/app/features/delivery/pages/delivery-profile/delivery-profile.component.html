@@ -1,0 +1,277 @@
+<div class="delivery-app-layout">
+  <!-- Top Navigation Header -->
+  <header class="delivery-header">
+    <button class="btn-header-square" (click)="goBack()" aria-label="Retour">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+    </button>
+    
+    <div class="header-title-col">
+      <h1 class="header-title">Profil Livreur</h1>
+      <div class="status-subline">
+        <span class="dot-green"></span>
+        <span>En service</span>
+      </div>
+    </div>
+
+    <button class="btn-header-square rel" aria-label="Notifications">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      </svg>
+      <span class="notification-dot-red"></span>
+    </button>
+  </header>
+
+  <!-- Main Scrollable Content -->
+  <main class="delivery-content">
+    <!-- Driver Profile Top Card -->
+    <div class="profile-card">
+      <div class="profile-header-row">
+        <img [src]="driverAvatar" alt="Driver Avatar" class="driver-avatar-img">
+        <div class="driver-meta-col">
+          <h2 class="driver-name">{{ driverName }}</h2>
+          <span class="driver-role">{{ driverRole }}</span>
+        </div>
+      </div>
+
+      <!-- Toggle Status Box -->
+      <div class="status-toggle-box">
+        <div class="status-text-side">
+          <div class="status-live-line">
+            <span class="dot-green"></span>
+            <span class="status-live-title">{{ isOnDuty ? 'En service' : 'Hors service' }}</span>
+          </div>
+          <span class="status-live-sub">Visible pour de nouvelles courses</span>
+        </div>
+
+        <button class="toggle-switch-btn" [class.on]="isOnDuty" (click)="toggleOnDuty()" aria-label="Changer statut">
+          <span class="switch-knob"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Section 1: Mon Véhicule -->
+    <div class="section-card">
+      <div class="section-card-header">
+        <div class="header-left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6" cy="15.5" r="3.2"/>
+            <circle cx="18" cy="15.5" r="3.2"/>
+            <path d="M 5 11.5 H 8 L 12 13.5 H 15.5 L 18 11.5 M 14 8 L 16.5 6.5 H 18.5 M 9 15.5 C 9.5 16.5 13.5 16.5 14 15.5"/>
+          </svg>
+          <span class="section-title">Mon Véhicule</span>
+        </div>
+        <span class="badge-actif">Actif</span>
+      </div>
+
+      <div class="info-inner-box">
+        <span class="bold-title">{{ vehicleName }}</span>
+        <span class="sub-detail">Matricule : {{ vehiclePlate }}</span>
+      </div>
+
+      <div class="info-inner-box row-between">
+        <div class="left-col">
+          <div class="flex-icon-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span class="bold-title-sm">Assurance Professionnelle</span>
+          </div>
+          <span class="sub-detail">Validée jusqu'au {{ insuranceExpiry }}</span>
+        </div>
+        <span class="badge-conforme">CONFORME</span>
+      </div>
+
+      <!-- Equipment sub-section -->
+      <div class="equipment-sub-section">
+        <span class="sub-label">ÉQUIPEMENTS CERTIFIÉS</span>
+        <div class="badges-row">
+          <div class="equip-badge red-equip">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span>Casque homologué</span>
+          </div>
+          <div class="equip-badge grey-equip">
+            <span>Sac isotherme AYYOU</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Zone & Reversement -->
+    <div class="section-card">
+      <div class="section-card-header">
+        <div class="header-left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+          </svg>
+          <span class="section-title">Zone & Reversement</span>
+        </div>
+      </div>
+
+      <div class="sub-block">
+        <span class="sub-label">SECTEUR D'INTERVENTION PRINCIPAL</span>
+        <div class="info-inner-box">
+          <span class="bold-title-sm">{{ interventionSectors }}</span>
+        </div>
+      </div>
+
+      <div class="sub-block margin-t-10">
+        <span class="sub-label">COMPTE DE REVERSEMENT DES GAINS</span>
+        <div class="info-inner-box row-between">
+          <div class="left-wave-col">
+            <div class="wave-circle-logo">W</div>
+            <div class="wave-text-col">
+              <span class="bold-title-sm">{{ payoutAccount }}</span>
+              <span class="sub-detail">{{ payoutPhone }}</span>
+            </div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Documents Officiels -->
+    <div class="section-card">
+      <div class="section-card-header">
+        <div class="header-left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          <span class="section-title">Documents Officiels</span>
+        </div>
+        <span class="sub-label-right">3/3 validés</span>
+      </div>
+
+      <div class="documents-list-box">
+        <!-- Item 1 -->
+        <div class="doc-item-row">
+          <div class="doc-left">
+            <div class="doc-icon-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="2">
+                <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                <circle cx="9" cy="10" r="2"></circle>
+                <line x1="15" y1="8" x2="17" y2="8"></line>
+                <line x1="15" y1="12" x2="17" y2="12"></line>
+              </svg>
+            </div>
+            <div class="doc-text-col">
+              <span class="doc-name">Pièce d'identité (CNI)</span>
+              <span class="doc-sub">République du Sénégal</span>
+            </div>
+          </div>
+          <span class="badge-verified">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Vérifié
+          </span>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="doc-item-row">
+          <div class="doc-left">
+            <div class="doc-icon-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="2">
+                <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                <line x1="2" y1="10" x2="22" y2="10"></line>
+              </svg>
+            </div>
+            <div class="doc-text-col">
+              <span class="doc-name">Permis moto (Catégorie A)</span>
+              <span class="doc-sub">Ministère des Transports</span>
+            </div>
+          </div>
+          <span class="badge-verified">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Vérifié
+          </span>
+        </div>
+
+        <!-- Item 3 -->
+        <div class="doc-item-row">
+          <div class="doc-left">
+            <div class="doc-icon-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <div class="doc-text-col">
+              <span class="doc-name">Casier judiciaire (Extrait n°3)</span>
+              <span class="doc-sub">Délivré &lt; 3 mois</span>
+            </div>
+          </div>
+          <span class="badge-verified">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Validé
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Action Links -->
+    <div class="actions-card">
+      <div class="action-row">
+        <div class="action-left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span class="action-title">Modifier mes informations</span>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </div>
+
+      <div class="action-row">
+        <div class="action-left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2.5">
+            <line x1="12" y1="2" x2="12" y2="22"></line>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+            <line x1="19.07" y1="4.93" x2="4.93" y2="19.07"></line>
+          </svg>
+          <div class="action-text-col">
+            <span class="action-title">Support & Urgence Livreur</span>
+            <span class="action-sub-red">Assistance prioritaire 24/7</span>
+          </div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Bottom Secondary Buttons -->
+    <div class="bottom-btns-col">
+      <button class="btn-outline-red" (click)="switchToClientMode()">
+        <span>→ Passer en mode client</span>
+      </button>
+
+      <button class="btn-outline-red" (click)="logoutProSession()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        <span>Déconnexion de la session Pro</span>
+      </button>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation Bar -->
+  <app-delivery-bottom-nav activeTab="profile"></app-delivery-bottom-nav>
+</div>

@@ -1,0 +1,138 @@
+<div class="driver-details-card" *ngIf="driver">
+  <!-- Top Panel Header -->
+  <div class="panel-header-banner">
+    <div class="status-badge-header">
+      <span class="status-orange-text">
+        {{ driver.isCandidate ? 'DOSSIER CANDIDATURE EN EXAMEN' : 'FICHE COURSIER' }}
+      </span>
+      <span class="complet-green-tag" *ngIf="driver.isCandidate">
+        • Complet ({{ driver.documentsCount || '4/4' }})
+      </span>
+    </div>
+    <span class="submitted-meta-date">{{ driver.submittedAt || 'En service actif' }}</span>
+  </div>
+
+  <!-- Candidate / Driver Identity Box -->
+  <div class="identity-card-box">
+    <img
+      [src]="driver.photoUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80'"
+      [alt]="driver.firstName"
+      class="candidate-photo-thumb"
+    />
+    <div class="identity-details">
+      <h3 class="candidate-name">{{ driver.firstName }} {{ driver.lastName }}</h3>
+      <span class="meta-row">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+        {{ driver.phone }}
+      </span>
+      <span class="meta-row">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        {{ driver.email }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Vehicle & Zone 2-Column Box -->
+  <div class="vehicle-zone-grid">
+    <div class="info-block">
+      <span class="block-label">VÉHICULE DÉCLARÉ</span>
+      <span class="block-value bold">{{ driver.vehicleDeclaredFull || driver.vehicle }}</span>
+    </div>
+
+    <div class="info-block">
+      <span class="block-label">ZONE SOUHAITÉE</span>
+      <span class="block-value">{{ driver.zone }}</span>
+    </div>
+  </div>
+
+  <!-- Justificative Documents Section -->
+  <div class="documents-section">
+    <div class="section-title-row">
+      <span class="section-title">PIÈCES JUSTIFICATIVES REQUISES</span>
+      <span class="files-count">{{ driver.documentsCount || '4' }} reçues</span>
+    </div>
+
+    <div class="documents-list">
+      <div class="doc-item-row" *ngFor="let doc of (driver.documents && driver.documents.length > 0 ? driver.documents : defaultDocs)">
+        <div class="doc-info">
+          <span class="doc-title">{{ doc.title }}</span>
+          <span class="doc-subtitle">{{ doc.subtitle }}</span>
+        </div>
+
+        <button type="button" class="btn-eye-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Action Buttons Stack -->
+  <div class="admin-actions-stack">
+    <button type="button" class="btn-admin-primary-red" (click)="promptApprove()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+      <span>{{ driver.isCandidate ? 'Valider et envoyer le lien d\'activation' : 'Renvoyer le lien d\'activation' }}</span>
+    </button>
+
+    <button type="button" class="btn-admin-secondary-gray" (click)="promptRequestDocs()">
+      Demander des pièces complémentaires
+    </button>
+
+    <button type="button" class="btn-admin-destructive-text" (click)="promptReject()">
+      Rejeter la candidature
+    </button>
+  </div>
+</div>
+
+<!-- Approval Confirmation Modal -->
+<div class="modal-backdrop" *ngIf="showApproveModal">
+  <div class="modal-card">
+    <h3 class="modal-title">Validation de candidature coursier</h3>
+    <p class="modal-message">
+      Êtes-vous sûr de vouloir valider la candidature de <strong>{{ driver?.firstName }} {{ driver?.lastName }}</strong> et déclencher l'envoi de son lien d'activation de compte AYYOU PRO ?
+    </p>
+    <div class="modal-actions-row">
+      <button type="button" class="btn-modal-cancel" (click)="closeModals()">Annuler</button>
+      <button type="button" class="btn-modal-confirm btn-red" (click)="confirmApprove()">Confirmer et envoyer le lien</button>
+    </div>
+  </div>
+</div>
+
+<!-- Rejection Confirmation Modal -->
+<div class="modal-backdrop" *ngIf="showRejectModal">
+  <div class="modal-card">
+    <h3 class="modal-title">Rejet de candidature</h3>
+    <p class="modal-message">
+      Êtes-vous sûr de vouloir rejeter la candidature de <strong>{{ driver?.firstName }} {{ driver?.lastName }}</strong> ? Cette action est irréversible.
+    </p>
+    <div class="modal-actions-row">
+      <button type="button" class="btn-modal-cancel" (click)="closeModals()">Annuler</button>
+      <button type="button" class="btn-modal-confirm btn-red" (click)="confirmReject()">Rejeter la candidature</button>
+    </div>
+  </div>
+</div>
+
+<!-- Request Additional Docs Modal -->
+<div class="modal-backdrop" *ngIf="showRequestDocsModal">
+  <div class="modal-card">
+    <h3 class="modal-title">Demande de pièces complémentaires</h3>
+    <p class="modal-message">
+      Précisez les pièces ou informations manquantes pour <strong>{{ driver?.firstName }} {{ driver?.lastName }}</strong> :
+    </p>
+    <textarea class="modal-textarea" rows="4" [(ngModel)]="docNotes" placeholder="Ex: Permis de conduire recto/verso illisible, merci d'envoyer un nouveau scan..."></textarea>
+    <div class="modal-actions-row">
+      <button type="button" class="btn-modal-cancel" (click)="closeModals()">Annuler</button>
+      <button type="button" class="btn-modal-confirm btn-black" (click)="sendDocsRequest()">Envoyer la demande</button>
+    </div>
+  </div>
+</div>

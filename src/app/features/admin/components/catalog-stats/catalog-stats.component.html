@@ -1,0 +1,54 @@
+<div class="catalog-stats-grid" *ngIf="stats">
+  <!-- Card 1: Total Références -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">TOTAL RÉFÉRENCES</span>
+      <span class="dot-indicator gray-dot"></span>
+    </div>
+    <span class="card-value">{{ (stats.totalReferences || 4820) | number:'1.0-0' }}</span>
+    <span class="card-subtext text-gray">Articles alimentaires & épicerie</span>
+  </div>
+
+  <!-- Card 2: Articles Disponibles -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">ARTICLES DISPONIBLES</span>
+      <span class="dot-indicator green-dot"></span>
+    </div>
+    <span class="card-value">{{ (stats.articlesAvailable || 4615) | number:'1.0-0' }}</span>
+    <span class="card-subtext text-green">En vente directe</span>
+  </div>
+
+  <!-- Card 3: En Rupture -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">EN RUPTURE</span>
+      <span class="dot-indicator orange-dot"></span>
+    </div>
+    <span class="card-value">{{ (stats.outOfStock || 205) | number:'1.0-0' }}</span>
+    <span class="card-subtext text-orange">Stock épuisé vendeur</span>
+  </div>
+
+  <!-- Card 4: Modération Requise -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">MODÉRATION REQUISE</span>
+      <span class="dot-indicator red-dot"></span>
+    </div>
+    <span class="card-value text-red">{{ (stats.moderationRequired || 18) | number:'1.0-0' }}</span>
+    <span class="card-subtext text-red">Nouvelles fiches ou visuels</span>
+  </div>
+
+  <!-- Card 5: Prix Moyen Plat -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">PRIX MOYEN PLAT</span>
+      <span class="dot-indicator blue-dot"></span>
+    </div>
+    <span class="card-value">
+      {{ (stats.averageDishPriceFcfa || 4250) | number:'1.0-0' }}
+      <span class="currency-tag">FCFA</span>
+    </span>
+    <span class="card-subtext text-gray">Marché Dakar Métropole</span>
+  </div>
+</div>

@@ -1,0 +1,23 @@
+<div class="page-container">
+  <!-- Top Floating Header Overlay (Back Arrow + Title) -->
+  <div class="favorites-header-overlay">
+    <a routerLink="/profile" class="btn-back" aria-label="Retour au profil">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M15 19L8 12L15 5" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    <h1 class="page-title">Mes favoris</h1>
+  </div>
+
+  <main class="feed-content">
+    <app-food-post
+      *ngFor="let item of favorites"
+      [feedItem]="item"
+      (orderDish)="onOrderDish($event)"
+      (quickCart)="onQuickCart($event)"
+    ></app-food-post>
+  </main>
+
+  <app-chatbot-floating></app-chatbot-floating>
+  <app-bottom-nav activeTab="profile"></app-bottom-nav>
+</div>

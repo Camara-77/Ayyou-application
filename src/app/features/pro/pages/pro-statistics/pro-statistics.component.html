@@ -1,0 +1,114 @@
+<div class="pro-app-layout">
+  <!-- Header with back button, centered title, bell icon -->
+  <app-pro-header [title]="'Statistiques'" [showBackButton]="true"></app-pro-header>
+
+  <main class="pro-main-content">
+
+    <!-- Period Filters Row -->
+    <div class="period-tabs-container">
+      <button [class.active]="selectedPeriod === 'TODAY'" (click)="setPeriod('TODAY')">
+        Aujourd'hui
+      </button>
+      <button [class.active]="selectedPeriod === 'WEEK'" (click)="setPeriod('WEEK')">
+        Cette semaine
+      </button>
+      <button [class.active]="selectedPeriod === 'MONTH'" (click)="setPeriod('MONTH')">
+        Ce mois
+      </button>
+    </div>
+
+    <!-- Synthesis Cards (2 Cards) -->
+    <section class="summary-cards-grid">
+      <div class="summary-card">
+        <span class="card-label">Revenus Total</span>
+        <div class="card-value">1 245 000 F</div>
+      </div>
+      <div class="summary-card">
+        <span class="card-label">Commandes</span>
+        <div class="card-value">84</div>
+      </div>
+    </section>
+
+    <!-- Évolution des Ventes Chart Section -->
+    <section class="chart-section-card">
+      <div class="chart-header">
+        <div class="title-wrap">
+          <h3>Évolution des Ventes</h3>
+          <p class="subtitle">Flux horaire des encaissements</p>
+        </div>
+        <span class="badge-live">En direct</span>
+      </div>
+
+      <div class="hourly-bar-chart">
+        <div class="bar-col" *ngFor="let item of stats.hourlyRevenue">
+          <div class="bar-fill-wrap">
+            <div class="bar-fill" [style.height.%]="(item.amount / 80000) * 100"></div>
+          </div>
+          <span class="hour-label">{{ item.hour }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Top Plats du Jour Section -->
+    <section class="top-dishes-section">
+      <div class="section-title-row">
+        <h3>Top Plats du Jour</h3>
+        <span class="label-right-red">Classement</span>
+      </div>
+
+      <div class="dishes-cards-list">
+        <div class="top-dish-card" *ngFor="let dish of stats.topDishes">
+          <div class="dish-details">
+            <h4 class="dish-title">{{ dish.name }}</h4>
+            <span class="dish-sold">{{ dish.count }} portions vendues</span>
+          </div>
+          <div class="dish-revenue">{{ dish.revenue | number }} F</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Plats à faible demande Section -->
+    <section class="low-demand-outer-box">
+      <h3>Plats à faible demande</h3>
+
+      <div class="low-demand-list">
+        
+        <!-- Item 1 -->
+        <div class="low-demand-card">
+          <div class="icon-square">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <div class="item-details">
+            <h4 class="item-name">Soupou Kandja Végétarien</h4>
+            <span class="item-stats">2 commandes · 9 000 F</span>
+          </div>
+          <button class="btn-action-grey">Promouvoir</button>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="low-demand-card">
+          <div class="icon-square">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/>
+              <line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/>
+              <line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>
+            </svg>
+          </div>
+          <div class="item-details">
+            <h4 class="item-name">Brochettes de Poisson Capitaine</h4>
+            <span class="item-stats">1 commande · 6 500 F</span>
+          </div>
+          <button class="btn-action-grey">Modifier prix</button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Navigation -->
+  <app-pro-bottom-nav></app-pro-bottom-nav>
+</div>

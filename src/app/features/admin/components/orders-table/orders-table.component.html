@@ -1,0 +1,86 @@
+<div class="orders-table-card">
+  <div class="table-responsive">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>COMMANDE</th>
+          <th>CLIENT</th>
+          <th>ÉTABLISSEMENT</th>
+          <th>MONTANT</th>
+          <th>PAIEMENT</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let order of orders"
+          [class.selected-row]="selectedOrder?.id === order.id"
+          (click)="onRowClick(order)"
+        >
+          <!-- COMMANDE -->
+          <td class="col-ref">
+            <div class="cell-block">
+              <span class="ref-bold" [class.text-red]="selectedOrder?.id === order.id">
+                {{ order.reference }}
+              </span>
+              <span class="sub-text">{{ order.timeAgo }}</span>
+            </div>
+          </td>
+
+          <!-- CLIENT -->
+          <td class="col-client">
+            <div class="cell-block">
+              <span class="main-bold">{{ order.client.name }}</span>
+              <span class="sub-text">{{ order.client.phone }}</span>
+            </div>
+          </td>
+
+          <!-- ÉTABLISSEMENT -->
+          <td class="col-establishment">
+            <div class="cell-block">
+              <span class="main-bold">{{ order.establishmentName }}</span>
+              <span class="sub-text">{{ order.establishmentDistrict }}</span>
+            </div>
+          </td>
+
+          <!-- MONTANT -->
+          <td class="col-amount">
+            <div class="cell-block">
+              <span class="main-bold">{{ order.amountFormatted }}</span>
+            </div>
+          </td>
+
+          <!-- PAIEMENT -->
+          <td class="col-payment">
+            <div class="cell-block">
+              <span class="main-bold">{{ order.payment.methodLabel }}</span>
+              <span class="sub-text">{{ order.payment.reference }}</span>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Empty State -->
+        <tr *ngIf="orders.length === 0">
+          <td colspan="5" class="empty-state-cell">
+            <p>Aucune commande ne correspond aux filtres.</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Bar -->
+  <div class="table-pagination-footer">
+    <div class="pagination-info">
+      Affichage 1 à 5 sur 1 240 commandes
+    </div>
+    <div class="pagination-controls">
+      <button class="btn-page-arrow" [disabled]="currentPage === 1" (click)="onPrevPage()">&lt;</button>
+      <button class="btn-page-num active">1</button>
+      <button class="btn-page-num">2</button>
+      <button class="btn-page-num">3</button>
+      <span class="dots-sep">...</span>
+      <button class="btn-page-num">248</button>
+      <button class="btn-page-arrow" (click)="onNextPage()">&gt;</button>
+    </div>
+  </div>
+</div>

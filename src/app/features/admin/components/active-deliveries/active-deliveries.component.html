@@ -1,0 +1,36 @@
+<div class="active-deliveries-card">
+  <div class="card-header">
+    <h3 class="card-title">Livraisons en cours</h3>
+    <span class="region-badge">{{ regionLabel }}</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="deliveries-table">
+      <thead>
+        <tr>
+          <th>LIVREUR</th>
+          <th>TRAJET (DÉPART || ARRIVÉE)</th>
+          <th class="text-right">STATUT / TEMPS ESTIMÉ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of deliveries">
+          <td class="col-driver">
+            <div class="driver-name-wrap">
+              <span class="driver-name">{{ item.driverName }}</span>
+              <span class="vehicle-sub">{{ item.vehiclePlate }}</span>
+            </div>
+          </td>
+          <td class="col-route">
+            <span class="origin-text">{{ item.origin }}</span>
+            <span class="route-arrow">➔</span>
+            <span class="destination-text">{{ item.destination }}</span>
+          </td>
+          <td class="col-status text-right">
+            <app-status-badge [label]="item.statusText" [color]="item.statusColor"></app-status-badge>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

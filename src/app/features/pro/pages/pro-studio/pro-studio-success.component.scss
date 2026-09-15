@@ -1,0 +1,230 @@
+.pro-app-layout {
+  min-height: 100vh;
+  background-color: #F8F9FA;
+  max-width: 440px;
+  margin: 0 auto;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #1A1A1A;
+}
+
+.pro-main-content {
+  padding: 24px 20px 90px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Success Icon Circle */
+.success-icon-outer {
+  width: 84px;
+  height: 84px;
+  background: #FFF1F2;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+  margin-bottom: 20px;
+
+  .success-icon-inner {
+    width: 48px;
+    height: 48px;
+    background: #E51A29;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(229, 26, 41, 0.25);
+  }
+}
+
+/* Success Titles */
+.success-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: #1A1A1A;
+  line-height: 1.25;
+  margin: 0 0 12px 0;
+}
+
+.success-subtitle {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 13px;
+  color: #6B7280;
+  line-height: 1.45;
+  margin: 0 0 24px 0;
+}
+
+/* Published Video Card */
+.published-video-card {
+  width: 100%;
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 28px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  text-align: left;
+  box-sizing: border-box;
+
+  .thumbnail-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+
+    .thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .play-circle {
+      width: 24px;
+      height: 24px;
+      background: #FFFFFF;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  .card-details {
+    flex: 1;
+    overflow: hidden;
+
+    .views-time-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 3px;
+
+      .red-dot {
+        color: #E51A29;
+        font-size: 10px;
+      }
+
+      .red-meta {
+        font-size: 12px;
+        font-weight: 600;
+        color: #E51A29;
+      }
+    }
+
+    .dish-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1A1A1A;
+      margin: 0 0 3px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .price-restaurant {
+      font-size: 12px;
+      color: #4B5563;
+      margin: 0 0 3px 0;
+    }
+
+    .hashtags {
+      font-size: 11px;
+      color: #9CA3AF;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+/* Actions Group */
+.actions-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+
+  .btn-primary-red {
+    width: 100%;
+    height: 48px;
+    background: #E51A29;
+    color: #FFFFFF;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(229, 26, 41, 0.2);
+    transition: background-color 0.2s;
+
+    &:hover {
+      background: #D01524;
+    }
+  }
+
+  .btn-secondary-grey {
+    width: 100%;
+    height: 48px;
+    background: #F3F4F6;
+    color: #1A1A1A;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background: #E5E7EB;
+    }
+  }
+
+  .link-dashboard-red {
+    color: #E51A29;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    margin-top: 6px;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+.font-serif-bold {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 800;
+}
+
+.font-serif {
+  font-family: 'Playfair Display', Georgia, serif;
+}

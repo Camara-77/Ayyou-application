@@ -1,0 +1,195 @@
+<div class="delivery-app-layout">
+
+  <!-- Header -->
+  <header class="delivery-app-header">
+    <button class="btn-icon-circle" (click)="goBack()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+
+    <h1 class="header-title-centered">Arrivée Client</h1>
+
+    <button class="btn-icon-circle">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="notification-dot-red"></span>
+    </button>
+  </header>
+
+  <main class="delivery-main-content">
+
+    <!-- Statut de la course card -->
+    <div class="course-status-card">
+      <div class="status-pin-circle">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+      </div>
+
+      <div class="status-text-col">
+        <span class="meta-label">STATUT DE LA COURSE</span>
+        <h2 class="status-title">{{ statusTitle }}</h2>
+      </div>
+
+      <div class="sur-place-pill">
+        <span class="dot-red">●</span>
+        <span>{{ statusBadge }}</span>
+      </div>
+    </div>
+
+    <!-- Arrival notification banner -->
+    <div class="arrival-notif-card">
+      <div class="notif-bell-circle">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+      </div>
+
+      <div class="notif-text-col">
+        <h4 class="notif-title">{{ locationName }}</h4>
+        <p class="notif-sub">{{ notificationSub }}</p>
+      </div>
+    </div>
+
+    <!-- Order Details Main Card -->
+    <div class="order-details-card">
+      
+      <!-- Top Ref Header -->
+      <div class="order-ref-line">
+        <h2 class="order-ref-bold">#{{ orderRef }}</h2>
+        <span class="badge-express-grey">Express</span>
+      </div>
+
+      <!-- Client Info Box -->
+      <div class="client-profile-box">
+        <img [src]="clientAvatarUrl" [alt]="clientName" class="client-avatar-img"/>
+        <div class="client-meta-col">
+          <h4 class="client-name">{{ clientName }}</h4>
+          <p class="client-addr-sub">{{ clientAddressSub }}</p>
+        </div>
+        <button class="btn-phone-circle" (click)="callClient()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Order Items List -->
+      <div class="items-section">
+        <span class="meta-label">DÉTAILS DE LA COMMANDE</span>
+
+        <div class="item-line-row" *ngFor="let item of orderItems">
+          <div class="item-name-side">
+            <span class="dot-red-item">●</span>
+            <span class="item-text">{{ item.quantity }}x {{ item.name }}</span>
+          </div>
+          <span class="item-variant-grey" *ngIf="item.variant">{{ item.variant }}</span>
+        </div>
+      </div>
+
+      <!-- Consigne de Livraison Box -->
+      <div class="consigne-box">
+        <span class="meta-label">CONSIGNE DE LIVRAISON</span>
+        <p class="consigne-text">{{ deliveryInstruction }}</p>
+      </div>
+
+      <!-- État du Règlement Card -->
+      <div class="payment-status-card">
+        <div class="payment-left-side">
+          <div class="check-icon-circle">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div class="payment-text-col">
+            <span class="meta-label">ÉTAT DU RÈGLEMENT</span>
+            <strong class="payment-val">{{ paymentStatus }}</strong>
+          </div>
+        </div>
+
+        <div class="zero-collect-pill">
+          <span>{{ collectAmountFcfa | number }} FCFA à collecter</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Secure Validation Card -->
+    <div class="validation-secure-card">
+      <h3 class="validation-title">Validation sécurisée</h3>
+      <p class="validation-sub">Scannez le badge client ou saisissez son code à 4 chiffres.</p>
+
+      <!-- Main QR Scanner Button -->
+      <button class="btn-qr-scan-red" (click)="openQrScanner()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"/>
+          <rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        <span>Scanner le QR Code du client</span>
+      </button>
+
+      <!-- Divider -->
+      <div class="pin-divider-row">
+        <span class="line-left"></span>
+        <span class="divider-text">OU AVEC CODE PIN</span>
+        <span class="line-right"></span>
+      </div>
+
+      <!-- PIN Input Boxes -->
+      <div class="pin-inputs-row">
+        <input 
+          *ngFor="let digit of pinDigits; let i = index"
+          [id]="'pin-digit-' + i"
+          type="tel"
+          maxlength="1"
+          class="pin-digit-box"
+          [value]="pinDigits[i]"
+          (input)="onDigitInput(i, $event)"
+          (keydown)="onDigitKeyDown(i, $event)"
+          autocomplete="off"/>
+      </div>
+
+      <!-- Error message -->
+      <p class="pin-error-text" *ngIf="pinError">{{ pinError }}</p>
+
+      <!-- Validate PIN Button -->
+      <button class="btn-validate-pin-red" (click)="validatePinCode()">
+        <span>Valider le code PIN</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Secondary Action Buttons -->
+    <div class="bottom-actions-row">
+      <button class="btn-secondary-action" (click)="callClient()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+        <span>Appeler client</span>
+      </button>
+
+      <button class="btn-secondary-action" (click)="reportProblem()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span>Problème ?</span>
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Bottom Navigation Bar -->
+  <app-delivery-bottom-nav activeTab="deliveries"></app-delivery-bottom-nav>
+</div>

@@ -1,0 +1,243 @@
+.order-details-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #F3F4F6;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  @media (max-width: 576px) {
+    padding: 14px;
+  }
+
+  /* Header Banner */
+  .panel-header-banner {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .control-label {
+        font-size: 10px;
+        font-weight: 800;
+        color: #757575;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+      }
+
+      .status-live-tag {
+        font-size: 11px;
+        font-weight: 800;
+
+        &.status-blue { color: #3B82F6; }
+        &.status-green { color: #16A34A; }
+        &.status-orange { color: #F59E0B; }
+        &.status-red { color: #E51B2A; }
+      }
+    }
+
+    .panel-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1A1A1A;
+      margin: 2px 0 0 0;
+      letter-spacing: -0.3px;
+    }
+
+    .panel-meta-time {
+      font-size: 12px;
+      color: #757575;
+      font-weight: 500;
+    }
+  }
+
+  /* Sub Card Boxes */
+  .info-box-card {
+    background: #F9FAFB;
+    border-radius: 12px;
+    padding: 14px 16px;
+    border: 1px solid #F3F4F6;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    .row-flex {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .name-bold {
+        font-size: 14px;
+        font-weight: 800;
+        color: #1A1A1A;
+      }
+
+      .phone-sub {
+        font-size: 12px;
+        color: #555555;
+        font-weight: 600;
+      }
+
+      .type-badge {
+        font-size: 10px;
+        font-weight: 800;
+        color: #555555;
+        background: #E5E7EB;
+        padding: 2px 6px;
+        border-radius: 4px;
+        letter-spacing: 0.4px;
+      }
+    }
+
+    .address-text {
+      font-size: 12px;
+      color: #555555;
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .box-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .distance-link {
+        font-size: 11px;
+        font-weight: 800;
+        color: #3B82F6;
+      }
+    }
+
+    .box-section-title {
+      font-size: 10px;
+      font-weight: 800;
+      color: #757575;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    /* Articles */
+    .articles-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 4px;
+
+      .article-item-row {
+        display: flex;
+        flex-direction: column;
+
+        .art-top-row {
+          display: flex;
+          justify-content: space-between;
+          font-size: 13px;
+
+          .art-name {
+            font-weight: 600;
+            color: #1A1A1A;
+
+            strong {
+              font-weight: 800;
+            }
+          }
+
+          .art-price {
+            font-weight: 800;
+            color: #1A1A1A;
+          }
+        }
+
+        .art-desc {
+          font-size: 11px;
+          color: #757575;
+          margin: 2px 0 0 0;
+        }
+      }
+    }
+
+    /* Finances */
+    .fin-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+
+      .fin-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: #555555;
+
+        &.total-row {
+          font-size: 13px;
+          font-weight: 800;
+          color: #1A1A1A;
+
+          .total-red-val {
+            font-size: 15px;
+            font-weight: 800;
+            color: #E51B2A;
+          }
+        }
+
+        &.sub-payout-row {
+          font-size: 11px;
+          color: #555555;
+        }
+      }
+
+      .fin-line {
+        height: 1px;
+        background: #E5E7EB;
+        margin: 4px 0;
+      }
+
+      .green-status-line {
+        font-size: 11px;
+        font-weight: 800;
+        color: #16A34A;
+        margin: 2px 0 6px 0;
+      }
+
+      .commission-note {
+        font-size: 11px;
+        color: #757575;
+        font-style: normal;
+        margin-top: 4px;
+      }
+    }
+
+    /* Driver Box */
+    .driver-box {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 2px;
+
+      .driver-name-bold {
+        font-size: 14px;
+        font-weight: 800;
+        color: #1A1A1A;
+      }
+
+      .driver-details-text {
+        font-size: 12px;
+        color: #555555;
+        font-weight: 500;
+      }
+    }
+
+    .no-driver-text {
+      font-size: 12px;
+      color: #9CA3AF;
+      font-style: italic;
+    }
+  }
+}

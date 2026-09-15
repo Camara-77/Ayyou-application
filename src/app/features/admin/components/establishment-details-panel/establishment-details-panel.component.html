@@ -1,0 +1,220 @@
+<div class="establishment-details-card" *ngIf="establishment">
+  <!-- Header Banner -->
+  <div class="panel-top-banner">
+    <div class="banner-title-group">
+      <div class="status-tag-inline">
+        <span class="orange-dot"></span>
+        <span class="tag-title">DOSSIER D'ADHÉSION EN EXAMEN</span>
+      </div>
+      <h2 class="establishment-main-name">{{ establishment.name }}</h2>
+      <span class="submitted-date-meta">{{ establishment.submittedAt }}</span>
+    </div>
+
+    <div class="shield-badge-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <polyline points="9 12 11 14 15 10"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Info Summary Card -->
+  <div class="summary-info-box">
+    <div class="info-row">
+      <span class="label">Type d'établissement</span>
+      <span class="value bold-text">{{ establishment.subCategory }}</span>
+    </div>
+
+    <div class="info-row">
+      <span class="label">Zone géographique</span>
+      <span class="value bold-text">{{ establishment.address }}</span>
+    </div>
+
+    <div class="info-row">
+      <span class="label">Gérant déclarant</span>
+      <span class="value bold-text">{{ establishment.ownerFirstName }} {{ establishment.ownerLastName }} ({{ establishment.phone }})</span>
+    </div>
+
+    <div class="info-row">
+      <span class="label">Taux de commission</span>
+      <span class="value text-red-bold">{{ establishment.commissionRate }}</span>
+    </div>
+  </div>
+
+  <!-- Legal Documents Section -->
+  <div class="legal-documents-section">
+    <div class="section-header-row">
+      <span class="section-title">PIÈCES LÉGALES REÇUES</span>
+      <span class="files-count-badge">{{ establishment.documentsCount }}</span>
+    </div>
+
+    <div class="documents-list">
+      <!-- Doc 1 -->
+      <div class="doc-card">
+        <div class="doc-left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="doc-icon text-green">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <div class="doc-meta">
+            <span class="doc-name">RCCM : SN-DKR-2023-B-145</span>
+            <span class="doc-sub text-green">Authentifié Greffe Dakar</span>
+          </div>
+        </div>
+        <button type="button" class="btn-doc-action">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Doc 2 -->
+      <div class="doc-card">
+        <div class="doc-left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="doc-icon text-green">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <div class="doc-meta">
+            <span class="doc-name">NINEA : 008492012 / 2V3</span>
+            <span class="doc-sub text-green">Attestation fiscale conforme</span>
+          </div>
+        </div>
+        <button type="button" class="btn-doc-action">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Doc 3 -->
+      <div class="doc-card">
+        <div class="doc-left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="doc-icon text-orange">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <div class="doc-meta">
+            <span class="doc-name">Certificat Hygiène & Salubrité</span>
+            <span class="doc-sub text-gray">Délivré Services Régionaux 2024</span>
+          </div>
+        </div>
+        <button type="button" class="btn-doc-action">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Doc 4 -->
+      <div class="doc-card">
+        <div class="doc-left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="doc-icon text-green">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <div class="doc-meta">
+            <span class="doc-name">Compte Wave Business Certifié</span>
+            <span class="doc-sub text-gray">Titulaire : {{ establishment.name }} SARL</span>
+          </div>
+        </div>
+        <button type="button" class="btn-doc-action">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Place Photos Preview Section -->
+  <div class="photos-preview-section">
+    <span class="section-title">APERÇU DES LIEUX & CUISINE</span>
+    <div class="photos-thumbnails-row">
+      <img
+        *ngFor="let photo of establishment.photos"
+        [src]="photo"
+        alt="Aperçu établissement"
+        class="photo-thumb"
+        (click)="openImagePreview(photo)"
+      />
+      <img
+        *ngIf="!establishment.photos || establishment.photos.length === 0"
+        src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=300&auto=format&fit=crop&q=80"
+        alt="Aperçu établissement"
+        class="photo-thumb"
+        (click)="openImagePreview('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&auto=format&fit=crop&q=80')"
+      />
+    </div>
+  </div>
+
+  <!-- Admin Action Buttons Stack -->
+  <div class="admin-actions-stack">
+    <button type="button" class="btn-admin-primary-red" (click)="promptApprove()">
+      + Ajouter l'établissement
+    </button>
+
+    <button type="button" class="btn-admin-secondary-gray" (click)="promptRequestDocs()">
+      Demander des pièces complémentaires
+    </button>
+
+    <button type="button" class="btn-admin-destructive-text" (click)="promptReject()">
+      Rejeter le dossier d'adhésion
+    </button>
+  </div>
+</div>
+
+<!-- Image Lightbox Modal -->
+<div class="modal-backdrop" *ngIf="selectedImage" (click)="closeImagePreview()">
+  <div class="lightbox-container" (click)="$event.stopPropagation()">
+    <img [src]="selectedImage" alt="Visualisation photo" class="lightbox-img" />
+    <button type="button" class="btn-close-lightbox" (click)="closeImagePreview()">Fermer</button>
+  </div>
+</div>
+
+<!-- Approval Confirmation Modal -->
+<div class="modal-backdrop" *ngIf="showApproveModal">
+  <div class="modal-card">
+    <h3 class="modal-title">Validation de l'établissement</h3>
+    <p class="modal-message">
+      Êtes-vous sûr de vouloir valider le dossier et ajouter <strong>{{ establishment?.name }}</strong> au réseau officiel AYYOU PRO Dakar ?
+    </p>
+    <div class="modal-actions-row">
+      <button type="button" class="btn-modal-cancel" (click)="closeModals()">Annuler</button>
+      <button type="button" class="btn-modal-confirm btn-red" (click)="confirmApprove()">Confirmer la validation</button>
+    </div>
+  </div>
+</div>
+
+<!-- Rejection Confirmation Modal -->
+<div class="modal-backdrop" *ngIf="showRejectModal">
+  <div class="modal-card">
+    <h3 class="modal-title">Rejet du dossier</h3>
+    <p class="modal-message">
+      Êtes-vous sûr de vouloir rejeter le dossier d'adhésion de <strong>{{ establishment?.name }}</strong> ? Cette action est irréversible.
+    </p>
+    <div class="modal-actions-row">
+      <button type="button" class="btn-modal-cancel" (click)="closeModals()">Annuler</button>
+      <button type="button" class="btn-modal-confirm btn-red" (click)="confirmReject()">Rejeter le dossier</button>
+    </div>
+  </div>
+</div>
+
+<!-- Request Additional Docs Modal -->
+<div class="modal-backdrop" *ngIf="showRequestDocsModal">
+  <div class="modal-card">
+    <h3 class="modal-title">Demande de pièces complémentaires</h3>
+    <p class="modal-message">
+      Précisez les documents ou justificatifs manquants pour <strong>{{ establishment?.name }}</strong> :
+    </p>
+    <textarea class="modal-textarea" rows="4" [(ngModel)]="docNotes" placeholder="Ex: Copie lisible de l'attestation NINEA demandée..."></textarea>
+    <div class="modal-actions-row">
+      <button type="button" class="btn-modal-cancel" (click)="closeModals()">Annuler</button>
+      <button type="button" class="btn-modal-confirm btn-black" (click)="sendDocsRequest()">Envoyer la demande</button>
+    </div>
+  </div>
+</div>

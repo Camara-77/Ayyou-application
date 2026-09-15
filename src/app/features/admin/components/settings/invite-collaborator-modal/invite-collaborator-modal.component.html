@@ -1,0 +1,68 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="onClose()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="title-wrap">
+        <h3 class="modal-title">Inviter un collaborateur</h3>
+        <p class="modal-subtitle">Attribuer un rôle et un périmètre d'accès à la console AYYOU Pro</p>
+      </div>
+
+      <button type="button" class="btn-close-x" (click)="onClose()">×</button>
+    </div>
+
+    <form class="modal-form" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label class="form-label">Nom complet *</label>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="ex: Aminata Ndiaye"
+          [(ngModel)]="name"
+          name="name"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Adresse email professionnel *</label>
+        <input
+          type="email"
+          class="form-control"
+          placeholder="ex: aminata.n@ayyou.sn"
+          [(ngModel)]="email"
+          name="email"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Rôle système *</label>
+        <select class="form-select" [(ngModel)]="role" name="role">
+          <option value="Super Administrateur">Super Administrateur</option>
+          <option value="Responsable Logistique Dakar">Responsable Logistique Dakar</option>
+          <option value="Modérateur Catalogue & Contenu">Modérateur Catalogue & Contenu</option>
+          <option value="Gestionnaire Facturation & Payouts">Gestionnaire Facturation & Payouts</option>
+          <option value="Support Opérationnel Niveau 1">Support Opérationnel Niveau 1</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Périmètre d'accès accordé *</label>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="ex: Commandes, Livreurs & Support client"
+          [(ngModel)]="scope"
+          name="scope"
+          required
+        />
+      </div>
+
+      <div class="modal-actions mt-24">
+        <button type="button" class="btn-cancel" (click)="onClose()">Annuler</button>
+        <button type="submit" class="btn-submit-red" [disabled]="!name || !email || !scope">
+          Envoyer l'invitation
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

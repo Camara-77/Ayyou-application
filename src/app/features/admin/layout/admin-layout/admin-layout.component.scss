@@ -1,0 +1,46 @@
+.admin-layout-wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #F8F9FA;
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #1A1A1A;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1050;
+
+  @media (min-width: 992px) {
+    display: none;
+  }
+}
+
+.admin-main-container {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.admin-page-content {
+  flex: 1;
+  padding: 32px;
+  box-sizing: border-box;
+
+  @media (min-width: 1440px) {
+    padding: 36px 40px;
+  }
+
+  @media (min-width: 1920px) {
+    padding: 40px 64px;
+  }
+
+  @media (max-width: 767px) {
+    padding: 20px 16px;
+  }
+}

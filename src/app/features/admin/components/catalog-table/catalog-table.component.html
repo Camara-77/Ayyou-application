@@ -1,0 +1,107 @@
+<div class="catalog-table-card">
+  <div class="table-responsive">
+    <table class="ayyou-table">
+      <thead>
+        <tr>
+          <th>ARTICLE & VISUEL</th>
+          <th>ÉTABLISSEMENT</th>
+          <th>CATÉGORIE</th>
+          <th>PRIX UNITAIRE</th>
+          <th>STATUT STOCK</th>
+          <th>MODÉRATION</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let item of articles"
+          [class.selected-row]="selectedArticle?.id === item.id"
+          [class.highlight-row]="item.isHighlightRow"
+          (click)="onSelectRow(item)"
+        >
+          <!-- Article & Thumbnail -->
+          <td class="col-article">
+            <div class="article-cell">
+              <img [src]="item.imageUrl" [alt]="item.name" class="article-thumb" />
+              <div class="article-info">
+                <span class="name" [class.text-red]="item.isHighlightRow">{{ item.name }}</span>
+                <span class="sub" [class.text-muted]="!item.isHighlightRow">
+                  {{ item.subtitle || 'SKU: ' + item.sku }}
+                </span>
+              </div>
+            </div>
+          </td>
+
+          <!-- Établissement -->
+          <td class="col-establishment">
+            <div class="establishment-cell">
+              <span class="est-name">{{ item.establishmentName }}</span>
+              <span class="est-district">{{ item.establishmentDistrict }}</span>
+            </div>
+          </td>
+
+          <!-- Catégorie -->
+          <td class="col-category">
+            <span class="category-name">{{ item.categoryName }}</span>
+          </td>
+
+          <!-- Prix Unitaire -->
+          <td class="col-price">
+            <span class="price-val" [class.text-red]="item.isHighlightRow">
+              {{ item.priceFormatted }}
+            </span>
+          </td>
+
+          <!-- Statut Stock -->
+          <td class="col-stock">
+            <div class="stock-pill">
+              <span
+                class="dot"
+                [ngClass]="'dot-' + item.stockStatusColor"
+              >●</span>
+              <span class="stock-label" [ngClass]="'text-' + item.stockStatusColor">
+                {{ item.stockStatusLabel }}
+              </span>
+            </div>
+          </td>
+
+          <!-- Modération -->
+          <td class="col-moderation">
+            <div class="moderation-pill">
+              <span
+                class="dot"
+                [ngClass]="'dot-' + item.moderationStatusColor"
+              >●</span>
+              <span
+                class="mod-label"
+                [class.text-red-bold]="item.moderationStatus === 'A_MODERER'"
+              >
+                {{ item.moderationStatusLabel }}
+              </span>
+            </div>
+          </td>
+        </tr>
+
+        <tr *ngIf="articles.length === 0">
+          <td colspan="6" class="empty-cell">
+            Aucun article ou produit trouvé dans le catalogue.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Table Footer Pagination -->
+  <div class="table-pagination-footer">
+    <span class="pagination-info">Affichage de 1 à {{ articles.length }} sur 4 820 articles</span>
+
+    <div class="pagination-controls">
+      <button class="page-nav-btn" disabled>‹</button>
+      <button class="page-num-btn active">1</button>
+      <button class="page-num-btn">2</button>
+      <button class="page-num-btn">3</button>
+      <span class="page-ellipsis">...</span>
+      <button class="page-num-btn">688</button>
+      <button class="page-nav-btn">›</button>
+    </div>
+  </div>
+</div>

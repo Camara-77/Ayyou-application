@@ -1,0 +1,301 @@
+.pro-app-layout {
+  min-height: 100vh;
+  background-color: #F8F9FA;
+  max-width: 440px;
+  margin: 0 auto;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #1A1A1A;
+}
+
+.pro-main-content {
+  padding: 12px 16px 90px 16px;
+}
+
+/* Search Box */
+.search-box {
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 10px 14px;
+  gap: 8px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+
+  .search-icon {
+    flex-shrink: 0;
+  }
+
+  input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 13px;
+    width: 100%;
+    color: #1A1A1A;
+
+    &::placeholder {
+      color: #9CA3AF;
+    }
+  }
+
+  .btn-mic {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+  }
+}
+
+/* Section Label Row */
+.section-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+
+  .label-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #757575;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-live {
+    font-size: 11px;
+    font-weight: 700;
+    color: #E51A29;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .dot-red {
+      font-size: 8px;
+      color: #E51A29;
+    }
+  }
+}
+
+/* Notifications List */
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.notif-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  position: relative;
+  transition: border-color 0.2s, background-color 0.2s;
+
+  &.unread {
+    border-left: 4px solid #E51A29;
+  }
+
+  &.pinned {
+    background: #FFFDFD;
+    border: 1.5px solid #FCA5A5;
+  }
+
+  .notif-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+
+    .avatar-wrap {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      .avatar-text {
+        font-size: 14px;
+        font-weight: 700;
+      }
+    }
+
+    .header-info {
+      flex: 1;
+      overflow: hidden;
+
+      .name-status {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        .notif-name {
+          font-size: 14px;
+          font-weight: 700;
+          color: #1A1A1A;
+          margin: 0;
+        }
+
+        .status-dot-green {
+          color: #10B981;
+          font-size: 10px;
+        }
+
+        .badge-tag {
+          font-size: 11px;
+          font-weight: 700;
+          padding: 2px 6px;
+          border-radius: 6px;
+
+          &.badge-pinned {
+            background: #FFF1F2;
+            color: #E51A29;
+          }
+
+          &.badge-green {
+            background: #ECFDF5;
+            color: #10B981;
+          }
+        }
+      }
+
+      .notif-sub {
+        font-size: 12px;
+        color: #757575;
+        margin: 2px 0 0 0;
+      }
+    }
+
+    .notif-time {
+      font-size: 11px;
+      color: #9CA3AF;
+      white-space: nowrap;
+    }
+  }
+
+  .notif-body-box {
+    background: #F9FAFB;
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 12px;
+
+    .dot-body-red {
+      color: #E51A29;
+      font-size: 10px;
+      margin-top: 2px;
+    }
+
+    .notif-message {
+      font-size: 13px;
+      color: #374151;
+      line-height: 1.4;
+      margin: 0;
+    }
+  }
+
+  .notif-footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .footer-left {
+      font-size: 12px;
+
+      .text-red-bold {
+        color: #E51A29;
+        font-weight: 600;
+      }
+
+      .text-green {
+        color: #10B981;
+        font-weight: 600;
+      }
+
+      .text-dark-bold {
+        color: #1A1A1A;
+        font-weight: 700;
+        font-size: 13px;
+      }
+
+      .badge-green-pill {
+        background: #ECFDF5;
+        color: #10B981;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 12px;
+      }
+    }
+
+    .footer-right {
+      .action-btn {
+        cursor: pointer;
+
+        &.btn-red-pill {
+          background: #E51A29;
+          color: #FFFFFF;
+          border: none;
+          border-radius: 20px;
+          padding: 8px 16px;
+          font-size: 13px;
+          font-weight: 700;
+          transition: background-color 0.2s;
+
+          &:hover {
+            background: #D01524;
+          }
+        }
+
+        &.btn-pink-pill {
+          background: #FFF1F2;
+          color: #E51A29;
+          border: none;
+          border-radius: 20px;
+          padding: 6px 14px;
+          font-size: 12px;
+          font-weight: 700;
+
+          &:hover {
+            background: #FEE2E2;
+          }
+        }
+
+        &.btn-text-link {
+          background: none;
+          border: none;
+          color: #1A1A1A;
+          font-size: 12px;
+          font-weight: 600;
+          text-decoration: underline;
+
+          &:hover {
+            color: #E51A29;
+          }
+        }
+      }
+    }
+  }
+}
+
+.empty-notif-state {
+  text-align: center;
+  padding: 30px 16px;
+  color: #757575;
+  font-size: 14px;
+}
+
+.font-serif-bold {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
+}

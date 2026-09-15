@@ -1,0 +1,45 @@
+<div class="establishment-stats-grid">
+  <!-- Card 1 -->
+  <div class="stat-card">
+    <span class="card-title">TOTAL ÉTABLISSEMENTS</span>
+    <span class="card-value">{{ stats?.total || 259 }}</span>
+    <span class="card-subtext text-green">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+        <polyline points="17 6 23 6 23 12"/>
+      </svg>
+      {{ stats?.totalSubtext || '+14 ce mois-ci' }}
+    </span>
+  </div>
+
+  <!-- Card 2 -->
+  <div class="stat-card">
+    <span class="card-title">RESTAURANTS ACTIFS</span>
+    <span class="card-value">{{ stats?.activeRestaurants || 185 }}</span>
+    <span class="card-subtext text-gray">{{ stats?.activeRestaurantsSubtext || 'Cuisine sénégalaise, braisés' }}</span>
+  </div>
+
+  <!-- Card 3 -->
+  <div class="stat-card">
+    <span class="card-title">COMMERCES & VENDEURS</span>
+    <span class="card-value">{{ stats?.commercesAndSellers || 74 }}</span>
+    <span class="card-subtext text-gray">{{ stats?.commercesAndSellersSubtext || 'Épiceries, primeurs, traiteurs' }}</span>
+  </div>
+
+  <!-- Card 4 (Pending) -->
+  <div class="stat-card">
+    <div class="card-title-row">
+      <span class="card-title">EN APPROBATION</span>
+      <span class="orange-dot"></span>
+    </div>
+    <span class="card-value text-orange">{{ stats?.pendingApproval || 8 }}</span>
+    <span class="card-subtext text-gray">{{ stats?.pendingApprovalSubtext || 'Dossiers NINEA à vérifier' }}</span>
+  </div>
+
+  <!-- Card 5 (Volume) -->
+  <div class="stat-card">
+    <span class="card-title">VOLUME D'AFFAIRES</span>
+    <span class="card-value text-red">{{ stats?.monthlyVolume || '148,5M FCFA' }}</span>
+    <span class="card-subtext text-gray">{{ stats?.monthlyVolumeSubtext || 'Sur les 30 derniers jours' }}</span>
+  </div>
+</div>

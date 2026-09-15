@@ -1,0 +1,144 @@
+<div class="establishment-list-card">
+  <!-- Card Top Header -->
+  <div class="card-top-header">
+    <div class="left-title-group">
+      <h3 class="card-main-title">Établissements enregistrés</h3>
+      <span class="location-sub-tag">Dakar Métropole</span>
+    </div>
+    <span class="last-updated-meta">Mis à jour il y a 4 min</span>
+  </div>
+
+  <!-- Table View -->
+  <div class="table-responsive">
+    <table class="establishment-table">
+      <thead>
+        <tr>
+          <th>ÉTABLISSEMENT</th>
+          <th>CATÉGORIE</th>
+          <th>LOCALISATION</th>
+          <th class="text-right">PERFORMANCE</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let item of establishments"
+          [class.active-row]="item.id === selectedEstablishment?.id"
+          (click)="onRowClick(item)"
+        >
+          <!-- Établissement (Logo + Nom + Gérant) -->
+          <td class="col-name">
+            <div class="establishment-name-wrap">
+              <img [src]="item.logoUrl" [alt]="item.name" class="establishment-thumb" />
+              <div class="text-details">
+                <div class="title-status-inline">
+                  <span class="name-bold" [class.text-red-pending]="item.status === 'EN_ATTENTE'">
+                    {{ item.name }}
+                  </span>
+                  <span class="red-dot" *ngIf="item.status === 'EN_ATTENTE'"></span>
+                </div>
+                <span class="owner-meta">
+                  {{ item.ownerFirstName }} {{ item.ownerLastName }} • {{ item.phone }}
+                </span>
+              </div>
+            </div>
+          </td>
+
+          <!-- Catégorie (Catégorie + Sous-catégorie) -->
+          <td class="col-category">
+            <div class="cat-details">
+              <span class="cat-title">{{ item.category }}</span>
+              <span class="cat-sub">{{ item.subCategory }}</span>
+            </div>
+          </td>
+
+          <!-- Localisation (Icon Pin + Quartier) -->
+          <td class="col-location">
+            <div class="location-details">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pin-icon">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span class="neighborhood-name">{{ item.neighborhood }}</span>
+            </div>
+          </td>
+
+          <!-- Performance -->
+          <td class="col-performance text-right">
+            <div class="perf-details">
+              <span class="perf-title" [class.perf-new]="item.ordersCount === 0">
+                {{ item.ordersCount > 0 ? (item.ordersCount | number:'1.0-0') : 'Nouveau' }}
+              </span>
+              <span class="perf-sub">
+                {{ item.ordersCount > 0 ? 'commandes' : '0 commande' }}
+              </span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Footer -->
+  <div class="table-pagination-footer">
+    <span class="pagination-info">
+      Affichage de 1 à {{ establishments.length }} sur 259 établissements
+    </span>
+
+    <div class="pagination-controls">
+      <button
+        type="button"
+        class="btn-page-nav"
+        [disabled]="currentPage === 1"
+        (click)="setPage(currentPage - 1)"
+      >
+        Précédent
+      </button>
+
+      <button
+        type="button"
+        class="btn-page-num"
+        [class.active]="currentPage === 1"
+        (click)="setPage(1)"
+      >
+        1
+      </button>
+
+      <button
+        type="button"
+        class="btn-page-num"
+        [class.active]="currentPage === 2"
+        (click)="setPage(2)"
+      >
+        2
+      </button>
+
+      <button
+        type="button"
+        class="btn-page-num"
+        [class.active]="currentPage === 3"
+        (click)="setPage(3)"
+      >
+        3
+      </button>
+
+      <span class="dots-separator">...</span>
+
+      <button
+        type="button"
+        class="btn-page-num"
+        (click)="setPage(37)"
+      >
+        37
+      </button>
+
+      <button
+        type="button"
+        class="btn-page-nav"
+        [disabled]="currentPage === totalPages"
+        (click)="setPage(currentPage + 1)"
+      >
+        Suivant
+      </button>
+    </div>
+  </div>
+</div>

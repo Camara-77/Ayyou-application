@@ -1,0 +1,99 @@
+.chatbot-wrapper {
+  position: fixed;
+  z-index: 9999;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+
+  &.dragging {
+    cursor: grabbing;
+
+    .chatbot-btn {
+      transform: scale(1.08);
+      box-shadow: 0 8px 24px rgba(229, 26, 41, 0.6);
+    }
+  }
+
+  .chatbot-btn {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #E51A29;
+    border: none;
+    box-shadow: 0 4px 16px rgba(229, 26, 41, 0.45);
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    touch-action: none;
+
+    &:active {
+      cursor: grabbing;
+    }
+
+    .badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background-color: #ffffff;
+      color: #E51A29;
+      font-size: 11px;
+      font-weight: 800;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #E51A29;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      pointer-events: none;
+    }
+  }
+
+  .chat-popover {
+    position: absolute;
+    top: 56px;
+    left: 0;
+    width: 280px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    border: 1px solid #EFEFEF;
+    overflow: hidden;
+    animation: fadeIn 0.2s ease-out;
+
+    .popover-header {
+      background: #E51A29;
+      color: white;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .close-btn {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+      }
+    }
+
+    .popover-body {
+      padding: 14px;
+      font-size: 13px;
+      color: #333;
+      line-height: 1.4;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

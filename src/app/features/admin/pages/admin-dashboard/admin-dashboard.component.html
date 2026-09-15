@@ -1,0 +1,56 @@
+<div class="dashboard-page-container">
+  <!-- Top Title Block -->
+  <div class="dashboard-header-row">
+    <div class="title-wrap">
+      <div class="title-heading">
+        <h1 class="main-title">Tableau de bord</h1>
+        <span class="live-tag">TEMPS RÉEL</span>
+      </div>
+      <p class="subtitle">Vue d'ensemble de l'activité AYYOU en direct à Dakar</p>
+    </div>
+
+    <div class="header-controls">
+      <button type="button" class="btn-date-pill">
+        {{ todayDateText }}
+      </button>
+
+      <button type="button" class="btn-refresh" (click)="refreshData()">
+        Rafraîchir
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI STAT CARDS GRID (8 CARDS) -->
+  <div class="kpi-grid mt-24" *ngIf="statCards$ | async as cards">
+    <app-stat-card *ngFor="let card of cards" [card]="card"></app-stat-card>
+  </div>
+
+  <!-- MAIN LOWER GRID (LEFT 2 COLUMNS + RIGHT 1 COLUMN) -->
+  <div class="main-dashboard-grid mt-32">
+    <!-- LEFT MAIN COLUMN (Commandes + Livraisons) -->
+    <div class="left-operations-column">
+      <!-- Section Commandes en cours -->
+      <app-active-orders 
+        *ngIf="activeOrders$ | async as orders" 
+        [orders]="orders"
+        [totalActiveCount]="58"
+      ></app-active-orders>
+
+      <!-- Section Livraisons en cours -->
+      <app-active-deliveries 
+        class="mt-24"
+        *ngIf="activeDeliveries$ | async as deliveries" 
+        [deliveries]="deliveries"
+        regionLabel="Dakar Métropole"
+      ></app-active-deliveries>
+    </div>
+
+    <!-- RIGHT SIDEBAR COLUMN (À traiter) -->
+    <div class="right-pending-column">
+      <app-pending-actions 
+        *ngIf="pendingActions$ | async as actions"
+        [actions]="actions"
+      ></app-pending-actions>
+    </div>
+  </div>
+</div>

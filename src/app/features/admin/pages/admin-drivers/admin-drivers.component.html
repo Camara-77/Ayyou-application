@@ -1,0 +1,42 @@
+<div class="drivers-page-container">
+  <!-- Top Page Header -->
+  <div class="page-title-wrap">
+    <h1 class="main-title">Livreurs</h1>
+    <p class="subtitle">
+      Gestion de la flotte de coursiers, suivi opérationnel en direct et instruction des candidatures à Dakar.
+    </p>
+  </div>
+
+  <!-- Horizontal Stats Grid -->
+  <div class="mt-20">
+    <app-driver-stats [stats]="stats$ | async"></app-driver-stats>
+  </div>
+
+  <!-- Filter Pills & Select Dropdowns -->
+  <div class="mt-24">
+    <app-driver-filters
+      (tabChange)="onTabChange($event)"
+      (zoneChange)="onZoneChange($event)"
+      (vehicleChange)="onVehicleChange($event)"
+    ></app-driver-filters>
+  </div>
+
+  <!-- Main Grid (2/3 Driver Table Left, 1/3 Details Panel Right) -->
+  <div class="drivers-main-grid mt-24">
+    <div class="table-column">
+      <app-driver-table
+        [drivers]="(drivers$ | async) || []"
+        [selectedDriver]="selectedDriver$ | async"
+        (selectDriver)="onSelectDriver($event)"
+      ></app-driver-table>
+    </div>
+
+    <div class="details-column">
+      <app-driver-details-panel
+        [driver]="selectedDriver$ | async"
+        (approve)="onApproveCandidate($event)"
+        (reject)="onRejectCandidate($event)"
+      ></app-driver-details-panel>
+    </div>
+  </div>
+</div>

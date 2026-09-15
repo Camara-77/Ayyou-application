@@ -1,0 +1,132 @@
+<div class="driver-table-card">
+  <div class="table-responsive">
+    <table class="drivers-table">
+      <thead>
+        <tr>
+          <th>COURSIER</th>
+          <th>ZONE & VÉHICULE</th>
+          <th>STATUT</th>
+          <th>MISSION ACTUELLE</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let item of drivers"
+          [class.active-row]="item.id === selectedDriver?.id"
+          [class.candidate-row]="item.isCandidate"
+          (click)="onRowClick(item)"
+        >
+          <!-- Coursier (Avatar initiales + Nom + Plaque) -->
+          <td class="col-driver">
+            <div class="driver-profile-wrap">
+              <div class="initials-avatar" [class.candidate-avatar]="item.isCandidate">
+                <span>{{ item.initials }}</span>
+              </div>
+              <div class="text-details">
+                <span class="driver-name">{{ item.firstName }} {{ item.lastName }}</span>
+                <span class="plate-sub" [class.text-orange]="item.isCandidate">{{ item.licensePlate }}</span>
+              </div>
+            </div>
+          </td>
+
+          <!-- Zone & Véhicule -->
+          <td class="col-zone">
+            <div class="zone-details">
+              <span class="zone-title">{{ item.zone }}</span>
+              <span class="vehicle-sub">{{ item.vehicle }}</span>
+            </div>
+          </td>
+
+          <!-- Statut -->
+          <td class="col-status">
+            <span class="status-indicator-badge"
+              [class.status-delivering]="item.status === 'EN_LIVRAISON' || item.status === 'RECUPERATION'"
+              [class.status-available]="item.status === 'DISPONIBLE'"
+              [class.status-offline]="item.status === 'HORS_LIGNE'"
+              [class.status-candidate]="item.status === 'DOSSIER_A_VALIDER'"
+            >
+              <span class="status-dot"></span>
+              <span class="status-label">{{ item.statusText }}</span>
+            </span>
+          </td>
+
+          <!-- Mission actuelle -->
+          <td class="col-mission">
+            <div class="mission-details">
+              <span class="mission-ref-bold" *ngIf="item.currentMissionRef" [class.text-orange]="item.status === 'DOSSIER_A_VALIDER'">
+                {{ item.currentMissionRef }}
+              </span>
+              <span class="mission-title" [class.text-orange]="item.status === 'DOSSIER_A_VALIDER'">
+                {{ item.currentMissionTitle }}
+              </span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Footer -->
+  <div class="table-pagination-footer">
+    <span class="pagination-info">
+      Affichage 1 à {{ drivers.length }} sur 190 livreurs
+    </span>
+
+    <div class="pagination-controls">
+      <button
+        type="button"
+        class="btn-page-nav"
+        [disabled]="currentPage === 1"
+        (click)="setPage(currentPage - 1)"
+      >
+        &lt;
+      </button>
+
+      <button
+        type="button"
+        class="btn-page-num"
+        [class.active]="currentPage === 1"
+        (click)="setPage(1)"
+      >
+        1
+      </button>
+
+      <button
+        type="button"
+        class="btn-page-num"
+        [class.active]="currentPage === 2"
+        (click)="setPage(2)"
+      >
+        2
+      </button>
+
+      <button
+        type="button"
+        class="btn-page-num"
+        [class.active]="currentPage === 3"
+        (click)="setPage(3)"
+      >
+        3
+      </button>
+
+      <span class="dots-separator">...</span>
+
+      <button
+        type="button"
+        class="btn-page-num"
+        (click)="setPage(32)"
+      >
+        32
+      </button>
+
+      <button
+        type="button"
+        class="btn-page-nav"
+        [disabled]="currentPage === totalPages"
+        (click)="setPage(currentPage + 1)"
+      >
+        &gt;
+      </button>
+    </div>
+  </div>
+</div>

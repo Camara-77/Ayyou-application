@@ -1,0 +1,37 @@
+<div class="admin-login-page">
+  <div class="split-container">
+    <!-- Left Hero Banner Column -->
+    <div class="banner-column">
+      <app-admin-login-banner></app-admin-login-banner>
+    </div>
+
+    <!-- Right Form Card Column -->
+    <div class="form-column">
+      <app-admin-login-form-card
+        [isLoading]="isLoading"
+        [errorMessage]="loginErrorMessage"
+        (submitForm)="onLoginSubmit($event)"
+        (googleLogin)="onGoogleLogin()"
+        (openRecovery)="onOpenRecovery()"
+      ></app-admin-login-form-card>
+    </div>
+  </div>
+
+  <!-- 2FA Modal -->
+  <app-admin-two-factor-modal
+    *ngIf="show2FAModal"
+    [isLoading]="isLoading"
+    [errorMessage]="twoFactorErrorMessage"
+    (verifyCode)="onVerifyTwoFactor($event)"
+    (closeModal)="onClose2FA()"
+  ></app-admin-two-factor-modal>
+
+  <!-- Password Recovery Modal -->
+  <app-admin-password-recovery-modal
+    *ngIf="showRecoveryModal"
+    [isLoading]="isLoading"
+    [errorMessage]="recoveryErrorMessage"
+    (requestRecovery)="onRequestRecovery($event)"
+    (closeModal)="onCloseRecovery()"
+  ></app-admin-password-recovery-modal>
+</div>

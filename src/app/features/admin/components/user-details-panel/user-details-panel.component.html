@@ -1,0 +1,145 @@
+<div class="user-details-card" *ngIf="user">
+  <!-- Top Panel Header -->
+  <div class="panel-header">
+    <span class="panel-title-tag">FICHE UTILISATEUR</span>
+    <button type="button" class="btn-close-text" (click)="onClosePanel()">Fermer</button>
+  </div>
+
+  <!-- Identity Row -->
+  <div class="user-identity-block">
+    <div class="avatar-circle">
+      <span>{{ initials }}</span>
+    </div>
+
+    <div class="identity-info">
+      <div class="name-status-row">
+        <h3 class="user-full-name">{{ user.firstName }} {{ user.lastName }}</h3>
+        <span class="status-badge-inline" [class.active]="user.status === 'ACTIF'" [class.disabled]="user.status === 'DESACTIVE'">
+          <span class="dot"></span>
+          <span>{{ user.status === 'ACTIF' ? 'Actif' : 'Désactivé' }}</span>
+        </span>
+      </div>
+
+      <span class="account-id-sub">ID Compte : {{ user.accountNumber }}</span>
+      <span class="account-type-sub">{{ user.accountTypeLabel }} {{ user.accountTypeSublabel }}</span>
+    </div>
+  </div>
+
+  <!-- Personal Information Box -->
+  <div class="info-section-box">
+    <div class="info-item-group">
+      <span class="info-label">EMAIL</span>
+      <span class="info-value bold-text">{{ user.email }}</span>
+    </div>
+
+    <div class="info-item-group">
+      <span class="info-label">TÉLÉPHONE</span>
+      <span class="info-value bold-text">{{ user.phone }}</span>
+    </div>
+
+    <div class="info-item-group">
+      <span class="info-label">ADRESSE DE LIVRAISON</span>
+      <span class="info-value bold-text">{{ user.address }}</span>
+    </div>
+
+    <div class="info-two-col-row">
+      <div class="info-item-group">
+        <span class="info-label">INSCRIPTION</span>
+        <span class="info-value">{{ user.registrationDate }}</span>
+      </div>
+
+      <div class="info-item-group">
+        <span class="info-label">DERNIÈRE ACTIVITÉ</span>
+        <span class="info-value">{{ user.lastActivity }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Metrics Grid (2x2) -->
+  <div class="user-metrics-grid">
+    <div class="metric-card">
+      <span class="metric-label">COMMANDES</span>
+      <span class="metric-number">{{ user.ordersCount }}</span>
+      <span class="metric-subtext text-gray">{{ user.completedPercent }}</span>
+    </div>
+
+    <div class="metric-card">
+      <span class="metric-label">TOTAL DÉPENSÉ</span>
+      <span class="metric-number">{{ user.totalSpentFormatted }}</span>
+      <span class="metric-subtext text-gray">FCFA</span>
+    </div>
+
+    <div class="metric-card">
+      <span class="metric-label">PANIER MOYEN</span>
+      <span class="metric-number">{{ user.averageBasketFormatted }}</span>
+      <span class="metric-subtext text-gray">FCFA / commande</span>
+    </div>
+
+    <div class="metric-card">
+      <span class="metric-label">PAIEMENT FAVORI</span>
+      <span class="metric-number font-md">{{ user.preferredPaymentMethod }}</span>
+      <span class="metric-subtext text-gray">{{ user.preferredPaymentPhone }}</span>
+    </div>
+  </div>
+
+  <!-- Recent Activity Section -->
+  <div class="recent-activity-section" *ngIf="user.recentOrders && user.recentOrders.length > 0">
+    <h4 class="activity-section-title">ACTIVITÉ RÉCENTE ({{ user.recentOrders.length }} COMMANDES)</h4>
+
+    <div class="activity-list">
+      <div class="activity-item-card" *ngFor="let order of user.recentOrders">
+        <div class="activity-left">
+          <span class="merchant-title">{{ order.merchantName }}</span>
+          <span class="order-ref-meta">{{ order.orderRef }} • {{ order.amountFormatted }}</span>
+        </div>
+
+        <div class="activity-right">
+          <span class="order-status-text" [class.text-orange]="order.statusColor === 'orange'" [class.text-green]="order.statusColor === 'green'">
+            Statut : {{ order.statusText }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Action Buttons -->
+  <div class="admin-actions-stack">
+    <button type="button" class="btn-admin-action-outline">
+      Modifier les informations
+    </button>
+
+    <button type="button" class="btn-admin-action-outline">
+      Réinitialiser le mot de passe
+    </button>
+
+    <button type="button" class="btn-admin-action-destructive" (click)="promptToggleStatus()">
+      {{ user.status === 'ACTIF' ? 'Désactiver le compte' : 'Activer le compte' }}
+    </button>
+  </div>
+</div>
+
+<!-- Confirmation Modal for Status Toggle -->
+<div class="modal-backdrop" *ngIf="showConfirmModal">
+  <div class="modal-card">
+    <h3 class="modal-title">
+      {{ user?.status === 'ACTIF' ? 'Confirmation de désactivation' : 'Confirmation d\'activation' }}
+    </h3>
+    <p class="modal-message">
+      Êtes-vous sûr de vouloir {{ user?.status === 'ACTIF' ? 'désactiver' : 'activer' }} le compte de 
+      <strong>{{ user?.firstName }} {{ user?.lastName }}</strong> ({{ user?.accountNumber }}) ?
+    </p>
+
+    <div class="modal-actions-row">
+      <button type="button" class="btn-modal-cancel" (click)="cancelModal()">Annuler</button>
+      <button 
+        type="button" 
+        class="btn-modal-confirm" 
+        [class.btn-red]="user?.status === 'ACTIF'"
+        [class.btn-green]="user?.status === 'DESACTIVE'"
+        (click)="confirmToggleStatus()"
+      >
+        {{ user?.status === 'ACTIF' ? 'Désactiver' : 'Activer' }}
+      </button>
+    </div>
+  </div>
+</div>

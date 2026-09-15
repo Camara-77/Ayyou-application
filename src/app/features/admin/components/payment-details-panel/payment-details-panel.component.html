@@ -1,0 +1,164 @@
+<div class="payment-details-card" *ngIf="payment">
+  <!-- Top Control Banner -->
+  <div class="panel-header-banner">
+    <div class="top-row">
+      <span class="control-label">DÉTAIL DU FLUX FINANCIER</span>
+      <span class="status-live-tag" [ngClass]="'status-' + payment.statusColor">
+        ● {{ payment.statusText }}
+      </span>
+    </div>
+
+    <div class="title-row">
+      <h2 class="panel-title">{{ payment.reference }}</h2>
+      <button class="btn-close-icon" (click)="onClose()" title="Fermer">✕</button>
+    </div>
+
+    <span class="panel-subtitle">
+      Émis le {{ payment.fullDate }} • {{ payment.waveTxId || payment.paymentChannelLabel }}
+    </span>
+  </div>
+
+  <!-- Beneficiary Info Box -->
+  <div class="info-card-box">
+    <div class="box-header-row">
+      <span class="box-label">BÉNÉFICIAIRE</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+    </div>
+
+    <h3 class="beneficiary-main-name">
+      {{ payment.beneficiaryName }}
+      <span *ngIf="payment.beneficiaryType === 'RESTAURANT' || payment.beneficiaryType === 'VENDEUR'">
+        {{ payment.beneficiaryType === 'RESTAURANT' ? 'Restaurant' : 'Vendeur' }}
+      </span>
+    </h3>
+    <span class="beneficiary-address" *ngIf="payment.beneficiaryAddress">
+      {{ payment.beneficiaryAddress }}
+    </span>
+
+    <div class="meta-details-grid mt-8">
+      <div class="meta-item" *ngIf="payment.beneficiaryWaveAccount">
+        <span class="m-lbl">Compte {{ payment.paymentChannelLabel }}</span>
+        <span class="m-val">{{ payment.beneficiaryWaveAccount }}</span>
+      </div>
+      <div class="meta-item" *ngIf="payment.beneficiaryNinea">
+        <span class="m-lbl">NINEA</span>
+        <span class="m-val">{{ payment.beneficiaryNinea }}</span>
+      </div>
+    </div>
+
+    <div class="plan-tag-badge mt-10" *ngIf="payment.beneficiaryPlanTag || payment.operationType === 'ABONNEMENT_FORFAIT'">
+      <span class="shield-icon">🛡️</span>
+      <span class="tag-text">
+        {{ payment.beneficiaryPlanTag || 'Forfait AYYOU Pro Illimité (0% commission)' }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Subscription Info Box (If applicable) -->
+  <div class="info-card-box" *ngIf="payment.subscriptionDetails">
+    <span class="box-label">DÉTAILS DE L'ABONNEMENT</span>
+    <div class="breakdown-list mt-8">
+      <div class="b-row">
+        <span class="b-lbl">Formule</span>
+        <span class="b-val bold">{{ payment.subscriptionDetails.planName }}</span>
+      </div>
+      <div class="b-row">
+        <span class="b-lbl">Date de début</span>
+        <span class="b-val">{{ payment.subscriptionDetails.startDate }}</span>
+      </div>
+      <div class="b-row">
+        <span class="b-lbl">Date d'échéance</span>
+        <span class="b-val">{{ payment.subscriptionDetails.dueDate }}</span>
+      </div>
+      <div class="b-row">
+        <span class="b-lbl">Prochain versement</span>
+        <span class="b-val text-green">{{ payment.subscriptionDetails.nextPaymentDate }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Financial Breakdown Box -->
+  <div class="info-card-box" *ngIf="payment.breakdown">
+    <span class="box-label">DÉCOMPOSITION DU DÉCOMPTE</span>
+
+    <div class="breakdown-list mt-10">
+      <div class="b-row">
+        <span class="b-lbl">
+          Ventes nettes cumulées
+          <ng-container *ngIf="payment.breakdown.orderCount">
+            ({{ payment.breakdown.orderCount }} commandes)
+          </ng-container>
+        </span>
+        <span class="b-val">{{ payment.breakdown.grossSales | number }} FCFA</span>
+      </div>
+
+      <div class="b-row">
+        <span class="b-lbl">Frais de service client perçus</span>
+        <span class="b-val">{{ payment.breakdown.serviceFees }} FCFA</span>
+      </div>
+
+      <div class="b-row">
+        <span class="b-lbl">Commission plateforme AYYOU</span>
+        <span class="b-val text-green bold">0 FCFA (Inclus)</span>
+      </div>
+
+      <div class="b-row text-muted" *ngIf="payment.breakdown.waveApiFeesOffered">
+        <span class="b-lbl">Frais API Wave (offerts par AYYOU)</span>
+        <span class="b-val strike">-4 250 FCFA</span>
+      </div>
+
+      <div class="b-row total-net-row mt-12">
+        <span class="b-lbl-net">Net versé sur compte marchand</span>
+        <span class="b-val-net">{{ payment.breakdown.netPayout | number }} FCFA</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fiscal Audit & Reconciliation Box -->
+  <div class="info-card-box">
+    <span class="box-label">AUDIT DE CONFORMITÉ FISCALE</span>
+
+    <div class="breakdown-list mt-8">
+      <div class="b-row" *ngIf="payment.fiscalReceiptRef">
+        <span class="b-lbl">Reçu TVA / Facture</span>
+        <span class="b-val bold">{{ payment.fiscalReceiptRef }}</span>
+      </div>
+
+      <div class="b-row" *ngIf="payment.bankReconciliation">
+        <span class="b-lbl">Rapprochement bancaire</span>
+        <span class="b-val text-green bold">{{ payment.bankReconciliation }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions Column -->
+  <div class="actions-group">
+    <button
+      type="button"
+      class="btn-action btn-verify"
+      *ngIf="!payment.isVerified"
+      (click)="onVerify()"
+    >
+      <i class="ri-checkbox-circle-line"></i>
+      <span>Vérifier le paiement</span>
+    </button>
+
+    <button
+      type="button"
+      class="btn-action btn-reminder"
+      *ngIf="payment.operationType === 'ABONNEMENT_FORFAIT' || payment.status === 'ECHEANCE_PROCHE'"
+      (click)="onReminder()"
+    >
+      <i class="ri-mail-send-line"></i>
+      <span>Relancer le partenaire</span>
+    </button>
+
+    <button type="button" class="btn-action btn-secondary" (click)="onExportPdf()">
+      <i class="ri-file-download-line"></i>
+      <span>Exporter le reçu PDF</span>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,101 @@
+<div class="page-container" *ngIf="restaurant">
+  <app-header [showBack]="true" backUrl="/home" [title]="restaurant.name"></app-header>
+
+  <main class="restaurant-content">
+    <!-- Hero Cover & Profile -->
+    <div class="hero-section">
+      <img [src]="restaurant.coverUrl" [alt]="restaurant.name" class="cover-img" />
+      <div class="profile-overlay">
+        <img [src]="restaurant.logoUrl" [alt]="restaurant.name" class="profile-logo" />
+        <div class="profile-details">
+          <h2 class="restaurant-name-badge">{{ restaurant.name }}</h2>
+          <p class="tagline" *ngIf="restaurant.tagline">{{ restaurant.tagline }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Status & Action Buttons -->
+    <div class="info-bar">
+      <div class="status-location-row">
+        <div class="status-indicator">
+          <span class="status-dot"></span>
+          <span class="status-text">Ouvert • Ferme à {{ restaurant.closingTime || '23h30' }}</span>
+        </div>
+
+        <div class="location-indicator" *ngIf="restaurant.location">
+          <span class="location-text">{{ restaurant.location }}</span>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <a [href]="'tel:' + restaurant.phoneNumber" class="btn-action btn-call">
+          📞 Appeler
+        </a>
+        <button class="btn-action btn-message">
+          💬 Message
+        </button>
+      </div>
+    </div>
+
+    <!-- About Section Card -->
+    <div class="about-card">
+      <h3 class="card-title">À propos de nous</h3>
+      <p class="about-text">{{ restaurant.description }}</p>
+    </div>
+
+    <!-- Main Navigation Tabs: Menu / Vidéos -->
+    <div class="tab-bar">
+      <button class="tab-btn" [class.active]="activeTab === 'menu'" (click)="activeTab = 'menu'">
+        Menu
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'videos'" (click)="activeTab = 'videos'">
+        Vidéos ({{ restaurant.videosCount || 14 }})
+      </button>
+    </div>
+
+    <!-- Tab 1: Menu Content -->
+    <div *ngIf="activeTab === 'menu'" class="menu-section">
+      <!-- Categories Carousel -->
+      <div class="categories-scroll">
+        <button
+          class="cat-chip"
+          [class.active]="selectedCategoryId === 'all'"
+          (click)="selectCategory('all')"
+        >
+          Tous
+        </button>
+        <button
+          *ngFor="let cat of restaurant.categories"
+          class="cat-chip"
+          [class.active]="selectedCategoryId === cat.id"
+          (click)="selectCategory(cat.id)"
+        >
+          {{ cat.name }}
+        </button>
+      </div>
+
+      <!-- Dishes List -->
+      <div class="dishes-list">
+        <app-dish-card
+          *ngFor="let dish of filteredDishes"
+          [dish]="dish"
+          (add)="addToCart($event)"
+        ></app-dish-card>
+      </div>
+    </div>
+
+    <!-- Tab 2: Vidéos Content -->
+    <div *ngIf="activeTab === 'videos'" class="videos-grid">
+      <div class="video-card" *ngFor="let item of [1,2,3,4]">
+        <div class="video-thumb">
+          <img [src]="restaurant.coverUrl" class="thumb-img" alt="Video thumbnail" />
+          <div class="play-icon">▶</div>
+        </div>
+        <span class="video-title">Préparation de notre Thiéboudienne #{{ item }}</span>
+      </div>
+    </div>
+  </main>
+
+  <app-chatbot-floating></app-chatbot-floating>
+  <app-bottom-nav></app-bottom-nav>
+</div>

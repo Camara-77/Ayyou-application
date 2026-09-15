@@ -1,0 +1,192 @@
+<!-- STICKY HEADER NAVBAR -->
+<header class="pro-header-sticky">
+  <div class="container header-content">
+    <div class="brand-logo-wrap">
+      <span class="logo-text">AYYOU</span>
+      <span class="badge-pro">PRO</span>
+    </div>
+
+    <nav class="nav-desktop">
+      <a routerLink="/pro">Accueil</a>
+      <a routerLink="/pro">Nos services</a>
+      <a routerLink="/pro">Restaurants & vendeurs</a>
+      <a routerLink="/pro">Livraison</a>
+      <a routerLink="/pro">À propos</a>
+    </nav>
+
+    <div class="header-actions">
+      <a routerLink="/pro/login" class="btn-login-outline">Se connecter</a>
+      <a routerLink="/pro/register" class="btn-register-red">S'inscrire</a>
+      
+      <div class="user-profile-circle">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>
+
+      <button class="mobile-toggle-btn" (click)="toggleMobileMenu()" aria-label="Toggle menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-menu-drawer" [class.open]="isMobileMenuOpen">
+    <a routerLink="/pro">Accueil</a>
+    <a routerLink="/pro">Nos services</a>
+    <a routerLink="/pro">Restaurants & vendeurs</a>
+    <a routerLink="/pro">Livraison</a>
+    <a routerLink="/pro">À propos</a>
+    <div class="mobile-menu-btns">
+      <a routerLink="/pro/login" class="btn-login-outline">Se connecter</a>
+      <a routerLink="/pro/register" class="btn-register-red">S'inscrire</a>
+    </div>
+  </div>
+</header>
+
+<div class="pro-login-container">
+  <div class="pro-login-card">
+    
+    <!-- Logo & Header -->
+    <div class="login-header">
+      <img src="assets/branding/logo.svg" alt="AYYOU Logo" class="brand-logo" />
+      <div class="badge-pro">AYYOU PRO</div>
+      <h1 class="login-title">Espace Professionnel</h1>
+      <p class="login-subtitle">Connectez-vous pour gérer votre restaurant ou boutique</p>
+    </div>
+
+    <!-- Login Form -->
+    <form (ngSubmit)="onLogin()" class="login-form">
+      <div class="form-group">
+        <label for="identifier">Identifiant / E-mail professionnel</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+          <input 
+            type="email" 
+            id="identifier" 
+            [(ngModel)]="identifier" 
+            name="identifier" 
+            placeholder="votre@etablissement.com"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="label-row">
+          <label for="password">Mot de passe</label>
+          <a href="#" (click)="$event.preventDefault()" class="forgot-link">Mot de passe oublié ?</a>
+        </div>
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+          <input 
+            [type]="showPassword ? 'text' : 'password'" 
+            id="password" 
+            [(ngModel)]="passwordText" 
+            name="password" 
+            placeholder="••••••••••••"
+            required
+          />
+          <button type="button" class="btn-toggle-eye" (click)="toggleShowPassword()">
+            <svg *ngIf="!showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+            <svg *ngIf="showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a10.03 10.03 0 014.122-.963c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21M3 3l18 18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary-pro" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Se connecter</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+
+      <div class="divider">
+        <span>ou continuer avec</span>
+      </div>
+
+      <button type="button" class="btn-google-pro" (click)="onGoogleLogin()">
+        <svg class="google-icon" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+          <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.26v3.15C3.25 21.32 7.33 24 12 24z"/>
+          <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.16 0 9.99 0 12s.46 3.84 1.26 5.42l4.02-3.15z"/>
+          <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.25 2.68 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+        </svg>
+        <span>Connexion Google Workspace</span>
+      </button>
+
+    </form>
+
+    <div class="login-footer">
+      <p>Vous souhaitez devenir partenaire AYYOU ?</p>
+      <a href="#" (click)="$event.preventDefault()" class="signup-link">Faire une demande de partenariat</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="pro-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand-col">
+      <div class="brand-logo-wrap">
+        <span class="logo-text">AYYOU</span>
+        <span class="badge-pro">PRO</span>
+      </div>
+      <p class="footer-brand-desc">
+        L'infrastructure B2B moderne dédiée aux restaurateurs, commerces de bouche et coursiers professionnels. Fluidité, précision opérationnelle et rayonnement culinaire.
+      </p>
+    </div>
+
+    <div class="footer-links-col">
+      <h4>NAVIGATION</h4>
+      <ul>
+        <li><a routerLink="/pro">Accueil</a></li>
+        <li><a routerLink="/pro">Nos services</a></li>
+        <li><a routerLink="/pro">À propos</a></li>
+        <li><a routerLink="/pro">Actualités & Presse</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-links-col">
+      <h4>PROFESSIONNELS</h4>
+      <ul>
+        <li><a routerLink="/pro">Restaurants partenaires</a></li>
+        <li><a routerLink="/pro">Flotte & Coursiers</a></li>
+        <li><a routerLink="/pro">AYYOU Terminal POS</a></li>
+        <li><a routerLink="/pro">Grille tarifaire</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-links-col">
+      <h4>SUPPORT</h4>
+      <ul>
+        <li><a routerLink="/pro">Centre d'assistance</a></li>
+        <li><a routerLink="/pro">Guide d'intégration</a></li>
+        <li><a routerLink="/pro">État du réseau</a></li>
+        <li><a routerLink="/pro">Contacter l'équipe</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom-bar">
+    <div class="container bottom-bar-content">
+      <p>© 2026 AYYOU Technologies Inc. Tous droits réservés.</p>
+      <div class="legal-links">
+        <a routerLink="/terms">Mentions légales</a>
+        <a routerLink="/privacy">Confidentialité</a>
+        <a routerLink="/terms">Conditions Générales</a>
+        <a routerLink="/privacy">Gestion des cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>

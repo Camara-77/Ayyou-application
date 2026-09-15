@@ -1,0 +1,182 @@
+<div class="delivery-app-layout">
+
+  <!-- Header -->
+  <header class="delivery-app-header transparent-bg">
+    <button class="btn-icon-circle" (click)="goBack()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+
+    <h1 class="header-title-centered">Guidage GPS</h1>
+
+    <button class="btn-icon-circle">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="notification-dot-red"></span>
+    </button>
+  </header>
+
+  <main class="delivery-main-content no-padding">
+
+    <!-- Step Badge Banner -->
+    <div class="step-badge-banner">
+      <div class="step-label-left">
+        <span class="dot-red">●</span>
+        <span>ÉTAPE 2 : LIVRAISON AU CLIENT</span>
+      </div>
+      <div class="live-pill-right">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="#E51A29">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+        <span>En direct</span>
+      </div>
+    </div>
+
+    <!-- Dark Navigation Instruction Card -->
+    <div class="dark-nav-instruction-card">
+      <div class="nav-top-row">
+        <div class="arrow-up-circle">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="19" x2="12" y2="5"/>
+            <polyline points="5 12 12 5 19 12"/>
+          </svg>
+        </div>
+
+        <div class="nav-text-col">
+          <span class="nav-distance-label">{{ instructionMeters }}</span>
+          <h2 class="nav-direction-title">{{ instructionTitle }}</h2>
+          <p class="nav-street-sub">{{ instructionSub }}</p>
+        </div>
+      </div>
+
+      <!-- Time & Distance Sub-Pill -->
+      <div class="nav-time-pill-row">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span>{{ estimatedTimeDistance }}</span>
+      </div>
+    </div>
+
+    <!-- Map Section -->
+    <div class="map-viewport-wrapper">
+      <div #mapContainer class="leaflet-map-box"></div>
+
+      <!-- Floating Map Control Buttons (Right) -->
+      <div class="map-floating-controls">
+        <button class="btn-map-control" (click)="recenterMap()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="2" x2="12" y2="6"/>
+            <line x1="12" y1="18" x2="12" y2="22"/>
+            <line x1="2" y1="12" x2="6" y2="12"/>
+            <line x1="18" y1="12" x2="22" y2="12"/>
+          </svg>
+        </button>
+
+        <button class="btn-map-control">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+            <polyline points="2 17 12 22 22 17"/>
+            <polyline points="2 12 12 17 22 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- White Bottom Panel -->
+      <div class="bottom-panel-card">
+        <div class="drag-handle-bar"></div>
+
+        <!-- Client Name & Gain Row -->
+        <div class="client-gain-row">
+          <div class="client-info-col">
+            <div class="client-name-line">
+              <h3 class="client-name">{{ clientName }}</h3>
+              <div class="verified-badge-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#E51A29">
+                  <path d="M12 2l2.4 2.4 3.4-.4 1 3.2 3.2 1.4-1.4 3.4.4 3.4-3.2 1-1.4 3.2-3.4-1.4L9 22l-2.4-2.4-3.4.4-1-3.2L2 13.4l1.4-3.4-.4-3.4 3.2-1 1.4-3.2 3.4 1.4L12 2z"/>
+                  <path d="M9 12l2 2 4-4" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+              </div>
+            </div>
+            <span class="order-ref-text">Commande #{{ orderRef }}</span>
+          </div>
+
+          <div class="gain-card-box">
+            <span class="gain-label">GAIN COURSE</span>
+            <span class="gain-amount">{{ gainFcfa | number }} FCFA</span>
+          </div>
+        </div>
+
+        <!-- Address Card -->
+        <div class="address-details-card">
+          <div class="addr-top-line">
+            <div class="addr-icon-circle">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+            </div>
+            <div class="addr-text-col">
+              <h4 class="street-bold">{{ deliveryAddress }}</h4>
+              <p class="appt-sub">{{ deliveryAppt }}</p>
+            </div>
+          </div>
+
+          <!-- Client Note Inner Box -->
+          <div class="client-note-box" *ngIf="clientNote">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            <span>Note client : « {{ clientNote }} »</span>
+          </div>
+        </div>
+
+        <!-- Call & Message Actions -->
+        <div class="comm-actions-row">
+          <button class="btn-comm-action">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            <span>Appeler (Masqué)</span>
+          </button>
+
+          <button class="btn-comm-action">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <span>Message</span>
+          </button>
+        </div>
+
+        <!-- Primary Action: Suivre l'itinéraire GPS -->
+        <button class="btn-follow-gps-red" (click)="openGpsExternal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+          </svg>
+          <span>Suivre l'itinéraire GPS</span>
+        </button>
+
+        <!-- State Action: Je suis arrivé chez le client -->
+        <button class="btn-arrived-dark" (click)="markArrivedAtClient()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          <span>Je suis arrivé chez le client</span>
+        </button>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Bottom Navigation Bar -->
+  <app-delivery-bottom-nav activeTab="deliveries"></app-delivery-bottom-nav>
+</div>

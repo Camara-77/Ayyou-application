@@ -1,0 +1,374 @@
+<!-- STICKY HEADER -->
+<header class="pro-header-sticky">
+  <div class="container header-content">
+    <div class="brand-logo-wrap">
+      <span class="logo-text">AYYOU</span>
+      <span class="badge-pro">PRO</span>
+    </div>
+
+    <nav class="nav-desktop">
+      <a href="#accueil" (click)="scrollToSection('accueil', $event)" [class.active]="activeSection === 'accueil'">Accueil</a>
+      <a href="#services" (click)="scrollToSection('services', $event)" [class.active]="activeSection === 'services'">Nos services</a>
+      <a href="#partenaires" (click)="scrollToSection('partenaires', $event)" [class.active]="activeSection === 'partenaires'">Restaurants & vendeurs</a>
+      <a href="#livraison" (click)="scrollToSection('livraison', $event)" [class.active]="activeSection === 'livraison'">Livraison</a>
+      <a href="#avantages" (click)="scrollToSection('avantages', $event)" [class.active]="activeSection === 'avantages'">À propos</a>
+    </nav>
+
+    <div class="header-actions">
+      <a routerLink="/pro/login" class="btn-login-outline">Se connecter</a>
+      <a routerLink="/pro/register" class="btn-register-red">S'inscrire</a>
+      
+      <button class="mobile-toggle-btn" (click)="toggleMobileMenu()" aria-label="Toggle menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-menu-drawer" [class.open]="isMobileMenuOpen">
+    <a href="#accueil" (click)="scrollToSection('accueil', $event)" [class.active]="activeSection === 'accueil'">Accueil</a>
+    <a href="#services" (click)="scrollToSection('services', $event)" [class.active]="activeSection === 'services'">Nos services</a>
+    <a href="#partenaires" (click)="scrollToSection('partenaires', $event)" [class.active]="activeSection === 'partenaires'">Restaurants & vendeurs</a>
+    <a href="#livraison" (click)="scrollToSection('livraison', $event)" [class.active]="activeSection === 'livraison'">Livraison</a>
+    <a href="#avantages" (click)="scrollToSection('avantages', $event)" [class.active]="activeSection === 'avantages'">À propos</a>
+    <div class="mobile-menu-btns">
+      <a routerLink="/pro/login" class="btn-login-outline">Se connecter</a>
+      <a routerLink="/pro/register" class="btn-register-red">S'inscrire</a>
+    </div>
+  </div>
+</header>
+
+<!-- SECTION HERO -->
+<section id="accueil" class="hero-section">
+  <div class="container hero-grid">
+    <div class="hero-left">
+      <h1 class="hero-title">
+        Développez votre activité avec <span class="text-red">AYYOU</span>
+      </h1>
+      
+      <p class="hero-description">
+        Rejoignez la première plateforme tout-en-un au Sénégal. Augmentez vos ventes et simplifiez votre logistique de livraison.
+      </p>
+
+      <div class="hero-cta-wrap">
+        <a routerLink="/pro/register" class="btn-hero-red">S'inscrire maintenant</a>
+      </div>
+
+      <div class="hero-stats-grid">
+        <div class="stat-box">
+          <span class="stat-value">0%</span>
+          <span class="stat-label">commission cachée</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value">&lt; 28min</span>
+          <span class="stat-label">livraison moyenne</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value">Wave / OM</span>
+          <span class="stat-label">versements directs</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-image-wrapper">
+        <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80" alt="Cuisine AYYOU Pro" class="hero-img" />
+        
+        <div class="hero-overlay-card">
+          <div class="overlay-icon-badge">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M12 2L15 9H22L16.5 13.5L18.5 20.5L12 16L5.5 20.5L7.5 13.5L2 9H9L12 2Z"/></svg>
+          </div>
+          <div class="overlay-info">
+            <span class="overlay-tag">Nouveau partenaire à Dakar</span>
+            <span class="overlay-title">N'Gaïdé Food • Inscription validée</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION NOS SERVICES -->
+<section id="services" class="services-section">
+  <div class="container">
+    <div class="section-header-center">
+      <span class="section-tag-red">POUR CHAQUE MÉTIER</span>
+      <h2>Les services AYYOU</h2>
+      <p class="section-subtitle">Une suite de services conçue pour booster votre activité et simplifier la gestion au quotidien.</p>
+    </div>
+
+    <div class="services-cards-grid">
+      <!-- Card 1: Restaurants -->
+      <div class="service-card">
+        <div class="card-icon-circle">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E51B2A" stroke-width="2">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"/>
+          </svg>
+        </div>
+        <h3>Restaurants</h3>
+        <p class="card-desc">Une solution complète pour gérer vos commandes sur place, à emporter et en livraison.</p>
+        
+        <ul class="checklist">
+          <li><span class="check-icon">✓</span> Gratuit à l'inscription et sans frais cachés</li>
+          <li><span class="check-icon">✓</span> Gestion en temps réel de votre menu & stock</li>
+          <li><span class="check-icon">✓</span> Acceptation des paiements Mobile Money & cartes</li>
+          <li><span class="check-icon">✓</span> Application tablette / smartphone intuitive</li>
+          <li><span class="check-icon">✓</span> Statistiques avancées et rapport d'activité</li>
+          <li><span class="check-icon">✓</span> Support & assistance personnalisée</li>
+        </ul>
+
+        <a routerLink="/pro/register" class="card-link-red">En savoir plus →</a>
+      </div>
+
+      <!-- Card 2: Vendeurs & Traiteurs -->
+      <div class="service-card">
+        <div class="card-icon-circle">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E51B2A" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+        </div>
+        <h3>Vendeurs & Traiteurs</h3>
+        <p class="card-desc">La solution idéale pour les préparateurs de repas, traiteurs et boutiques gourmandes.</p>
+
+        <ul class="checklist">
+          <li><span class="check-icon">✓</span> Vendez vos produits en direct ou sur commande</li>
+          <li><span class="check-icon">✓</span> Gestion simple des stocks et commandes</li>
+          <li><span class="check-icon">✓</span> Amplifiez votre visibilité auprès des clients</li>
+          <li><span class="check-icon">✓</span> Suivi des livraisons en temps réel</li>
+          <li><span class="check-icon">✓</span> Versement direct sur Wave / Orange Money</li>
+        </ul>
+
+        <a routerLink="/pro/register" class="card-link-red">En savoir plus →</a>
+      </div>
+
+      <!-- Card 3: Livreurs Indépendants -->
+      <div class="service-card">
+        <div class="card-icon-circle">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E51B2A" stroke-width="2">
+            <circle cx="5.5" cy="17.5" r="2.5"/><circle cx="18.5" cy="17.5" r="2.5"/>
+            <path d="M15 6h4l3 5v7h-2M9 17h6M2 11h9l3-5H7L2 11z"/>
+          </svg>
+        </div>
+        <h3>Livreurs indépendants</h3>
+        <p class="card-desc">Rejoignez la flotte AYYOU et générez des revenus flexibles selon vos disponibilités.</p>
+
+        <ul class="checklist">
+          <li><span class="check-icon">✓</span> Nouveaux sous-traitants & flotte dédiée</li>
+          <li><span class="check-icon">✓</span> Rémunération transparente et attractive</li>
+          <li><span class="check-icon">✓</span> Payouts rapides sur votre compte</li>
+          <li><span class="check-icon">✓</span> Application livreur moderne et intuitive</li>
+          <li><span class="check-icon">✓</span> Choix de vos créneaux et zones de livraison</li>
+          <li><span class="check-icon">✓</span> Équipement et accessoires AYYOU fournis</li>
+        </ul>
+
+        <a routerLink="/pro/register" class="card-link-red">Rejoindre en tant que livreur →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION AYYOU LIVRAISON -->
+<section id="livraison" class="livraison-section">
+  <div class="container livraison-grid">
+    <div class="livraison-left">
+      <span class="section-tag-red">FLOTTE & LOGISTIQUE</span>
+      <h2>AYYOU Livraison</h2>
+      <p class="section-subtitle">Notre flotte de livreurs partenaires garantit des livraisons rapides, fiables et sécurisées à vos clients partout à Dakar.</p>
+
+      <div class="steps-vertical-list">
+        <div class="step-item">
+          <span class="step-badge">1</span>
+          <div class="step-text">
+            <h4>Inscription</h4>
+            <p>Remplissez le formulaire d'inscription en ligne en quelques minutes.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <span class="step-badge">2</span>
+          <div class="step-text">
+            <h4>Validation</h4>
+            <p>Validation de vos documents et compte par notre équipe sous 24h.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <span class="step-badge">3</span>
+          <div class="step-text">
+            <h4>Téléchargement</h4>
+            <p>Téléchargez l'application livreur et recevez vos équipements.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <span class="step-badge">4</span>
+          <div class="step-text">
+            <h4>Commencer</h4>
+            <p>Acceptez vos premières courses et commencez à générer des revenus.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="livraison-cta-wrap">
+        <a routerLink="/pro/register" class="btn-primary-red">Devenir livreur</a>
+      </div>
+    </div>
+
+    <div class="livraison-right">
+      <div class="livraison-img-wrapper">
+        <img src="https://images.unsplash.com/photo-1526367790999-0150786686a2?auto=format&fit=crop&w=800&q=80" alt="Livreur AYYOU Dakar" class="livraison-img" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION NOS PARTENAIRES A DAKAR -->
+<section id="partenaires" class="partenaires-section">
+  <div class="container">
+    <div class="partenaires-header-row">
+      <div class="header-titles">
+        <span class="section-tag-red">NOS PARTENAIRES</span>
+        <h2>Nos partenaires à Dakar</h2>
+        <p class="section-subtitle">Ils nous font confiance pour leur activité à Dakar.</p>
+      </div>
+
+      <a href="#partenaires" (click)="$event.preventDefault()" class="link-see-all-red">Voir tous nos partenaires →</a>
+    </div>
+
+    <div class="partenaires-grid">
+      <div *ngFor="let p of partners" class="partner-card" (click)="navigateToPartner(p.id)">
+        <div class="partner-img-box">
+          <img [src]="p.imageUrl" [alt]="p.name" />
+          <span class="badge-ouvert">{{ p.status }}</span>
+        </div>
+        <div class="partner-card-body">
+          <h3 class="partner-name">{{ p.name }}</h3>
+          <p class="partner-spec">{{ p.speciality }}</p>
+          <p class="partner-loc">{{ p.location }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION POURQUOI REJOINDRE AYYOU -->
+<section id="avantages" class="avantages-section">
+  <div class="container">
+    <div class="section-header-center">
+      <span class="section-tag-red">POURQUOI NOUS REJOINDRE</span>
+      <h2>Pourquoi rejoindre AYYOU ?</h2>
+      <p class="section-subtitle">Une solution pensée pour vous accompagner au quotidien et faire grandir votre commerce à Dakar.</p>
+    </div>
+
+    <div class="avantages-grid">
+      <div class="avantage-card">
+        <span class="avantage-num">01</span>
+        <h3>Augmenter sa visibilité</h3>
+        <p>Bénéficiez d'une présence forte sur notre application mobile et web pour vous faire connaître auprès de milliers de clients.</p>
+      </div>
+
+      <div class="avantage-card">
+        <span class="avantage-num">02</span>
+        <h3>Toucher de nouveaux clients</h3>
+        <p>Élargissez votre clientèle au-delà de votre quartier grâce à notre couverture de livraison étendue sur Dakar.</p>
+      </div>
+
+      <div class="avantage-card">
+        <span class="avantage-num">03</span>
+        <h3>Gérer ses commandes simplement</h3>
+        <p>Une interface intuitive et performante pour recevoir, accepter et suivre vos commandes en temps réel sans stress.</p>
+      </div>
+
+      <div class="avantage-card">
+        <span class="avantage-num">04</span>
+        <h3>Sans commission abusive</h3>
+        <p>Des tarifs transparents et équitables pensés pour vous permettre de préserver vos marges et d'investir dans votre entreprise.</p>
+      </div>
+
+      <div class="avantage-card">
+        <span class="avantage-num">05</span>
+        <h3>Flotte de livraison dédiée</h3>
+        <p>Des livreurs professionnels, équipés et formés pour garantir que vos plats arrivent chauds et intacts chez vos clients.</p>
+      </div>
+
+      <div class="avantage-card">
+        <span class="avantage-num">06</span>
+        <h3>Développer durablement son activité</h3>
+        <p>Un accompagnement sur-mesure et des outils statistiques avancés pour piloter au mieux votre chiffre d'affaires.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION CTA FINAL -->
+<section class="cta-final-section">
+  <div class="container">
+    <div class="cta-inner-card">
+      <span class="section-tag-red">REJOIGNEZ-NOUS</span>
+      <h2>Vous êtes restaurant, vendeur ou livreur ? Rejoignez AYYOU et développez votre activité.</h2>
+      <p class="cta-subtitle">Inscrivez-vous en moins de 5 minutes et commencez à recevoir vos premières commandes dès aujourd'hui.</p>
+      
+      <div class="cta-btns-row">
+        <a routerLink="/pro/register" class="btn-primary-red">S'inscrire</a>
+        <a routerLink="/pro/register" class="btn-secondary-outline">Contacter un conseiller</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="pro-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand-col">
+      <div class="brand-logo-wrap">
+        <span class="logo-text">AYYOU</span>
+        <span class="badge-pro">PRO</span>
+      </div>
+      <p class="footer-brand-desc">
+        La solution n°1 à Dakar pour booster la visibilité et les ventes des restaurants, traiteurs, boutiques et livreurs indépendants.
+      </p>
+    </div>
+
+    <div class="footer-links-col">
+      <h4>NAVIGATION</h4>
+      <ul>
+        <li><a href="#accueil" (click)="scrollToSection('accueil', $event)">Accueil</a></li>
+        <li><a href="#services" (click)="scrollToSection('services', $event)">Nos services</a></li>
+        <li><a href="#avantages" (click)="scrollToSection('avantages', $event)">À propos</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-links-col">
+      <h4>PROFESSIONNELS</h4>
+      <ul>
+        <li><a href="#partenaires" (click)="scrollToSection('partenaires', $event)">Restaurants partenaires</a></li>
+        <li><a href="#livraison" (click)="scrollToSection('livraison', $event)">Flotte & Courses</a></li>
+        <li><a routerLink="/pro/register">AYYOU TERMINAL POS</a></li>
+        <li><a routerLink="/pro/register">Tarifs & Offres</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-links-col">
+      <h4>SUPPORT</h4>
+      <ul>
+        <li><a routerLink="/pro/register">Centre d'aide</a></li>
+        <li><a routerLink="/pro/register">Guide d'intégration</a></li>
+        <li><a routerLink="/pro/register">État du réseau</a></li>
+        <li><a routerLink="/pro/register">Contacter l'équipe</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom-bar">
+    <div class="container bottom-bar-content">
+      <p>© 2026 AYYOU Pro. Tous droits réservés.</p>
+      <div class="legal-links">
+        <a routerLink="/terms">Mentions légales</a>
+        <a routerLink="/privacy">Confidentialité</a>
+        <a routerLink="/terms">Conditions d'utilisation</a>
+        <a routerLink="/privacy">Politique de cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,82 @@
+<div class="delivery-table-card">
+  <!-- Table Header Bar -->
+  <div class="table-header-bar">
+    <div class="title-group">
+      <h3 class="table-title">Courses actives en temps réel</h3>
+      <span class="region-tag">DAKAR MÉTROPOLE</span>
+    </div>
+    <span class="sync-tag">● Synchronisé</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="deliveries-table">
+      <thead>
+        <tr>
+          <th>ID COURSE</th>
+          <th>COURSIER</th>
+          <th>ITINÉRAIRE (DÉPART / ARRIVÉE)</th>
+          <th>TEMPS ESTIMÉ</th>
+          <th>STATUT</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let item of deliveries"
+          [class.selected-row]="selectedDelivery?.id === item.id"
+          [class.incident-row]="item.isIncident"
+          (click)="onRowClick(item)"
+        >
+          <!-- ID COURSE -->
+          <td class="col-id">
+            <div class="id-cell-wrap">
+              <span *ngIf="item.isIncident" class="warning-icon">⚠️</span>
+              <span class="ref-bold" [class.text-red]="item.isIncident || selectedDelivery?.id === item.id">
+                {{ item.reference }}
+              </span>
+            </div>
+          </td>
+
+          <!-- COURSIER -->
+          <td class="col-courier">
+            <div class="cell-block">
+              <span class="main-bold">{{ item.courierName }}</span>
+              <span class="sub-text">{{ item.courierVehicle }}</span>
+            </div>
+          </td>
+
+          <!-- ITINÉRAIRE -->
+          <td class="col-route">
+            <div class="cell-block">
+              <span class="main-bold">{{ item.originName }} ({{ item.originDistrict }})</span>
+              <span class="sub-text">{{ item.destinationName }} ({{ item.destinationDistrict }})</span>
+            </div>
+          </td>
+
+          <!-- TEMPS ESTIMÉ -->
+          <td class="col-time">
+            <div class="cell-block">
+              <span class="main-bold" [class.text-orange]="item.isIncident">
+                {{ item.estimatedTimeText }}
+              </span>
+            </div>
+          </td>
+
+          <!-- STATUT -->
+          <td class="col-status">
+            <div class="status-indicator-badge" [ngClass]="'status-' + item.statusDotColor">
+              <span class="status-dot"></span>
+              <span>{{ item.statusText }}</span>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Empty State -->
+        <tr *ngIf="deliveries.length === 0">
+          <td colspan="5" class="empty-state-cell">
+            <p>Aucune course active ne correspond aux filtres.</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

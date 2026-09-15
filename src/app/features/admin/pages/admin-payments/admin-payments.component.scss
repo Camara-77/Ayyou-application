@@ -1,0 +1,70 @@
+.payments-page-container {
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+
+  @media (min-width: 1920px) {
+    max-width: 1800px;
+  }
+
+  .page-title-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .breadcrumb-tag {
+      font-size: 10px;
+      font-weight: 800;
+      color: #757575;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    .main-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #1A1A1A;
+      letter-spacing: -0.8px;
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #555555;
+      font-weight: 500;
+      margin: 0;
+      max-width: 800px;
+      line-height: 1.5;
+    }
+  }
+
+  .payments-main-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 24px;
+    align-items: start;
+
+    @media (max-width: 1200px) {
+      grid-template-columns: 1fr;
+    }
+
+    .table-column {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      min-width: 0;
+    }
+
+    .details-column {
+      position: sticky;
+      top: 24px;
+
+      @media (max-width: 1200px) {
+        position: static;
+      }
+    }
+  }
+}
+
+.mt-20 { margin-top: 20px; }
+.mt-24 { margin-top: 24px; }

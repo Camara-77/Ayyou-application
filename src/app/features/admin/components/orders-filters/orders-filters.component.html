@@ -1,0 +1,51 @@
+<div class="orders-filters-container">
+  <!-- Row 1: Filter Tabs Pills -->
+  <div class="filter-tabs-pill">
+    <button
+      *ngFor="let tab of tabs"
+      class="tab-pill-btn"
+      [class.active]="selectedTab === tab.key"
+      (click)="selectTab(tab.key)"
+    >
+      {{ tab.label }} ({{ tab.count | number }})
+    </button>
+  </div>
+
+  <!-- Row 2: Search Input & Select Dropdowns -->
+  <div class="filter-inputs-row">
+    <!-- Search Input -->
+    <div class="search-input-wrap">
+      <i class="ri-search-line search-icon"></i>
+      <input
+        type="text"
+        class="search-field"
+        placeholder="Filtrer par référence ou client..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearch()"
+      />
+    </div>
+
+    <!-- Payment Select Pill -->
+    <div class="select-pill-container">
+      <select class="filter-select" [(ngModel)]="selectedPaymentStatus" (change)="onPaymentFilterChange()">
+        <option value="">Mode de paiement: Tous (Wave, OM, Cash)</option>
+        <option value="WAVE">Wave</option>
+        <option value="ORANGE_MONEY">Orange Money</option>
+        <option value="CASH">Espèces</option>
+        <option value="CARTE_BANCAIRE">Carte Bancaire</option>
+      </select>
+    </div>
+
+    <!-- Zone Select Pill -->
+    <div class="select-pill-container">
+      <select class="filter-select" [(ngModel)]="selectedCorridor" (change)="onCorridorFilterChange()">
+        <option value="">Zone: Tout Dakar</option>
+        <option value="Plateau">Plateau</option>
+        <option value="Almadies">Almadies</option>
+        <option value="Mermoz">Mermoz</option>
+        <option value="Ouakam">Ouakam</option>
+        <option value="Fann">Fann</option>
+      </select>
+    </div>
+  </div>
+</div>

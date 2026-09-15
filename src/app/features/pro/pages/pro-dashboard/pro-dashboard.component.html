@@ -1,0 +1,135 @@
+<div class="pro-app-layout">
+  <!-- Top Header -->
+  <app-pro-header></app-pro-header>
+
+  <!-- Main Content -->
+  <main class="pro-main-content">
+
+    <!-- 4 KPI Cards Grid (2x2) -->
+    <section class="kpi-cards-grid">
+      
+      <!-- Card 1: COMMANDES AUJOURD'HUI -->
+      <div class="kpi-card">
+        <div class="kpi-header-label">
+          <span>COMMANDES</span>
+          <span>AUJOURD'HUI</span>
+        </div>
+        <div class="kpi-value">42</div>
+        <div class="kpi-subtitle">Commandes du jour</div>
+      </div>
+
+      <!-- Card 2: REVENUS FCFA -->
+      <div class="kpi-card">
+        <div class="kpi-header-row">
+          <span>REVENUS</span>
+          <span class="unit">FCFA</span>
+        </div>
+        <div class="kpi-value">125 000</div>
+        <div class="kpi-subtitle">Recette totale</div>
+      </div>
+
+      <!-- Card 3: À EMPORTER -->
+      <div class="kpi-card">
+        <div class="kpi-header-row">
+          <span>À EMPORTER</span>
+          <span class="dot-orange">●</span>
+        </div>
+        <div class="kpi-value">8</div>
+        <div class="kpi-subtitle">Commandes à récupérer</div>
+      </div>
+
+      <!-- Card 4: PRIORITAIRE (URGENT) -->
+      <div class="kpi-card card-urgent">
+        <div class="kpi-header-row">
+          <span class="text-red">PRIORITAIRE</span>
+          <span class="badge-red">Urgent</span>
+        </div>
+        <div class="kpi-value">5</div>
+        <div class="kpi-subtitle">À valider</div>
+      </div>
+
+    </section>
+
+    <!-- Historique des commandes Banner Card -->
+    <a routerLink="/pro/orders/history" class="history-banner-card">
+      <div class="icon-circle">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <div class="history-text">
+        <span class="title">Historique des commandes</span>
+        <span class="subtitle">Consulter toutes les commandes antérieures</span>
+      </div>
+      <div class="chevron">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </div>
+    </a>
+
+    <!-- Commandes urgentes Section -->
+    <section class="urgent-section">
+      <div class="urgent-header-row">
+        <div class="title-group">
+          <h3>Commandes urgentes</h3>
+          <span class="count-badge-red">2</span>
+        </div>
+        <a routerLink="/pro/orders/history" class="link-see-all">Voir tout &gt;</a>
+      </div>
+
+      <!-- Filters Pills -->
+      <div class="filter-pills-row">
+        <button class="pill" [class.active]="selectedFilter === 'ALL'" (click)="setFilter('ALL')">
+          Toutes (5)
+        </button>
+        <button class="pill" [class.active]="selectedFilter === 'PICKUP'" (click)="setFilter('PICKUP')">
+          À emporter (2)
+        </button>
+        <button class="pill" [class.active]="selectedFilter === 'DELIVERY'" (click)="setFilter('DELIVERY')">
+          Livraison (3)
+        </button>
+      </div>
+
+      <!-- Urgent Order Cards List -->
+      <div class="urgent-list">
+        
+        <!-- Card 1: #142 -->
+        <div class="order-item-card">
+          <div class="badge-square badge-pickup">
+            <span class="ref-num">#142</span>
+            <span class="service-type">À EMPORTER</span>
+          </div>
+          <div class="order-details">
+            <h4 class="dish-name">Thiéboudienne Rouge Rc</h4>
+            <p class="order-meta">Il y a 3 min · 6 500 FCFA</p>
+          </div>
+          <button (click)="updateOrderStatus('#142', 'VALIDEE')" class="btn-valider">
+            Valider
+          </button>
+        </div>
+
+        <!-- Card 2: #143 -->
+        <div class="order-item-card">
+          <div class="badge-square badge-delivery">
+            <span class="ref-num">#143</span>
+            <span class="service-type">LIVRAISON</span>
+          </div>
+          <div class="order-details">
+            <h4 class="dish-name">Yassa Poulet Braisé</h4>
+            <p class="order-meta">Il y a 6 min · 4 500 FCFA</p>
+          </div>
+          <button (click)="updateOrderStatus('#143', 'VALIDEE')" class="btn-valider">
+            Valider
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Navigation -->
+  <app-pro-bottom-nav></app-pro-bottom-nav>
+</div>
