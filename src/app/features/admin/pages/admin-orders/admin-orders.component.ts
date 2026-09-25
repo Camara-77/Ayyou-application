@@ -94,14 +94,14 @@ export class AdminOrdersComponent implements OnInit {
   }
 
   onAssignDriver(order: Order): void {
-    const driverName = prompt(`Assigner un livreur pour la commande ${order.reference}:`, order.delivery.driverName || 'Mamadou Ndiaye');
-    if (driverName) {
-      this.adminOrderService.assignDriver(order.id, driverName);
+    const driverId = prompt(`Assigner un livreur (ID) pour la commande ${order.reference}:`, '1');
+    if (driverId) {
+      this.adminOrderService.assignDriver(order.id, driverId).subscribe();
     }
   }
 
   onUpdateStatus(event: { order: Order; status: OrderStatus }): void {
-    this.adminOrderService.updateOrderStatus(event.order.id, event.status);
+    this.adminOrderService.updateOrderStatus(event.order.id, event.status).subscribe();
   }
 
   onPageChange(page: number): void {

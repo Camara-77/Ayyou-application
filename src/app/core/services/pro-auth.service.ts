@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ProfessionalProfile, ProfessionalType } from '../models/pro';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -41,12 +43,23 @@ export class ProAuthService {
     return this.profileSubject.value;
   }
 
+  private authService = inject(AuthService);
+
   isAuthenticated(): boolean {
-    return !!this.profileSubject.value;
+    const user = this.authService.getCurrentUser();
+    if (user && this.authService.isAuthenticated()) {
+      const hasMerchantRole = user.roles?.some((r: string) => r === 'RESTAURANT' || r === 'VENDEUR');
+      if (hasMerchantRole) {
+        return user.merchantStatus === 'VALIDE';
+      }
+    }
+    return false;
   }
 
   login(identifier: string, pass: string): Observable<boolean> {
-    return of(true);
+    return this.authService.login({ identifier, password: pass }).pipe(
+      map(res => !!res.access)
+    );
   }
 
   logout(): void {

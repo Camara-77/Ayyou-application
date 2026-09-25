@@ -6,7 +6,10 @@ import { ProHeaderComponent } from '../../components/pro-header/pro-header.compo
 import { ProBottomNavComponent } from '../../components/pro-bottom-nav/pro-bottom-nav.component';
 import { ProStudioService } from '../../../../core/services/pro-studio.service';
 import { ProMenuService } from '../../../../core/services/pro-menu.service';
+import { ProfessionalService } from '../../../../core/services/professional.service';
 import { ProDish } from '../../../../core/models/pro';
+
+import { MainCategory, CATEGORIES_HIERARCHY } from '../../../../core/constants/taxonomy';
 
 @Component({
   selector: 'app-pro-studio-upload',
@@ -16,50 +19,128 @@ import { ProDish } from '../../../../core/models/pro';
   styleUrls: ['./pro-studio-upload.component.scss']
 })
 export class ProStudioUploadComponent implements OnInit {
-  productName: string = 'Thiéboudienne Rouge Royale';
-  productPrice: number | null = 4500;
-  description: string = 'Riz rouge traditionnel sénégalais préparé avec du mérou frais et des légumes locaux.';
-  selectedCategory: string = 'Plat';
-  categories: string[] = ['Plat', 'Boisson', 'Dessert', 'Entrée'];
+  productName: string = '';
+  productPrice: number | null = null;
+  description: string = '';
 
-  selectedDishId: string = 'd1';
+  categoriesHierarchy: MainCategory[] = CATEGORIES_HIERARCHY;
+  selectedMainCategory: MainCategory = CATEGORIES_HIERARCHY[0];
+  selectedSubCategory: string = CATEGORIES_HIERARCHY[0].subCategories[0];
+
+  selectedDishId: string = '';
   dishes: ProDish[] = [];
-  videoFileSelected: boolean = true;
-  videoPreviewUrl: string = 'https://assets.mixkit.co/videos/preview/mixkit-cooking-fresh-vegetables-in-a-pan-41584-large.mp4';
+  selectedFile: File | null = null;
+  videoFileSelected: boolean = false;
+  videoPreviewUrl: string = '';
+  extractedThumbnailUrl: string = '';
+  defaultFoodBgUrl: string = 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80';
+  videoDurationSeconds: number = 0;
   isUploading: boolean = false;
   errorMessage: string = '';
 
   constructor(
     private proStudioService: ProStudioService,
     private proMenuService: ProMenuService,
+    private professionalService: ProfessionalService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.proMenuService.dishes$.subscribe(d => this.dishes = d);
+    this.proMenuService.dishes$.subscribe(d => {
+      this.dishes = d;
+      if (d.length > 0) {
+        const first = d[0];
+        this.selectedDishId = first.id;
+        this.productName = first.name;
+        this.productPrice = first.price;
+        this.description = first.description || '';
+      }
+    });
   }
 
-  setCategory(cat: string): void {
-    this.selectedCategory = cat;
+  onDishSelect(dishId: string): void {
+    this.selectedDishId = dishId;
+    const selected = this.dishes.find(d => d.id === dishId);
+    if (selected) {
+      this.productName = selected.name;
+      this.productPrice = selected.price;
+      this.description = selected.description || '';
+    }
+  }
+
+  selectMainCategory(mainCat: MainCategory): void {
+    this.selectedMainCategory = mainCat;
+    this.selectedSubCategory = mainCat.subCategories.length > 0 ? mainCat.subCategories[0] : 'Général';
+  }
+
+  selectSubCategory(subCat: string): void {
+    this.selectedSubCategory = subCat;
   }
 
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
+      this.selectedFile = file;
       this.videoFileSelected = true;
       this.errorMessage = '';
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.videoPreviewUrl = e.target.result;
+
+      // Extrait la première frame réécrivant la miniature
+      this.extractFirstFrameThumbnail(file);
+
+      const url = URL.createObjectURL(file);
+      this.videoPreviewUrl = url;
+
+      const tempVideo = document.createElement('video');
+      tempVideo.preload = 'metadata';
+      tempVideo.src = url;
+      tempVideo.onloadedmetadata = () => {
+        URL.revokeObjectURL(tempVideo.src);
+        this.videoDurationSeconds = Math.round(tempVideo.duration || 0);
+        if (this.videoDurationSeconds > 180) {
+          this.errorMessage = 'La durée maximale autorisée pour une vidéo est de 3 minutes (180 secondes).';
+        }
       };
-      reader.readAsDataURL(file);
     }
   }
 
+  private extractFirstFrameThumbnail(file: File): void {
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    const objectUrl = URL.createObjectURL(file);
+    video.src = objectUrl;
+    video.muted = true;
+    video.playsInline = true;
+
+    video.onloadeddata = () => {
+      video.currentTime = 0.5;
+    };
+
+    video.onseeked = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth || 360;
+        canvas.height = video.videoHeight || 640;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          this.extractedThumbnailUrl = canvas.toDataURL('image/jpeg', 0.85);
+        }
+      } catch (e) {
+        console.warn('Extraction miniature frame:', e);
+      } finally {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }
+
   publishVideo(): void {
-    // Form Validations
     if (!this.videoFileSelected) {
       this.errorMessage = 'Veuillez filmer ou importer une vidéo.';
+      return;
+    }
+
+    if (this.videoDurationSeconds > 180) {
+      this.errorMessage = 'La durée maximale autorisée pour une vidéo est de 3 minutes (180 secondes).';
       return;
     }
 
@@ -81,22 +162,38 @@ export class ProStudioUploadComponent implements OnInit {
     this.errorMessage = '';
     this.isUploading = true;
 
-    setTimeout(() => {
-      this.isUploading = false;
-      const selectedDish = this.dishes.find(d => d.id === this.selectedDishId);
+    const formData = new FormData();
+    if (this.selectedFile) {
+      formData.append('video_file', this.selectedFile);
+    } else {
+      formData.append('media_url', this.videoPreviewUrl);
+    }
+    if (this.selectedDishId) {
+      formData.append('produit_id', this.selectedDishId);
+      formData.append('produit', this.selectedDishId);
+    }
+    formData.append('title', this.productName.trim());
+    formData.append('description', this.description ? this.description.trim() : `#${this.selectedMainCategory.name.replace(/\s+/g, '')} #${this.selectedSubCategory.replace(/\s+/g, '')}`);
+    formData.append('category', this.selectedMainCategory.name);
+    formData.append('sub_category', this.selectedSubCategory);
+    formData.append('duree_secondes', this.videoDurationSeconds.toString());
 
-      this.proStudioService.addVideo({
-        title: this.productName.trim(),
-        dishName: this.productName.trim(),
-        priceFcfa: Number(this.productPrice),
-        category: this.selectedCategory,
-        description: this.description ? this.description.trim() : '#Thieboudienne #DakarFood #AYYOU',
-        videoUrl: this.videoPreviewUrl,
-        thumbnailUrl: selectedDish?.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
-        dishTag: this.productName.trim()
-      });
-
-      this.router.navigate(['/pro/studio/success']);
-    }, 800);
+    this.professionalService.uploadVideoFeed(formData).subscribe({
+      next: (res) => {
+        this.isUploading = false;
+        const newVid = this.proStudioService.mapBackendToProVideo(res);
+        if (this.extractedThumbnailUrl) {
+          newVid.thumbnailUrl = this.extractedThumbnailUrl;
+        }
+        newVid.category = this.selectedMainCategory.name;
+        newVid.subCategory = this.selectedSubCategory;
+        this.proStudioService.prependVideo(newVid);
+        this.router.navigate(['/pro/profile']);
+      },
+      error: (err) => {
+        this.isUploading = false;
+        this.errorMessage = err?.error?.detail || err?.message || 'Erreur lors du téléversement de la vidéo vers Cloudinary.';
+      }
+    });
   }
 }

@@ -25,6 +25,9 @@
 .dark-cover-banner {
   height: 110px;
   background: #1A1A1A;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   margin: 0 -16px;
   position: relative;
 }

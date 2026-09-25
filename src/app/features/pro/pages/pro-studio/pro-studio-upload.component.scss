@@ -162,7 +162,8 @@
     display: flex;
     gap: 8px;
     overflow-x: auto;
-    padding-bottom: 2px;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
 
     .pill-btn {
       border: 1px solid #E5E7EB;
@@ -181,6 +182,37 @@
         color: #FFFFFF;
         border-color: #E51A29;
         font-weight: 700;
+      }
+    }
+  }
+
+  .subcategory-section {
+    margin-top: -4px;
+    background: #FFF5F5;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px dashed #FECDD3;
+
+    .section-label {
+      color: #991B1B;
+      font-size: 10px;
+      margin-bottom: 6px;
+    }
+  }
+
+  .subcategories-pills-row {
+    .sub-pill {
+      font-size: 11px;
+      padding: 6px 14px;
+      border-radius: 16px;
+      border: 1px solid #FCA5A5;
+      background: #FFFFFF;
+      color: #991B1B;
+
+      &.active {
+        background: #991B1B;
+        color: #FFFFFF;
+        border-color: #991B1B;
       }
     }
   }

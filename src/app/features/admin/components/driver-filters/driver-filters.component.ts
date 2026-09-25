@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DriverFilterTab } from '../../models/admin-driver.models';
+import { DriverFilterTab, DriverStatsSummary } from '../../models/admin-driver.models';
 
 @Component({
   selector: 'app-driver-filters',
@@ -11,6 +11,9 @@ import { DriverFilterTab } from '../../models/admin-driver.models';
   styleUrls: ['./driver-filters.component.scss']
 })
 export class DriverFiltersComponent {
+  @Input() stats: DriverStatsSummary | null = null;
+  @Input() totalCount: number = 0;
+
   activeTab: DriverFilterTab = 'ALL';
   selectedZone: string = 'ALL';
   selectedVehicle: string = 'ALL';
@@ -25,10 +28,9 @@ export class DriverFiltersComponent {
   ];
 
   vehicleTypes: string[] = [
-    'Yamaha',
-    'Boxer',
-    'Kymco',
-    'TVS'
+    'Moto',
+    'Scooter',
+    'Voiture'
   ];
 
   @Output() tabChange = new EventEmitter<DriverFilterTab>();

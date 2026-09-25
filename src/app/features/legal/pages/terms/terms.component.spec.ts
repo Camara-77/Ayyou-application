@@ -1,21 +1,23 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TermsComponent } from './terms.component';
-import { provideRouter, Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('TermsComponent', () => {
   let component: TermsComponent;
   let fixture: ComponentFixture<TermsComponent>;
-  let routerSpy: jasmine.SpyObj<Router>;
+  let router: Router;
 
   beforeEach(async () => {
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-
     await TestBed.configureTestingModule({
-      imports: [TermsComponent],
+      imports: [TermsComponent, RouterTestingModule],
       providers: [
-        { provide: Router, useValue: routerSpy }
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map() } } }
       ]
     }).compileComponents();
+
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
 
     fixture = TestBed.createComponent(TermsComponent);
     component = fixture.componentInstance;
@@ -33,6 +35,6 @@ describe('TermsComponent', () => {
 
   it('should navigate to /login on back button click', () => {
     component.onBack();
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
+    expect(router.navigate).toHaveBeenCalledWith(['/login']);
   });
 });

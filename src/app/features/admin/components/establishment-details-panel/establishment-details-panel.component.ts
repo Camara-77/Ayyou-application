@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { EstablishmentDetail } from '../../models/admin-business.models';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { EstablishmentDetail, EstablishmentDocument } from '../../models/admin-business.models';
 
 @Component({
   selector: 'app-establishment-details-panel',
@@ -13,15 +14,39 @@ import { EstablishmentDetail } from '../../models/admin-business.models';
 export class EstablishmentDetailsPanelComponent {
   @Input() establishment: EstablishmentDetail | null = null;
   @Output() approve = new EventEmitter<string>();
-  @Output() reject = new EventEmitter<string>();
+  @Output() reject = new EventEmitter<{ id: string; motif: string } | string>();
 
   selectedImage: string | null = null;
+  selectedPdfUrl: SafeResourceUrl | null = null;
+  selectedPdfRawUrl: string | null = null;
+  selectedDocTitle: string = '';
 
   showApproveModal: boolean = false;
   showRejectModal: boolean = false;
   showRequestDocsModal: boolean = false;
 
   docNotes: string = '';
+  rejectReason: string = '';
+
+  constructor(private sanitizer: DomSanitizer) {}
+
+  viewDocument(doc: EstablishmentDocument): void {
+    if (!doc || !doc.fichierUrl) return;
+
+    this.selectedDocTitle = doc.title;
+    const url = doc.fichierUrl;
+    if (doc.isPdf || url.toLowerCase().includes('.pdf')) {
+      this.selectedPdfRawUrl = url;
+      this.selectedPdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    } else {
+      this.selectedImage = url;
+    }
+  }
+
+  closePdfPreview(): void {
+    this.selectedPdfUrl = null;
+    this.selectedPdfRawUrl = null;
+  }
 
   openImagePreview(photoUrl: string): void {
     this.selectedImage = photoUrl;
@@ -43,14 +68,16 @@ export class EstablishmentDetailsPanelComponent {
   }
 
   promptReject(): void {
+    this.rejectReason = '';
     this.showRejectModal = true;
   }
 
   confirmReject(): void {
-    if (this.establishment) {
-      this.reject.emit(this.establishment.id);
+    if (this.establishment && this.rejectReason && this.rejectReason.trim()) {
+      this.reject.emit({ id: this.establishment.id, motif: this.rejectReason.trim() });
+      this.showRejectModal = false;
+      this.rejectReason = '';
     }
-    this.showRejectModal = false;
   }
 
   promptRequestDocs(): void {
@@ -66,5 +93,6 @@ export class EstablishmentDetailsPanelComponent {
     this.showApproveModal = false;
     this.showRejectModal = false;
     this.showRequestDocsModal = false;
+    this.rejectReason = '';
   }
 }

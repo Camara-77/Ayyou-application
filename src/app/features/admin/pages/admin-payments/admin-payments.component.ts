@@ -87,7 +87,7 @@ export class AdminPaymentsComponent implements OnInit {
   }
 
   onVerifyPayment(payment: PaymentItem): void {
-    this.adminPaymentService.verifyPayment(payment.id);
+    this.adminPaymentService.verifyPayment(payment.id).subscribe();
   }
 
   onReminderPartner(payment: PaymentItem): void {

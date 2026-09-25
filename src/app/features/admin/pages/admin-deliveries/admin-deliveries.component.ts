@@ -102,7 +102,7 @@ export class AdminDeliveriesComponent implements OnInit {
   }
 
   onCloseIncident(delivery: DeliveryItem): void {
-    this.adminDeliveryService.closeIncident(delivery.id);
+    this.adminDeliveryService.closeIncident(delivery.id).subscribe();
   }
 
   onCallCourier(delivery: DeliveryItem): void {

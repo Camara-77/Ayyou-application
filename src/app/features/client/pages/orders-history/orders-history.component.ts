@@ -5,8 +5,9 @@ import { AppHeaderComponent } from '../../components/app-header/app-header.compo
 import { AppBottomNavComponent } from '../../components/app-bottom-nav/app-bottom-nav.component';
 import { ChatbotFloatingComponent } from '../../components/chatbot-floating/chatbot-floating.component';
 import { ClientDataService } from '../../../../core/services/client-data.service';
+import { OrderService } from '../../../../core/services/order.service';
 import { OrderHistoryItem } from '../../../../core/models/client';
-
+import { CommandeOrder } from '../../../../core/models/orders';
 import { AppFooterComponent } from '../../../../shared/components/app-footer/app-footer.component';
 
 @Component({
@@ -25,33 +26,72 @@ import { AppFooterComponent } from '../../../../shared/components/app-footer/app
 })
 export class OrdersHistoryComponent implements OnInit {
   orders: OrderHistoryItem[] = [];
+  isLoading = true;
 
-  constructor(private clientDataService: ClientDataService) {}
+  constructor(
+    private clientDataService: ClientDataService,
+    private orderService: OrderService
+  ) {}
 
   ngOnInit(): void {
-    this.clientDataService.getOrderHistory().subscribe(history => {
-      this.orders = history;
-    });
+    this.loadFullHistory();
   }
 
   loadFullHistory(): void {
-    // Frontend mock append for history loading
-    this.orders.push({
-      id: 'oh3',
-      restaurantName: 'Chez Loutcha',
-      restaurantIconType: 'food',
-      dateText: '01 Nov, 12:30',
-      status: 'Livrée',
-      items: [
-        { name: 'Thiéboudienne Rouge', quantity: 2, price: 9000 },
-        { name: 'Jus de Bouye', quantity: 2, price: 2400 }
-      ],
-      deliveryFee: 1000,
-      totalPrice: 12400
+    this.isLoading = true;
+    this.orderService.getOrders().subscribe({
+      next: (res: any) => {
+        this.isLoading = false;
+        const list: CommandeOrder[] = Array.isArray(res) ? res : res?.results || [];
+        this.orders = list.map(cmd => this.mapCommandeToHistoryItem(cmd));
+      },
+      error: () => {
+        this.isLoading = false;
+        this.orders = [];
+      }
     });
   }
 
   formatPrice(price: number): string {
     return price.toLocaleString('fr-FR') + ' CFA';
+  }
+
+  private mapCommandeToHistoryItem(cmd: CommandeOrder): OrderHistoryItem {
+    const firstSub = cmd.sous_commandes && cmd.sous_commandes.length > 0 ? cmd.sous_commandes[0] : null;
+    const restaurantName = firstSub ? firstSub.etablissement_nom : 'AYYOU Restaurant';
+
+    const dateObj = cmd.date_creation ? new Date(cmd.date_creation) : new Date();
+    const dateText = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }) + ', ' +
+                     dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+    let statusText: 'Livrée' | 'En cours' | 'Annulée' = 'En cours';
+    if (cmd.statut === 'LIVREE') {
+      statusText = 'Livrée';
+    } else if (cmd.statut === 'ANNULEE') {
+      statusText = 'Annulée';
+    }
+
+    const itemsSummary: Array<{ name: string; quantity: number; price: number }> = [];
+    (cmd.sous_commandes || []).forEach(sub => {
+      (sub.lignes || []).forEach(line => {
+        itemsSummary.push({
+          name: line.nom_produit_snapshot,
+          quantity: line.quantite,
+          price: parseFloat(line.prix_unitaire || '0')
+        });
+      });
+    });
+
+    return {
+      id: String(cmd.id),
+      restaurantName,
+      restaurantIconType: 'food',
+      dateText,
+      status: statusText,
+      items: itemsSummary.length > 0 ? itemsSummary : [{ name: 'Commande AYYOU', quantity: 1, price: parseFloat(cmd.total) }],
+      deliveryFee: parseFloat(cmd.frais_livraison || '1000'),
+      totalPrice: parseFloat(cmd.total || '0'),
+      paymentMethod: 'Paiement AYYOU'
+    };
   }
 }

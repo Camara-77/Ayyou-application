@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } fr
 import { Router } from '@angular/router';
 import { AuthHeaderComponent } from '../../components/auth-header/auth-header.component';
 import { AuthButtonComponent } from '../../components/auth-button/auth-button.component';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-verify-sms',
@@ -20,6 +21,7 @@ import { AuthButtonComponent } from '../../components/auth-button/auth-button.co
 export class VerifySmsComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private authService = inject(AuthService);
 
   @ViewChildren('otpInput') otpInputRefs!: QueryList<ElementRef<HTMLInputElement>>;
 
@@ -57,6 +59,10 @@ export class VerifySmsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    const pending = this.authService.getPendingPhone();
+    if (pending) {
+      this.phoneNumber = pending;
+    }
     this.startResendTimer();
   }
 
@@ -154,14 +160,28 @@ export class VerifySmsComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.errorMessage = null;
 
-    setTimeout(() => {
-      this.loading = false;
-      // Mock validation: code "123456" or any 6-digit code for dev testing
-      if (this.otpCode === '123456' || this.otpCode.length === 6) {
-        this.router.navigate(['/location']);
-      } else {
-        this.errorMessage = 'Code de vérification incorrect. Veuillez réessayer.';
+    this.authService.verifyOtp(this.otpCode).subscribe({
+      next: (res) => {
+        this.loading = false;
+        if (res.verified) {
+          this.router.navigate(['/location']);
+        }
+      },
+      error: (err) => {
+        this.loading = false;
+        if (err.error?.errors) {
+          const errors = err.error.errors;
+          if (typeof errors === 'string') {
+            this.errorMessage = errors;
+          } else if (errors.detail) {
+            this.errorMessage = errors.detail;
+          } else {
+            this.errorMessage = 'Code de vérification incorrect ou expiré.';
+          }
+        } else {
+          this.errorMessage = 'Code de vérification incorrect ou expiré.';
+        }
       }
-    }, 400);
+    });
   }
 }

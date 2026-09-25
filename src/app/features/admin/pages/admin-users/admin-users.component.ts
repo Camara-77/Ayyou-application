@@ -56,8 +56,10 @@ export class AdminUsersComponent implements OnInit {
   }
 
   onToggleUserStatus(userId: string): void {
-    this.userService.toggleUserStatus(userId);
-    this.loadFilteredUsers();
+    this.userService.toggleUserStatus(userId).subscribe(() => {
+      this.loadFilteredUsers();
+      this.stats$ = this.userService.getStatsSummary();
+    });
   }
 
   private loadFilteredUsers(): void {

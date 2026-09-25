@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SocialLoginButtonComponent } from './social-login-button.component';
 
 describe('SocialLoginButtonComponent', () => {

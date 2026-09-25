@@ -60,9 +60,16 @@ export interface FeedItem {
 }
 
 export interface CartItem {
+  id?: number;
   dish: Dish;
   quantity: number;
   selected?: boolean;
+  varianteId?: string | number;
+  varianteName?: string;
+  optionIds?: (string | number)[];
+  optionsDetails?: Array<{ id: string | number; nom: string; surcout: string }>;
+  unitPrice?: number;
+  subtotal?: number;
 }
 
 export interface Vendor {

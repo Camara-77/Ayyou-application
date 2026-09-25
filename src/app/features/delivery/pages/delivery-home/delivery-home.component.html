@@ -1,462 +1,362 @@
-<div class="delivery-page">
+<div class="stitch-dashboard-page">
 
-  <!-- HEADER -->
-  <header class="delivery-header">
+  <!-- TOP HEADER UNIFIÉ -->
+  <app-delivery-header [title]="isMissionsPage ? 'LIVRAISONS' : 'LIVREUR'"></app-delivery-header>
 
-    <button
-      type="button"
-      class="header-back"
-      aria-label="Retour"
-      (click)="router.navigate(['/'])">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"/>
-      </svg>
-    </button>
+  <!-- ALERTS & MESSAGES FEEDBACK -->
+  <div class="alert alert-error" *ngIf="errorMessage">
+    <span>{{ errorMessage }}</span>
+  </div>
+  <div class="alert alert-success" *ngIf="successMessage">
+    <span>{{ successMessage }}</span>
+  </div>
 
-    <div class="brand">
-      <div class="brand-name">
-        AYYOU
-        <span class="brand-pro">PRO</span>
+  <main class="dashboard-content">
+
+    <!-- AVAILABILITY BANNER (SWITCH BUTTON COMMON TO ALL STATES) -->
+    <div class="availability-card" [class.active-duty]="isOnDuty">
+      <div class="status-left">
+        <span class="status-dot-lg" [class.online]="isOnDuty"></span>
+        <div class="status-text">
+          <h3 class="status-title">{{ isOnDuty ? 'Vous êtes en ligne' : 'Vous êtes hors ligne' }}</h3>
+          <p class="status-sub">{{ isOnDuty ? 'Radar actif • Haute priorité' : 'Mode pause • Non disponible' }}</p>
+        </div>
       </div>
 
-      <div class="online-status">
-        <span class="online-dot"></span>
-        EN LIGNE
+      <div class="status-right">
+        <label class="toggle-switch" aria-label="Basculer disponibilité">
+          <input type="checkbox" [checked]="isOnDuty" (change)="toggleAvailability()" [disabled]="isUpdatingAvailability">
+          <span class="slider round">
+            <span class="switch-icon" *ngIf="isOnDuty">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+            </span>
+          </span>
+        </label>
       </div>
     </div>
 
-    <button
-      type="button"
-      class="notification-button"
-      aria-label="Notifications">
-      <span class="notification-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    <!-- ========================================================================= -->
+    <!-- ÉTAT HORS SERVICE -->
+    <!-- ========================================================================= -->
+    <div class="offline-card" *ngIf="!isOnDuty">
+      <div class="offline-icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
         </svg>
-      </span>
-      <span class="notification-dot"></span>
-    </button>
-
-  </header>
-
-
-  <!-- CONTENU -->
-  <main class="delivery-content">
-
-    <!-- PROFIL LIVREUR -->
-    <section class="driver-summary">
-
-      <div class="driver-avatar">
-        AD
       </div>
-
-      <div class="driver-information">
-
-        <h1>
-          Abdoulaye<br />
-          Diop
-        </h1>
-
-        <div class="driver-meta">
-          <span class="rating">
-            4.9★
-          </span>
-
-          <span class="ready-dot"></span>
-
-          <span>
-            {{ driver.status }}
-          </span>
-
-          <span>•</span>
-
-          <span>
-            {{ driver.zone }}
-          </span>
-        </div>
-
-      </div>
-
-      <span class="driver-role">
-        LIVREUR
-      </span>
-
-    </section>
-
-
-    <!-- COURSE ASSIGNÉE -->
-    <section
-      class="assigned-card"
-      [class.expired]="isExpired">
-
-      <div class="assigned-header">
-
-        <strong>
-          ! COURSE ASSIGNÉE EXPRESS
-        </strong>
-
-        <span class="order-reference">
-          {{ assignedCourse.orderRef }}
-        </span>
-
-      </div>
-
-
-      <h2>
-        {{ isExpired
-          ? 'Cette course a expiré'
-          : 'Nouvelle course qui vous est assignée !'
-        }}
-      </h2>
-
-
-      <!-- TIMER -->
-      <div class="timer-box">
-
-        <span class="timer-label">
-          ⏱ Temps restant pour accepter
-        </span>
-
-        <strong class="timer-value">
-          {{ formattedTimer }}
-        </strong>
-
-      </div>
-
-
-      <div class="timer-progress">
-        <span
-          [style.width.%]="timerProgress">
-        </span>
-      </div>
-
-    </section>
-
-
-    <!-- INFORMATIONS COURSE ASSIGNÉE -->
-    <section class="assigned-details">
-
-      <div class="earnings-row">
-
-        <div>
-          <span class="small-label">
-            RÉMUNÉRATION NETTE
-          </span>
-
-          <strong class="earning-value">
-            {{ assignedCourse.netEarningsFcfa | number:'1.0-0' }}
-            <small>FCFA</small>
-          </strong>
-        </div>
-
-        <div class="kitchen-time">
-          <span class="small-label">
-            TEMPS CUISINE
-          </span>
-
-          <strong>
-            Prêt dans {{ assignedCourse.restaurant.readyInMinutes }} min
-          </strong>
-        </div>
-
-      </div>
-
-
-      <!-- RETRAIT -->
-      <div class="route-block">
-
-        <div class="route-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
-          </svg>
-        </div>
-
-        <div class="route-information">
-
-          <span class="route-label">
-            RETRAIT • RESTAURANT
-          </span>
-
-          <strong>
-            {{ assignedCourse.restaurant.name }}
-          </strong>
-
-          <span>
-            {{ assignedCourse.restaurant.address }}
-          </span>
-
-        </div>
-
-        <span class="items-badge">
-          2 plats
-        </span>
-
-      </div>
-
-
-      <div class="route-line"></div>
-
-
-      <!-- LIVRAISON -->
-      <div class="route-block">
-
-        <div class="route-icon client">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-            <circle cx="12" cy="10" r="3"/>
-          </svg>
-        </div>
-
-        <div class="route-information">
-
-          <div class="delivery-label-row">
-
-            <span class="route-label">
-              LIVRAISON CLIENT
-            </span>
-
-            <span class="distance">
-              {{ assignedCourse.distanceKm }} km •
-              {{ assignedCourse.estimatedDurationMinutes }} min
-            </span>
-
-          </div>
-
-          <strong>
-            {{ assignedCourse.client.address }}
-          </strong>
-
-          <span>
-            {{ assignedCourse.client.note }}
-          </span>
-
-        </div>
-
-      </div>
-
-
-      <!-- ACTIONS -->
-      <div class="assigned-actions">
-
-        <button
-          type="button"
-          class="primary-action"
-          [disabled]="isExpired"
-          (click)="acceptAssignedCourse()">
-
-          <span class="action-check">✓</span>
-
-          Accepter cette livraison
-
-        </button>
-
-
-        <button
-          type="button"
-          class="secondary-action"
-          [disabled]="isExpired"
-          (click)="declineAssignedCourse()">
-
-          × Décliner la course
-
-        </button>
-
-      </div>
-
-    </section>
-
-
-    <!-- COURSES DISPONIBLES -->
-    <section class="available-section">
-
-      <div class="available-heading">
-
-        <div>
-          <h2>
-            Courses disponibles
-            <span class="count">
-              {{ availableCourses.length }}
-            </span>
-          </h2>
-
-          <p>
-            Vous pouvez accepter l'une des courses
-            en attente
-          </p>
-        </div>
-
-        <button
-          type="button"
-          class="proximity-filter">
-
-          À<br />
-          PROXIMITÉ
-
-        </button>
-
-      </div>
-
-
-      <!-- LISTE -->
-      <div class="available-list">
-
-        <article
-          class="available-card"
-          *ngFor="let course of availableCourses">
-
-          <div class="available-top">
-
-            <span class="course-id">
-              {{ course.orderRef }}
-            </span>
-
-            <strong class="course-price">
-              {{ course.netEarningsFcfa | number:'1.0-0' }}
-              <small>FCFA</small>
-            </strong>
-
-          </div>
-
-
-          <div class="available-restaurant">
-
-            <span class="small-red-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-              </svg>
-            </span>
-
-            <div>
-              <strong>
-                {{ course.restaurant.name }}
-              </strong>
-
-              <span>
-                {{ course.restaurant.address }}
-              </span>
-            </div>
-
-          </div>
-
-
-          <div class="available-client">
-
-            <span class="small-location-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
-            </span>
-
-            <div>
-              <strong>
-                {{ course.client.address }}
-              </strong>
-
-              <span>
-                {{ course.distanceKm }} km • ~{{
-                  course.estimatedDurationMinutes
-                }} min de trajet
-              </span>
-            </div>
-
-          </div>
-
-
-          <span
-            class="insulated-badge"
-            *ngIf="course.requiresInsulatedBag">
-
-            Isotherme requis
-
-          </span>
-
-
-          <button
-            type="button"
-            class="available-action"
-            (click)="acceptAvailableCourse(course)">
-
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="5.5" cy="17.5" r="3.5"/>
-              <circle cx="18.5" cy="17.5" r="3.5"/>
-              <path d="M15 6L12 11H5M12 11L9 17"/>
+      <h3 class="offline-title">Vous êtes actuellement hors service</h3>
+      <p class="offline-text">Activez le bouton de disponibilité ci-dessus pour passer en ligne et recevoir vos propositions de courses.</p>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- ÉTAT EN SERVICE : 1. COURSE ASSIGNÉE À VOUS (GRANDE CARTE PRIORITAIRE STITCH) -->
+    <!-- ========================================================================= -->
+    <ng-container *ngIf="isOnDuty">
+
+      <div class="assigned-section" *ngIf="assignedCourse">
+        <!-- Top Badges Row -->
+        <div class="assigned-top-bar">
+          <div class="badge-assigned">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
             </svg>
-            Accepter cette course
+            <span>ASSIGNÉE À VOUS</span>
+          </div>
 
-          </button>
+          <div class="badge-timer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span>{{ remainingTime }}</span>
+          </div>
+        </div>
 
-        </article>
+        <!-- Grande Carte Course Assignée -->
+        <div class="assigned-card">
+          <div class="card-top-row">
+            <div class="col-left">
+              <span class="label-muted">COMMANDE</span>
+              <h3 class="order-ref">#{{ assignedCourse.commande_reference || ('AY-' + assignedCourse.commande) }}</h3>
+            </div>
+            <div class="col-right">
+              <span class="label-muted">GAIN NET</span>
+              <h3 class="order-price">{{ getFormattedPrice(assignedCourse) }} <span class="currency">FCFA</span></h3>
+            </div>
+          </div>
 
+          <!-- Trajet Container Box -->
+          <div class="trajet-box">
+            <!-- Retrait -->
+            <div class="point-row">
+              <div class="icon-circle restaurant">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                  <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+              </div>
+              <div class="point-details">
+                <div class="title-with-badge">
+                  <h4 class="point-name">{{ getEtablissementName(assignedCourse) }}</h4>
+                  <span class="readiness-badge warning">Prête dans 3 min</span>
+                </div>
+                <p class="point-address">{{ getEtablissementAddress(assignedCourse) }}</p>
+              </div>
+            </div>
+
+            <!-- Connecting Line -->
+            <div class="connecting-line"></div>
+
+            <!-- Destination -->
+            <div class="point-row">
+              <div class="icon-circle destination">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+              </div>
+              <div class="point-details">
+                <h4 class="point-name">{{ getDestinationName(assignedCourse) }}</h4>
+                <p class="point-address">{{ getDestinationAddress(assignedCourse) }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Meta Info Row -->
+          <div class="meta-info-row">
+            <span class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              </svg>
+              1,8 km
+            </span>
+            <span class="dot-sep">•</span>
+            <span class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              ~8 min
+            </span>
+            <span class="dot-sep">•</span>
+            <span class="meta-item green-text">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="5" width="20" height="14" rx="2"/>
+                <line x1="2" y1="10" x2="22" y2="10"/>
+              </svg>
+              Payé en ligne
+            </span>
+          </div>
+
+          <!-- Actions Buttons -->
+          <div class="actions-group">
+            <button
+              class="btn-accept-main"
+              [disabled]="acceptingId === assignedCourse.id"
+              (click)="acceptMission(assignedCourse)"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" *ngIf="acceptingId !== assignedCourse.id">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span *ngIf="acceptingId !== assignedCourse.id">ACCEPTER LA COURSE</span>
+              <span *ngIf="acceptingId === assignedCourse.id">Acceptation...</span>
+            </button>
+
+            <button class="btn-decline" (click)="declineAssignedCourse()">
+              Décliner cette course
+            </button>
+          </div>
+        </div>
       </div>
 
-    </section>
+      <!-- ========================================================================= -->
+      <!-- ÉTAT EN SERVICE : 2. COURSES DISPONIBLES (LISTE STITCH COMPACTE) -->
+      <!-- ========================================================================= -->
+      <div class="available-section" *ngIf="availableMissions.length > 0">
+        <div class="section-header-row">
+          <div class="title-with-count">
+            <h3 class="section-title">Courses disponibles</h3>
+            <span class="count-pill">{{ availableMissions.length }}</span>
+          </div>
+
+          <div class="filter-dropdown">
+            <span>Plus proche</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="available-list">
+          <div class="compact-card" *ngFor="let mission of sortedAvailableMissions">
+            <div class="compact-header">
+              <span class="meta-summary">
+                #{{ mission.commande_reference || ('AY-' + mission.commande) }} • 1,2 km • ~7 min
+              </span>
+              <span class="compact-price">{{ getFormattedPrice(mission) }} FCFA</span>
+            </div>
+
+            <div class="compact-route">
+              <span class="pickup">{{ getEtablissementName(mission) }}</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+              <span class="dest">📍 {{ getDestinationAddress(mission) }}</span>
+            </div>
+
+            <div class="compact-footer">
+              <span class="readiness-badge" [class.warning]="getReadinessBadge(mission).isWarning" [class.success]="!getReadinessBadge(mission).isWarning">
+                {{ getReadinessBadge(mission).text }}
+              </span>
+
+              <button
+                class="btn-accept-compact"
+                [disabled]="acceptingId === mission.id"
+                (click)="acceptMission(mission)"
+              >
+                <span>Accepter</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- ÉTAT EN SERVICE : 3. SANS COURSE (CARTE STITCH « EN ATTENTE DE COURSES ») -->
+      <!-- ========================================================================= -->
+      <ng-container *ngIf="!assignedCourse && availableMissions.length === 0">
+
+        <!-- Carte Radar Stitch (Affichée uniquement sur la Page d'Accueil) -->
+        <div class="waiting-card" *ngIf="!isMissionsPage">
+          <div class="illustration-wrapper">
+            <div class="radar-arcs">
+              <span class="arc arc-1"></span>
+              <span class="arc arc-2"></span>
+            </div>
+
+            <div class="illustration-circle">
+              <!-- Signal Badge Top Right -->
+              <div class="floating-badge signal-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5">
+                  <path d="M4.93 4.93a10 10 0 0 1 14.14 0"/>
+                  <path d="M7.76 7.76a6 6 0 0 1 8.48 0"/>
+                  <circle cx="12" cy="12" r="1.5" fill="#FFFFFF"/>
+                </svg>
+              </div>
+
+              <!-- Cross Badge Center Left -->
+              <div class="floating-badge cross-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </div>
+
+              <!-- Rider Scooter Illustration -->
+              <svg class="rider-svg" width="130" height="95" viewBox="0 0 120 90" fill="none">
+                <line x1="10" y1="75" x2="110" y2="75" stroke="#E2E8F0" stroke-width="3" stroke-dasharray="4 4"/>
+                <circle cx="34" cy="65" r="13" stroke="#1A1A1A" stroke-width="4.5" fill="#FFFFFF"/>
+                <circle cx="34" cy="65" r="4" fill="#1A1A1A"/>
+                <circle cx="86" cy="65" r="13" stroke="#1A1A1A" stroke-width="4.5" fill="#FFFFFF"/>
+                <circle cx="86" cy="65" r="4" fill="#1A1A1A"/>
+                <path d="M 34 65 L 50 44 H 74 L 86 65" stroke="#1A1A1A" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <rect x="20" y="32" width="22" height="22" rx="4" fill="#E51A29"/>
+                <path d="M 31 38 V 48 M 26 43 H 36" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="62" cy="24" r="8.5" fill="#1A1A1A"/>
+                <path d="M 54 24 H 70" stroke="#E51A29" stroke-width="3" stroke-linecap="round"/>
+                <path d="M 60 32.5 L 66 43 L 52 47" stroke="#1A1A1A" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M 72 40 H 82" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="estimated-badge">
+            <span>Attente estimée : ~3 à 5 min</span>
+          </div>
+
+          <h3 class="waiting-title">En attente de courses</h3>
+        </div>
+
+        <!-- Message Page Livraisons si aucune livraison en cours -->
+        <div class="no-active-delivery-card" *ngIf="isMissionsPage" style="background: #FFFFFF; border-radius: 16px; padding: 24px; text-align: center; border: 1px dashed #CBD5E1; margin-bottom: 20px;">
+          <div style="width: 48px; height: 48px; border-radius: 50%; background: #F1F5F9; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round">
+              <path d="M5 11.5H8L12 13.5H15.5L18 11.5"/>
+              <circle cx="6" cy="15.5" r="3"/>
+              <circle cx="18" cy="15.5" r="3"/>
+            </svg>
+          </div>
+          <h4 style="font-size: 0.95rem; font-weight: 700; color: #1E293B; margin: 0 0 4px;">Aucune livraison en cours</h4>
+          <p style="font-size: 0.82rem; color: #64748B; margin: 0;">Les livraisons attribuées ou en cours d'acheminement s'afficheront ici.</p>
+        </div>
+
+        <!-- Activité d'aujourd'hui -->
+        <div class="activity-section">
+          <div class="section-header">
+            <h3 class="section-title">Activité d'aujourd'hui</h3>
+            <span class="update-label">MIS À JOUR</span>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-label">Courses finies</span>
+              <div class="stat-val-row">
+                <span class="stat-number">{{ todayStats.completedCount }}</span>
+                <span class="stat-unit">livraisons</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <span class="stat-label">Gains nets</span>
+              <div class="stat-val-row">
+                <span class="stat-number primary-red">{{ todayStats.netGainsFormatted }}</span>
+                <span class="stat-unit primary-red bold">FCFA</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <span class="stat-label">Distance</span>
+              <div class="stat-val-row">
+                <span class="stat-number">{{ todayStats.distanceKm }}</span>
+                <span class="stat-unit">km</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <span class="stat-label">Temps connecté</span>
+              <div class="stat-val-row">
+                <span class="stat-number">{{ todayStats.connectedTime }}</span>
+                <span class="stat-unit">min</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rayon d'attribution actif -->
+        <div class="attribution-card">
+          <h3 class="attribution-title">Rayon d'attribution actif</h3>
+          <div class="chips-list">
+            <span class="chip-item" *ngFor="let sector of attributionSectors">
+              {{ sector }}
+            </span>
+          </div>
+        </div>
+
+      </ng-container>
+
+    </ng-container>
 
   </main>
 
-
-  <!-- NAVIGATION -->
-  <nav class="delivery-bottom-nav">
-
-    <button class="nav-item active">
-      <span class="nav-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="#E51A29" stroke-width="2" fill="#E51A29" fill-opacity="0.12"/>
-          <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="#E51A29" stroke-width="2"/>
-          <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="#E51A29" stroke-width="2"/>
-          <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="#E51A29" stroke-width="2"/>
-        </svg>
-      </span>
-      <span>Accueil</span>
-    </button>
-
-    <button
-      class="nav-item"
-      type="button"
-      (click)="router.navigate(['/delivery/navigation'])">
-
-      <span class="nav-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <circle cx="5.5" cy="17.5" r="3.5" stroke="#757575" stroke-width="2"/>
-          <circle cx="18.5" cy="17.5" r="3.5" stroke="#757575" stroke-width="2"/>
-          <path d="M15 6L12 11H5M12 11L9 17M12 11L18.5 17.5" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </span>
-      <span>Livraisons</span>
-
-    </button>
-
-    <button
-      class="nav-item"
-      type="button"
-      (click)="router.navigate(['/delivery/history'])">
-
-      <span class="nav-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <path d="M12 8V12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C14.75 3 17.2 4.24 18.8 6.2" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </span>
-      <span>Historique</span>
-
-    </button>
-
-    <button
-      class="nav-item"
-      type="button"
-      (click)="router.navigate(['/delivery/profile'])">
-
-      <span class="nav-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="#757575" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="12" cy="7" r="4" stroke="#757575" fill="none" stroke-width="2"/>
-        </svg>
-      </span>
-      <span>Profil</span>
-
-    </button>
-
-  </nav>
+  <!-- BOTTOM NAVIGATION BAR (COMMON TO ALL STATES) -->
+  <app-delivery-bottom-nav></app-delivery-bottom-nav>
 
 </div>

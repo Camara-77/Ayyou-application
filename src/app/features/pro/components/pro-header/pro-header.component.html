@@ -8,12 +8,12 @@
 
     <div *ngIf="!showBackButton" class="pro-identity-row">
       <div class="pro-avatar-circle">
-        <img [src]="avatarUrl" [alt]="restaurantName" class="avatar-img" />
+        <img [src]="computedAvatarUrl" [alt]="computedName" class="avatar-img" />
       </div>
       <div class="pro-name-group">
-        <h2 class="pro-name">{{ restaurantName }}</h2>
-        <span class="status-badge-green" *ngIf="isOpen">Ouvert</span>
-        <span class="status-badge-red" *ngIf="!isOpen">Fermé</span>
+        <h2 class="pro-name">{{ computedName }}</h2>
+        <span class="status-badge-green" *ngIf="computedIsOpen">Ouvert</span>
+        <span class="status-badge-red" *ngIf="!computedIsOpen">Fermé</span>
       </div>
     </div>
   </div>
@@ -29,7 +29,7 @@
         <path d="M18 8A6 6 0 0 0 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="M13.73 21A2 2 0 0 1 10.27 21" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <span class="notif-badge-dot"></span>
+      <span *ngIf="unreadCount > 0" class="notif-badge-dot"></span>
     </a>
     <button *ngIf="rightIcon === 'calendar'" type="button" class="btn-bell-circle" aria-label="Calendrier">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

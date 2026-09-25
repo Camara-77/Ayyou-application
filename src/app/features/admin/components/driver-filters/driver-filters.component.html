@@ -7,7 +7,7 @@
       [class.active]="activeTab === 'ALL'"
       (click)="selectTab('ALL')"
     >
-      Tous (190)
+      Tous ({{ totalCount }})
     </button>
 
     <button
@@ -16,7 +16,7 @@
       [class.active]="activeTab === 'DISPONIBLE'"
       (click)="selectTab('DISPONIBLE')"
     >
-      Disponibles (52)
+      Disponibles ({{ stats?.availableCount ?? 0 }})
     </button>
 
     <button
@@ -25,7 +25,7 @@
       [class.active]="activeTab === 'EN_LIVRAISON'"
       (click)="selectTab('EN_LIVRAISON')"
     >
-      En livraison (96)
+      En livraison ({{ stats?.deliveringCount ?? 0 }})
     </button>
 
     <button
@@ -34,7 +34,16 @@
       [class.active]="activeTab === 'HORS_LIGNE'"
       (click)="selectTab('HORS_LIGNE')"
     >
-      Hors ligne (42)
+      Hors ligne ({{ stats?.offlineCount ?? 0 }})
+    </button>
+
+    <button
+      type="button"
+      class="tab-pill-btn"
+      [class.active]="activeTab === 'DOSSIER_A_VALIDER'"
+      (click)="selectTab('DOSSIER_A_VALIDER')"
+    >
+      Candidatures ({{ stats?.applicationsCount ?? 0 }})
     </button>
   </div>
 

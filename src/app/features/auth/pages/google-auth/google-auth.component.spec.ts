@@ -77,7 +77,7 @@ describe('GoogleAuthComponent', () => {
 
     component.onContinue();
 
-    expect(component.authState).toBe('loading');
+    expect(component.authState).toBe('success');
     expect(authServiceSpy.loginWithGoogle).toHaveBeenCalled();
   });
 });

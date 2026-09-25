@@ -1,287 +1,299 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import {
   EstablishmentDetail,
+  EstablishmentDocument,
   EstablishmentFilterTab,
-  EstablishmentStatsSummary
+  EstablishmentStatsSummary,
+  EstablishmentStatus,
+  EstablishmentType
 } from '../models/admin-business.models';
+import { environment } from '../../../../environments/environment';
+
+function isPdfUrl(url: string): boolean {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  return lower.includes('.pdf') || (!lower.includes('.jpg') && !lower.includes('.jpeg') && !lower.includes('.png') && !lower.includes('.webp') && !lower.includes('.gif'));
+}
+
+function isImageUrl(url: string): boolean {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  return lower.includes('.jpg') || lower.includes('.jpeg') || lower.includes('.png') || lower.includes('.webp') || lower.includes('.gif');
+}
+
+function formatDocTitle(docType: string, comment?: string): string {
+  if (comment && comment.trim()) {
+    return comment.trim();
+  }
+  switch (docType) {
+    case 'REGISTRE_COMMERCE':
+      return 'NINEA / Registre de Commerce';
+    case 'CERTIFICAT_HYGIENE':
+      return 'Certificat d\'Hygiène & Salubrité';
+    case 'CNI_GERANT':
+      return 'CNI du Gérant';
+    case 'PIECE_IDENTITE':
+      return 'Pièce d\'Identité (CNI)';
+    case 'PERMIS_CONDUIRE':
+      return 'Permis de Conduire';
+    case 'CARTE_GRISE':
+      return 'Carte Grise & Assurance';
+    default:
+      return 'Document Officiel';
+  }
+}
+
+export function mapBackendBusinessToEstablishmentDetail(b: any): EstablishmentDetail {
+  const type: EstablishmentType = b.type_etablissement === 'VENDEUR' ? 'VENDEUR' : 'RESTAURANT';
+
+  let status: EstablishmentStatus = 'EN_ATTENTE';
+  if (b.statut_verification === 'VALIDE' || b.est_verifie) {
+    status = 'ACTIF';
+  } else if (b.statut_verification === 'REFUSE' || b.statut === 'REJETE') {
+    status = 'REJETE';
+  } else if (b.statut === 'SUSPENDU') {
+    status = 'SUSPENDU';
+  } else {
+    status = 'EN_ATTENTE';
+  }
+
+  const candidat = b.candidat || {};
+  const ownerFirstName = b.proprietaire_prenom || candidat.prenom || (b.proprietaire_nom ? b.proprietaire_nom.split(' ')[0] : 'Responsable');
+  const ownerLastName = b.proprietaire_nom || candidat.nom || (b.proprietaire_nom ? b.proprietaire_nom.split(' ').slice(1).join(' ') : '');
+  const ownerFullName = b.proprietaire_nom_complet || candidat.nom_complet || `${ownerFirstName} ${ownerLastName}`.trim();
+  const email = b.proprietaire_email || candidat.email || '';
+  const phone = b.telephone || b.proprietaire_telephone || candidat.numero_telephone || '';
+
+  const regDate = b.date_creation
+    ? new Date(b.date_creation).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+    : 'Date inconnue';
+
+  const neighborhood = b.adresse ? b.adresse.split(',')[0].trim() : 'Dakar';
+
+  const rawDocs: any[] = b.documents || [];
+  const documents: EstablishmentDocument[] = rawDocs.map((doc: any) => {
+    const fileUrl = doc.fichier_url || doc.fichier_url_ou_reference || '';
+    const isPdf = isPdfUrl(fileUrl);
+    const isImage = isImageUrl(fileUrl);
+    const docTitle = formatDocTitle(doc.type_document, doc.commentaire);
+    const docSub = doc.date_creation
+      ? `Soumis le ${new Date(doc.date_creation).toLocaleDateString('fr-FR')}`
+      : (doc.statut === 'VALIDE' ? 'Document validé' : 'En attente de vérification');
+
+    return {
+      id: doc.id ? doc.id.toString() : `doc-${Math.random()}`,
+      typeDocument: doc.type_document || 'AUTRE',
+      title: docTitle,
+      documentRef: `DOC-#${doc.id || 'N/A'}`,
+      subtitle: docSub,
+      statut: doc.statut || 'EN_ATTENTE',
+      commentaire: doc.commentaire || '',
+      fichierUrl: fileUrl,
+      dateCreation: doc.date_creation,
+      isPdf,
+      isImage,
+      iconType: doc.statut === 'VALIDE' ? 'check' : 'eye'
+    };
+  });
+
+  const photos: string[] = [];
+  if (b.couverture || b.couverture_url) {
+    photos.push(b.couverture || b.couverture_url);
+  }
+  documents.filter(d => d.isImage && d.fichierUrl).forEach(d => {
+    if (!photos.includes(d.fichierUrl!)) {
+      photos.push(d.fichierUrl!);
+    }
+  });
+
+  return {
+    id: b.id ? b.id.toString() : '',
+    name: b.nom || 'Établissement',
+    ownerFirstName,
+    ownerLastName,
+    ownerFullName,
+    phone,
+    email,
+    type,
+    typeDisplay: b.type_display || (type === 'VENDEUR' ? 'Vendeur à domicile' : 'Restaurant'),
+    category: b.specialite || (type === 'VENDEUR' ? 'Commerce & Primeur' : 'Cuisine générale'),
+    subCategory: b.slogan || (type === 'VENDEUR' ? 'Épicerie & Produits' : 'Plats & Spécialités'),
+    neighborhood,
+    address: b.adresse || 'Dakar, Sénégal',
+    performanceText: b.est_verifie 
+      ? `${b.nombre_produits || 0} produit(s) en ligne` 
+      : 'En attente de vérification',
+    ordersCount: 0,
+    status,
+    submittedAt: `Soumis le ${regDate}`,
+    commissionRate: type === 'VENDEUR' ? '10.0% commerce' : '15.0% standard',
+    logoUrl: b.logo || b.logo_url || undefined,
+    couvertureUrl: b.couverture || b.couverture_url || undefined,
+    documentsCount: `${documents.length} Fichier(s)`,
+    documents,
+    photos
+  };
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminBusinessService {
-  private initialEstablishments: EstablishmentDetail[] = [
-    {
-      id: 'b-1',
-      name: 'Le Relais de la Corniche',
-      ownerFirstName: 'Moussa',
-      ownerLastName: 'Diop',
-      phone: '+221 78 123 45 67',
-      type: 'RESTAURANT',
-      category: 'Cuisine sénégalaise',
-      subCategory: 'Table gastronomique',
-      neighborhood: 'Corniche Ouest',
-      address: 'Corniche Ouest, Dakar',
-      performanceText: 'Nouveau • 0 commande',
-      ordersCount: 0,
-      status: 'EN_ATTENTE',
-      submittedAt: 'Soumis le 23 Octobre 2024 • 14:15',
-      commissionRate: '12.0% convenu',
-      logoUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=100&auto=format&fit=crop&q=80',
-      documentsCount: '4/4 Fichiers',
-      documents: [
-        {
-          id: 'doc-1',
-          title: 'RCCM',
-          documentRef: 'SN-DKR-2023-B-145',
-          subtitle: 'Authentifié Greffe Dakar',
-          iconType: 'eye'
-        },
-        {
-          id: 'doc-2',
-          title: 'NINEA',
-          documentRef: '008492012 / 2V3',
-          subtitle: 'Attestation fiscale conforme',
-          iconType: 'eye'
-        },
-        {
-          id: 'doc-3',
-          title: 'Certificat Hygiène & Salubrité',
-          documentRef: 'Service Régional 2024',
-          subtitle: 'Délivré Services Régionaux 2024',
-          iconType: 'download'
-        },
-        {
-          id: 'doc-4',
-          title: 'Compte Wave Business Certifié',
-          documentRef: 'Wave SARL',
-          subtitle: 'Titulaire : Le Relais de la Corniche SARL',
-          iconType: 'check'
-        }
-      ],
-      photos: [
-        'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=300&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=300&auto=format&fit=crop&q=80'
-      ]
-    },
-    {
-      id: 'b-2',
-      name: 'Chez Loutcha',
-      ownerFirstName: 'Loutcha',
-      ownerLastName: 'C.',
-      phone: '+221 77 541 20 90',
-      type: 'RESTAURANT',
-      category: 'Sénégalo-Capverdien',
-      subCategory: 'Plats du jour & Thiéb',
-      neighborhood: 'Plateau',
-      address: '101 Rue Raffenel, Dakar Plateau',
-      performanceText: '2 840 commandes',
-      ordersCount: 2840,
-      status: 'ACTIF',
-      submittedAt: 'Approuvé le 15 Mars 2024',
-      commissionRate: '15.0% standard',
-      logoUrl: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=100&auto=format&fit=crop&q=80',
-      documentsCount: '4/4 Fichiers',
-      documents: [
-        { id: 'doc-5', title: 'RCCM', documentRef: 'SN-DKR-2020-B-891', subtitle: 'Valide', iconType: 'eye' },
-        { id: 'doc-6', title: 'NINEA', documentRef: '001293810 / 1A2', subtitle: 'Attestation conforme', iconType: 'eye' }
-      ],
-      photos: [
-        'https://images.unsplash.com/photo-1544025162-d76694265947?w=300&auto=format&fit=crop&q=80'
-      ]
-    },
-    {
-      id: 'b-3',
-      name: 'Burger Black Bun',
-      ownerFirstName: 'Kader',
-      ownerLastName: 'Kane',
-      phone: '+221 77 892 11 34',
-      type: 'RESTAURANT',
-      category: 'Fast Food Braisé',
-      subCategory: 'Burgers & Frites maison',
-      neighborhood: 'Almadies',
-      address: 'Route des Almadies, Dakar',
-      performanceText: '1 920 commandes',
-      ordersCount: 1920,
-      status: 'ACTIF',
-      submittedAt: 'Approuvé le 02 Juin 2024',
-      commissionRate: '14.0% convenu',
-      logoUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=100&auto=format&fit=crop&q=80',
-      documentsCount: '4/4 Fichiers',
-      documents: [],
-      photos: []
-    },
-    {
-      id: 'b-4',
-      name: 'Touba Primeurs & Bio',
-      ownerFirstName: 'Serigne',
-      ownerLastName: 'Fall',
-      phone: '+221 76 601 99 82',
-      type: 'VENDEUR',
-      category: 'Commerce & Primeur',
-      subCategory: 'Fruits, Légumes & Épices',
-      neighborhood: 'Mermoz',
-      address: 'Avenue Cheikh Anta Diop, Mermoz',
-      performanceText: '740 commandes',
-      ordersCount: 740,
-      status: 'ACTIF',
-      submittedAt: 'Approuvé le 10 Juillet 2024',
-      commissionRate: '10.0% commerce',
-      logoUrl: 'https://images.unsplash.com/photo-1610348725531-843dff563e2c?w=100&auto=format&fit=crop&q=80',
-      documentsCount: '4/4 Fichiers',
-      documents: [],
-      photos: []
-    },
-    {
-      id: 'b-5',
-      name: 'L\'Atelier du Choucouya',
-      ownerFirstName: 'Awa',
-      ownerLastName: 'Diallo',
-      phone: '+221 77 217 32 80',
-      type: 'RESTAURANT',
-      category: 'Grillades & Braisés',
-      subCategory: 'Agneau, Dibiterie chic',
-      neighborhood: 'Ouakam',
-      address: 'Cité Avion, Ouakam',
-      performanceText: '1 510 commandes',
-      ordersCount: 1510,
-      status: 'ACTIF',
-      submittedAt: 'Approuvé le 18 Janvier 2024',
-      commissionRate: '12.5% convenu',
-      logoUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=100&auto=format&fit=crop&q=80',
-      documentsCount: '4/4 Fichiers',
-      documents: [],
-      photos: []
-    },
-    {
-      id: 'b-6',
-      name: 'Chez Tantie Marie',
-      ownerFirstName: 'Marie',
-      ownerLastName: 'Sagna',
-      phone: '+221 77 444 19 82',
-      type: 'RESTAURANT',
-      category: 'Cuisine Familiale',
-      subCategory: 'Yassa, Maffé, Soupe Kandia',
-      neighborhood: 'Ngor',
-      address: 'Plage de Ngor, Dakar',
-      performanceText: '830 commandes',
-      ordersCount: 830,
-      status: 'ACTIF',
-      submittedAt: 'Approuvé le 05 Mai 2024',
-      commissionRate: '13.0% convenu',
-      logoUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=100&auto=format&fit=crop&q=80',
-      documentsCount: '4/4 Fichiers',
-      documents: [],
-      photos: []
-    },
-    {
-      id: 'b-7',
-      name: 'Dakar Sweets & Pastry',
-      ownerFirstName: 'Alioune',
-      ownerLastName: 'Badara',
-      phone: '+221 77 110 50 33',
-      type: 'VENDEUR',
-      category: 'Pâtisserie Fine',
-      subCategory: 'Gâteaux & Viennoiseries',
-      neighborhood: 'Point E',
-      address: 'Rue de Louga, Point E',
-      performanceText: '210 commandes',
-      ordersCount: 210,
-      status: 'ACTIF',
-      submittedAt: 'Approuvé le 12 Septembre 2024',
-      commissionRate: '11.0% pâtisserie',
-      logoUrl: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=100&auto=format&fit=crop&q=80',
-      documentsCount: '4/4 Fichiers',
-      documents: [],
-      photos: []
-    }
-  ];
+  private http = inject(HttpClient);
 
-  private establishmentsSubject = new BehaviorSubject<EstablishmentDetail[]>(this.initialEstablishments);
-  private selectedSubject = new BehaviorSubject<EstablishmentDetail | null>(this.initialEstablishments[0]);
+  private establishmentsSubject = new BehaviorSubject<EstablishmentDetail[]>([]);
+  private selectedSubject = new BehaviorSubject<EstablishmentDetail | null>(null);
 
   establishments$ = this.establishmentsSubject.asObservable();
   selectedEstablishment$ = this.selectedSubject.asObservable();
 
+  getBusinessDetail(id: string): Observable<EstablishmentDetail> {
+    const url = `${environment.apiUrl}/api/admin/businesses/${id}/`;
+    return this.http.get<any>(url).pipe(
+      map(raw => {
+        const detail = mapBackendBusinessToEstablishmentDetail(raw);
+        this.selectedSubject.next(detail);
+        return detail;
+      }),
+      catchError(err => {
+        console.error(`Erreur chargement détails établissement ${id}:`, err);
+        return of(null as any);
+      })
+    );
+  }
+
   getStatsSummary(): Observable<EstablishmentStatsSummary> {
-    return of({
-      total: 259,
-      totalSubtext: '+14 ce mois-ci',
-      activeRestaurants: 185,
-      activeRestaurantsSubtext: 'Cuisine sénégalaise, braisés',
-      commercesAndSellers: 74,
-      commercesAndSellersSubtext: 'Épiceries, primeurs, traiteurs',
-      pendingApproval: 8,
-      pendingApprovalSubtext: 'Dossiers NINEA à vérifier',
-      monthlyVolume: '148,5M FCFA',
-      monthlyVolumeSubtext: 'Sur les 30 derniers jours'
-    });
+    const url = `${environment.apiUrl}/api/admin/businesses/`;
+    return this.http.get<any>(url).pipe(
+      map(res => {
+        const rawItems: any[] = Array.isArray(res) ? res : (res.results || []);
+        const items = rawItems.map(mapBackendBusinessToEstablishmentDetail);
+
+        const total = items.length;
+        const activeRestaurants = items.filter(i => i.type === 'RESTAURANT' && i.status === 'ACTIF').length;
+        const commercesAndSellers = items.filter(i => i.type === 'VENDEUR' && i.status === 'ACTIF').length;
+        const pendingApproval = items.filter(i => i.status === 'EN_ATTENTE').length;
+
+        return {
+          total,
+          totalSubtext: `${total} partenaire(s) au total`,
+          activeRestaurants,
+          activeRestaurantsSubtext: `${activeRestaurants} restaurant(s) actif(s)`,
+          commercesAndSellers,
+          commercesAndSellersSubtext: `${commercesAndSellers} commerce(s) actif(s)`,
+          pendingApproval,
+          pendingApprovalSubtext: `${pendingApproval} dossier(s) en attente`,
+          monthlyVolume: 'Volume AYYOU',
+          monthlyVolumeSubtext: 'Données en temps réel'
+        };
+      }),
+      catchError(() => of({
+        total: 0,
+        totalSubtext: '0 partenaire',
+        activeRestaurants: 0,
+        activeRestaurantsSubtext: 'Aucun',
+        commercesAndSellers: 0,
+        commercesAndSellersSubtext: 'Aucun',
+        pendingApproval: 0,
+        pendingApprovalSubtext: 'Aucun dossier',
+        monthlyVolume: '0 FCFA',
+        monthlyVolumeSubtext: 'Non disponible'
+      }))
+    );
   }
 
   selectEstablishment(item: EstablishmentDetail): void {
     this.selectedSubject.next(item);
-  }
-
-  approveEstablishment(id: string): void {
-    const updated = this.establishmentsSubject.getValue().map(item => {
-      if (item.id === id) {
-        return {
-          ...item,
-          status: 'ACTIF' as const,
-          performanceText: 'Approuvé • 0 commande'
-        };
-      }
-      return item;
-    });
-    this.establishmentsSubject.next(updated);
-
-    const currentSelected = this.selectedSubject.getValue();
-    if (currentSelected && currentSelected.id === id) {
-      const updatedSelected = updated.find(i => i.id === id) || null;
-      this.selectedSubject.next(updatedSelected);
+    if (item && item.id) {
+      this.getBusinessDetail(item.id).subscribe();
     }
   }
 
-  rejectEstablishment(id: string): void {
-    const updated = this.establishmentsSubject.getValue().map(item => {
-      if (item.id === id) {
-        return {
-          ...item,
-          status: 'REJETE' as const,
-          performanceText: 'Dossier rejeté'
-        };
-      }
-      return item;
-    });
-    this.establishmentsSubject.next(updated);
+  approveEstablishment(id: string): Observable<EstablishmentDetail | null> {
+    const url = `${environment.apiUrl}/api/admin/businesses/${id}/approve/`;
+    return this.http.patch<any>(url, {}).pipe(
+      map(raw => {
+        const updated = mapBackendBusinessToEstablishmentDetail(raw);
+        const currentList = this.establishmentsSubject.getValue().map(i => i.id === id ? updated : i);
+        this.establishmentsSubject.next(currentList);
 
-    const currentSelected = this.selectedSubject.getValue();
-    if (currentSelected && currentSelected.id === id) {
-      const updatedSelected = updated.find(i => i.id === id) || null;
-      this.selectedSubject.next(updatedSelected);
-    }
+        const currentSel = this.selectedSubject.getValue();
+        if (currentSel && currentSel.id === id) {
+          this.selectedSubject.next(updated);
+        }
+        return updated;
+      }),
+      catchError(err => {
+        console.error('Erreur approbation établissement:', err);
+        return of(null);
+      })
+    );
+  }
+
+  rejectEstablishment(id: string, motif?: string): Observable<EstablishmentDetail | null> {
+    const url = `${environment.apiUrl}/api/admin/businesses/${id}/reject/`;
+    return this.http.patch<any>(url, { motif: motif || 'Dossier non conforme' }).pipe(
+      map(raw => {
+        const updated = mapBackendBusinessToEstablishmentDetail(raw);
+        const currentList = this.establishmentsSubject.getValue().map(i => i.id === id ? updated : i);
+        this.establishmentsSubject.next(currentList);
+
+        const currentSel = this.selectedSubject.getValue();
+        if (currentSel && currentSel.id === id) {
+          this.selectedSubject.next(updated);
+        }
+        return updated;
+      }),
+      catchError(err => {
+        console.error('Erreur rejet établissement:', err);
+        return of(null);
+      })
+    );
   }
 
   filterEstablishments(tab: EstablishmentFilterTab, neighborhood: string): Observable<EstablishmentDetail[]> {
-    return this.establishments$.pipe(
-      map(items => {
-        return items.filter(item => {
-          // Tab filter
-          let matchTab = true;
-          if (tab === 'RESTAURANTS') matchTab = item.type === 'RESTAURANT';
-          else if (tab === 'VENDEURS') matchTab = item.type === 'VENDEUR';
-          else if (tab === 'PENDING') matchTab = item.status === 'EN_ATTENTE';
+    let params = new HttpParams();
 
-          // Neighborhood filter
-          let matchNeighborhood = true;
-          if (neighborhood && neighborhood !== 'ALL' && neighborhood !== 'Tous les quartiers') {
-            matchNeighborhood = item.neighborhood.toLowerCase() === neighborhood.toLowerCase();
+    if (tab === 'RESTAURANTS') {
+      params = params.set('type_etablissement', 'RESTAURANT');
+    } else if (tab === 'VENDEURS') {
+      params = params.set('type_etablissement', 'VENDEUR');
+    } else if (tab === 'PENDING') {
+      params = params.set('est_verifie', 'false');
+    }
+
+    const url = `${environment.apiUrl}/api/admin/businesses/`;
+
+    return this.http.get<any>(url, { params }).pipe(
+      map(res => {
+        const rawItems: any[] = Array.isArray(res) ? res : (res.results || []);
+        let items = rawItems.map(mapBackendBusinessToEstablishmentDetail);
+
+        if (neighborhood && neighborhood !== 'ALL' && neighborhood !== 'Tous les quartiers') {
+          items = items.filter(item => item.neighborhood.toLowerCase().includes(neighborhood.toLowerCase()));
+        }
+
+        this.establishmentsSubject.next(items);
+
+        const currentSel = this.selectedSubject.getValue();
+        if (items.length > 0) {
+          if (!currentSel || !items.some(i => i.id === currentSel.id)) {
+            this.selectedSubject.next(items[0]);
           }
+        } else {
+          this.selectedSubject.next(null);
+        }
 
-          return matchTab && matchNeighborhood;
-        });
+        return items;
+      }),
+      catchError(err => {
+        console.error('Erreur chargement établissements backend:', err);
+        this.establishmentsSubject.next([]);
+        this.selectedSubject.next(null);
+        return of([]);
       })
     );
   }

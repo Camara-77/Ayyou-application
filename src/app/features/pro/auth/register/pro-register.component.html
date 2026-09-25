@@ -144,8 +144,8 @@
               </div>
             </div>
 
-            <!-- LIVREUR PASSWORD FIELDS -->
-            <div *ngIf="selectedType === 'LIVREUR'" class="form-grid-2col mt-12">
+            <!-- PASSWORD FIELDS FOR ALL ACCOUNT TYPES -->
+            <div class="form-grid-2col mt-12">
               <div class="form-group">
                 <label>Mot de passe de connexion</label>
                 <input type="password" formControlName="password" placeholder="••••••••••••" />
@@ -282,26 +282,34 @@
               <!-- CNI -->
               <div class="doc-upload-box">
                 <div class="doc-info">
-                  <h4 class="doc-title">Pièce d'identité (CNI / Passeport)</h4>
+                  <h4 class="doc-title">Pièce d'identité (CNI / Passeport) <span class="required-star">*</span></h4>
                   <p class="doc-sub">CNI biométrique CEDEAO ou Passeport</p>
                 </div>
                 <div class="doc-action-row">
-                  <span class="status-dot imported">✓ Validé</span>
-                  <input type="file" id="cniInput" hidden (change)="onDocumentSelected($event, 'cni')" accept=".pdf,.png,.jpg,.jpeg" />
-                  <button type="button" class="btn-import-grey" (click)="triggerFileInput('cniInput')">Remplacer</button>
+                  <span class="status-dot" [class.imported]="cniDoc.file !== null">
+                    {{ cniDoc.file ? '✓ ' + cniDoc.name : '● Document requis' }}
+                  </span>
+                  <input type="file" id="cniInput" hidden (change)="onDocumentSelected($event, 'cni')" accept=".pdf,.png,.jpg,.jpeg,.webp" />
+                  <button type="button" class="btn-import-grey" (click)="triggerFileInput('cniInput')">
+                    {{ cniDoc.file ? 'Remplacer' : 'Importer' }}
+                  </button>
                 </div>
               </div>
 
               <!-- PERMIS -->
               <div class="doc-upload-box">
                 <div class="doc-info">
-                  <h4 class="doc-title">Permis de Conduire Moto</h4>
+                  <h4 class="doc-title">Permis de Conduire Moto <span class="required-star">*</span></h4>
                   <p class="doc-sub">Permis A ou A1 en cours de validité</p>
                 </div>
                 <div class="doc-action-row">
-                  <span class="status-dot imported">✓ Validé</span>
-                  <input type="file" id="permisInput" hidden (change)="onDocumentSelected($event, 'permis')" accept=".pdf,.png,.jpg,.jpeg" />
-                  <button type="button" class="btn-import-grey" (click)="triggerFileInput('permisInput')">Remplacer</button>
+                  <span class="status-dot" [class.imported]="permisDoc.file !== null">
+                    {{ permisDoc.file ? '✓ ' + permisDoc.name : '● Document requis' }}
+                  </span>
+                  <input type="file" id="permisInput" hidden (change)="onDocumentSelected($event, 'permis')" accept=".pdf,.png,.jpg,.jpeg,.webp" />
+                  <button type="button" class="btn-import-grey" (click)="triggerFileInput('permisInput')">
+                    {{ permisDoc.file ? 'Remplacer' : 'Importer' }}
+                  </button>
                 </div>
               </div>
 
@@ -312,9 +320,13 @@
                   <p class="doc-sub">Bulletin n°3 (moins de 3 mois)</p>
                 </div>
                 <div class="doc-action-row">
-                  <span class="status-dot-orange">● En attente d'import</span>
-                  <input type="file" id="casierInput" hidden (change)="onDocumentSelected($event, 'casier')" accept=".pdf,.png,.jpg,.jpeg" />
-                  <button type="button" class="btn-import-grey" (click)="triggerFileInput('casierInput')">Importer</button>
+                  <span class="status-dot" [class.imported]="casierDoc.file !== null">
+                    {{ casierDoc.file ? '✓ ' + casierDoc.name : 'Non fourni' }}
+                  </span>
+                  <input type="file" id="casierInput" hidden (change)="onDocumentSelected($event, 'casier')" accept=".pdf,.png,.jpg,.jpeg,.webp" />
+                  <button type="button" class="btn-import-grey" (click)="triggerFileInput('casierInput')">
+                    {{ casierDoc.file ? 'Remplacer' : 'Importer' }}
+                  </button>
                 </div>
               </div>
 
@@ -325,9 +337,13 @@
                   <p class="doc-sub">Justificatif d'utilisation de l'engin</p>
                 </div>
                 <div class="doc-action-row">
-                  <span class="status-dot-grey">Non fourni</span>
-                  <input type="file" id="carteGriseInput" hidden (change)="onDocumentSelected($event, 'carteGrise')" accept=".pdf,.png,.jpg,.jpeg" />
-                  <button type="button" class="btn-import-grey" (click)="triggerFileInput('carteGriseInput')">Importer</button>
+                  <span class="status-dot" [class.imported]="carteGriseDoc.file !== null">
+                    {{ carteGriseDoc.file ? '✓ ' + carteGriseDoc.name : 'Non fourni' }}
+                  </span>
+                  <input type="file" id="carteGriseInput" hidden (change)="onDocumentSelected($event, 'carteGrise')" accept=".pdf,.png,.jpg,.jpeg,.webp" />
+                  <button type="button" class="btn-import-grey" (click)="triggerFileInput('carteGriseInput')">
+                    {{ carteGriseDoc.file ? 'Remplacer' : 'Importer' }}
+                  </button>
                 </div>
               </div>
             </div>

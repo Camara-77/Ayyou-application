@@ -17,31 +17,19 @@ export const DELIVERY_ROUTES: Routes = [
     canActivate: [driverAuthGuard]
   },
   {
-    path: 'navigation/:orderId',
-    loadComponent: () => import('./pages/delivery-navigation/delivery-navigation.component').then(m => m.DeliveryNavigationComponent),
+    path: 'missions',
+    loadComponent: () => import('./pages/delivery-home/delivery-home.component').then(m => m.DeliveryHomeComponent),
     canActivate: [driverAuthGuard]
   },
   {
-    path: 'navigation',
-    redirectTo: 'navigation/delivery-9482'
-  },
-  {
-    path: 'arrival/:orderId',
-    loadComponent: () => import('./pages/delivery-arrival/delivery-arrival.component').then(m => m.DeliveryArrivalComponent),
+    path: 'detail/:id',
+    loadComponent: () => import('./pages/delivery-detail/delivery-detail.component').then(m => m.DeliveryDetailComponent),
     canActivate: [driverAuthGuard]
   },
   {
-    path: 'arrival',
-    redirectTo: 'arrival/delivery-9482'
-  },
-  {
-    path: 'validation/:orderId',
-    loadComponent: () => import('./pages/delivery-validation/delivery-validation.component').then(m => m.DeliveryValidationComponent),
+    path: 'navigation/:id',
+    loadComponent: () => import('./pages/delivery-detail/delivery-detail.component').then(m => m.DeliveryDetailComponent),
     canActivate: [driverAuthGuard]
-  },
-  {
-    path: 'validation',
-    redirectTo: 'validation/delivery-9482'
   },
   {
     path: 'detail/:orderId',
@@ -49,20 +37,23 @@ export const DELIVERY_ROUTES: Routes = [
     canActivate: [driverAuthGuard]
   },
   {
-    path: 'detail',
-    redirectTo: 'detail/delivery-9482'
+    path: 'validation/:id',
+    loadComponent: () => import('./pages/delivery-validation/delivery-validation.component').then(m => m.DeliveryValidationComponent),
+    canActivate: [driverAuthGuard]
   },
   {
-    path: 'completed/:orderId',
-    redirectTo: 'detail/:orderId'
+    path: 'validation/:orderId',
+    loadComponent: () => import('./pages/delivery-validation/delivery-validation.component').then(m => m.DeliveryValidationComponent),
+    canActivate: [driverAuthGuard]
   },
   {
-    path: 'completed',
-    redirectTo: 'detail/delivery-9482'
+    path: 'success/:id',
+    loadComponent: () => import('./pages/delivery-success/delivery-success.component').then(m => m.DeliverySuccessComponent),
+    canActivate: [driverAuthGuard]
   },
   {
-    path: 'profile',
-    loadComponent: () => import('./pages/delivery-profile/delivery-profile.component').then(m => m.DeliveryProfileComponent),
+    path: 'success/:orderId',
+    loadComponent: () => import('./pages/delivery-success/delivery-success.component').then(m => m.DeliverySuccessComponent),
     canActivate: [driverAuthGuard]
   },
   {
@@ -71,7 +62,13 @@ export const DELIVERY_ROUTES: Routes = [
     canActivate: [driverAuthGuard]
   },
   {
-    path: 'gains',
-    redirectTo: 'history'
+    path: 'profile/edit',
+    loadComponent: () => import('./pages/delivery-profile-edit/delivery-profile-edit.component').then(m => m.DeliveryProfileEditComponent),
+    canActivate: [driverAuthGuard]
+  },
+  {
+    path: 'profile',
+    loadComponent: () => import('./pages/delivery-profile/delivery-profile.component').then(m => m.DeliveryProfileComponent),
+    canActivate: [driverAuthGuard]
   }
 ];

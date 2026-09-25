@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ProHeaderComponent } from '../../components/pro-header/pro-header.component';
@@ -7,6 +7,7 @@ import { ProAuthService } from '../../../../core/services/pro-auth.service';
 import { ProOrderService } from '../../../../core/services/pro-order.service';
 import { ProStatsService } from '../../../../core/services/pro-stats.service';
 import { ProMenuService } from '../../../../core/services/pro-menu.service';
+import { ProfessionalService, BackendEtablissement, BackendProduit } from '../../../../core/services/professional.service';
 import { ProProfile, ProOrder, ProStats } from '../../../../core/models/pro';
 
 @Component({
@@ -17,22 +18,44 @@ import { ProProfile, ProOrder, ProStats } from '../../../../core/models/pro';
   styleUrls: ['./pro-dashboard.component.scss']
 })
 export class ProDashboardComponent implements OnInit {
+  private proAuthService = inject(ProAuthService);
+  private proOrderService = inject(ProOrderService);
+  private proStatsService = inject(ProStatsService);
+  public proMenuService = inject(ProMenuService);
+  private professionalService = inject(ProfessionalService);
+
   profile!: ProProfile;
   stats!: ProStats;
   urgentOrders: ProOrder[] = [];
   selectedFilter: 'ALL' | 'PICKUP' | 'DELIVERY' = 'ALL';
-
-  constructor(
-    private proAuthService: ProAuthService,
-    private proOrderService: ProOrderService,
-    private proStatsService: ProStatsService,
-    public proMenuService: ProMenuService
-  ) {}
+  establishment: BackendEtablissement | null = null;
+  products: BackendProduit[] = [];
 
   ngOnInit(): void {
     this.proAuthService.profile$.subscribe(p => this.profile = p);
-    this.stats = this.proStatsService.getStats();
+
+    // Charge les statistiques réelles depuis l'API /api/pro/merchant/stats/
+    this.proStatsService.getStatsObservable().subscribe(s => this.stats = s);
+
     this.proOrderService.urgentOrders$.subscribe(orders => this.urgentOrders = orders);
+
+    // Charge les données réelles de l'établissement professionnel depuis Django DRF
+    this.professionalService.getMyEstablishment().subscribe({
+      next: (etab) => {
+        this.establishment = etab;
+        const mapped = this.professionalService.mapEtablissementToProfile(etab);
+        this.proAuthService.updateProfile(mapped);
+
+        // Charge les produits de l'établissement
+        this.professionalService.getProducts(etab.id).subscribe({
+          next: (prods) => {
+            this.products = prods;
+          },
+          error: () => {}
+        });
+      },
+      error: () => {}
+    });
   }
 
   setFilter(filter: 'ALL' | 'PICKUP' | 'DELIVERY'): void {

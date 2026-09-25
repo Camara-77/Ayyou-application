@@ -18,7 +18,7 @@
 
       <!-- Payment Method Verified Pill -->
       <div class="payment-badge-pill">
-        <span class="pill-text">Paiement {{ selectedPaymentId === 'wave' ? 'Wave' : 'Orange Money' }} validé</span>
+        <span class="pill-text">Paiement {{ paymentMethodName }} validé</span>
       </div>
 
       <!-- Title & Subtitle -->
@@ -31,19 +31,34 @@
       <div class="summary-details-card">
         <div class="summary-row">
           <span class="sum-label">Référence commande</span>
-          <strong class="sum-val ref-code">#AY-9482</strong>
+          <strong class="sum-val ref-code">#{{ orderRef }}</strong>
+        </div>
+
+        <div class="summary-row" *ngIf="createdPayment">
+          <span class="sum-label">Réf. transaction</span>
+          <strong class="sum-val">{{ createdPayment.reference }}</strong>
+        </div>
+
+        <div class="summary-row" *ngIf="createdInvoice">
+          <span class="sum-label">N° Facture</span>
+          <strong class="sum-val">{{ createdInvoice.numero_facture }}</strong>
         </div>
 
         <div class="summary-row">
           <span class="sum-label">Moyen de règlement</span>
           <span class="pay-method-tag">
-            <span class="method-name">{{ selectedPaymentId === 'wave' ? 'Wave Sénégal' : 'Orange Money' }}</span>
+            <span class="method-name">{{ paymentMethodName }}</span>
           </span>
         </div>
 
         <div class="summary-row">
           <span class="sum-label">Montant total payé</span>
-          <strong class="sum-val red-price">11 500 FCFA</strong>
+          <strong class="sum-val red-price">{{ formatPrice(createdOrderTotal) }}</strong>
+        </div>
+
+        <div class="summary-row delivery-code-box" *ngIf="deliveryValidationCode">
+          <span class="sum-label">Code de livraison</span>
+          <strong class="sum-val code-highlight">{{ deliveryValidationCode }}</strong>
         </div>
       </div>
 
@@ -83,6 +98,12 @@
       </a>
       <h1 class="page-title">Récapitulatif de la commande</h1>
       <div class="header-spacer"></div>
+    </div>
+
+    <!-- Error Alert Banner -->
+    <div class="error-banner" *ngIf="errorMessage">
+      <span class="error-icon">⚠️</span>
+      <span class="error-text">{{ errorMessage }}</span>
     </div>
 
     <!-- Search Bar in /checkout -->
@@ -151,7 +172,7 @@
             <div class="item-info">
               <div class="title-price-row">
                 <h5 class="dish-name">{{ item.dish.name }}</h5>
-                <span class="dish-price">{{ formatPrice(item.dish.price) }}</span>
+                <span class="dish-price">{{ formatPrice(item.subtotal || (item.dish.price * item.quantity)) }}</span>
               </div>
               <p class="dish-desc" *ngIf="item.dish.description">{{ item.dish.description }}</p>
 
@@ -197,6 +218,10 @@
 
     <!-- Payment Methods Selector -->
     <div class="payment-section">
+      <div class="mock-payment-banner">
+        <span class="mock-badge">MODE PAIEMENT SIMULÉ</span>
+        <span class="mock-desc">Paiement simulé backend sans prélèvement réel (Phase de test & démonstration AYYOU)</span>
+      </div>
       <h4 class="payment-header-title">MÉTHODE DE PAIEMENT</h4>
       <div class="payment-options">
         <!-- Wave -->

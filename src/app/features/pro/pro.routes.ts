@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { vendorAuthGuard } from './guards/vendor-auth.guard';
+import { proGuard } from '../../core/guards/pro.guard';
 
 export const PRO_ROUTES: Routes = [
   {
@@ -7,7 +8,7 @@ export const PRO_ROUTES: Routes = [
     loadComponent: () => import('./public/home/pro-public-home.component').then(m => m.ProPublicHomeComponent)
   },
 
-  // Auth PRO
+  // Auth PRO & Onboarding Status
   {
     path: 'login',
     loadComponent: () => import('./pages/pro-login/pro-login.component').then(m => m.ProLoginComponent)
@@ -24,35 +25,50 @@ export const PRO_ROUTES: Routes = [
     path: 'register/confirmation',
     loadComponent: () => import('./auth/register-confirmation/pro-register-confirmation.component').then(m => m.ProRegisterConfirmationComponent)
   },
+  {
+    path: 'onboarding/pending',
+    loadComponent: () => import('./pages/onboarding/pro-onboarding-pending.component').then(m => m.ProOnboardingPendingComponent)
+  },
+  {
+    path: 'onboarding/rejected',
+    loadComponent: () => import('./pages/onboarding/pro-onboarding-rejected.component').then(m => m.ProOnboardingRejectedComponent)
+  },
 
   // Espace Restaurant
   {
     path: 'restaurant/dashboard',
-    loadComponent: () => import('./pages/pro-dashboard/pro-dashboard.component').then(m => m.ProDashboardComponent)
+    loadComponent: () => import('./pages/pro-dashboard/pro-dashboard.component').then(m => m.ProDashboardComponent),
+    canActivate: [proGuard]
   },
   {
     path: 'restaurant/orders',
-    loadComponent: () => import('./pages/pro-order-history/pro-order-history.component').then(m => m.ProOrderHistoryComponent)
+    loadComponent: () => import('./pages/pro-order-history/pro-order-history.component').then(m => m.ProOrderHistoryComponent),
+    canActivate: [proGuard]
   },
   {
     path: 'restaurant/statistics',
-    loadComponent: () => import('./pages/pro-statistics/pro-statistics.component').then(m => m.ProStatisticsComponent)
+    loadComponent: () => import('./pages/pro-statistics/pro-statistics.component').then(m => m.ProStatisticsComponent),
+    canActivate: [proGuard]
   },
   {
     path: 'restaurant/studio',
-    loadComponent: () => import('./pages/pro-studio/pro-studio-upload.component').then(m => m.ProStudioUploadComponent)
+    loadComponent: () => import('./pages/pro-studio/pro-studio-upload.component').then(m => m.ProStudioUploadComponent),
+    canActivate: [proGuard]
   },
   {
     path: 'restaurant/menu',
-    loadComponent: () => import('./pages/pro-dashboard/pro-dashboard.component').then(m => m.ProDashboardComponent)
+    loadComponent: () => import('./pages/pro-dashboard/pro-dashboard.component').then(m => m.ProDashboardComponent),
+    canActivate: [proGuard]
   },
   {
     path: 'restaurant/profile',
-    loadComponent: () => import('./pages/pro-profile/pro-profile.component').then(m => m.ProProfileComponent)
+    loadComponent: () => import('./pages/pro-profile/pro-profile.component').then(m => m.ProProfileComponent),
+    canActivate: [proGuard]
   },
   {
     path: 'restaurant/notifications',
-    loadComponent: () => import('./pages/pro-notifications/pro-notifications.component').then(m => m.ProNotificationsComponent)
+    loadComponent: () => import('./pages/pro-notifications/pro-notifications.component').then(m => m.ProNotificationsComponent),
+    canActivate: [proGuard]
   },
 
   // Espace Vendeur

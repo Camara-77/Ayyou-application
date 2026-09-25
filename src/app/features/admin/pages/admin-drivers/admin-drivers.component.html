@@ -15,6 +15,8 @@
   <!-- Filter Pills & Select Dropdowns -->
   <div class="mt-24">
     <app-driver-filters
+      [stats]="stats$ | async"
+      [totalCount]="(stats$ | async)?.totalCount ?? 0"
       (tabChange)="onTabChange($event)"
       (zoneChange)="onZoneChange($event)"
       (vehicleChange)="onVehicleChange($event)"
@@ -26,6 +28,7 @@
     <div class="table-column">
       <app-driver-table
         [drivers]="(drivers$ | async) || []"
+        [totalCount]="(stats$ | async)?.totalCount ?? 0"
         [selectedDriver]="selectedDriver$ | async"
         (selectDriver)="onSelectDriver($event)"
       ></app-driver-table>

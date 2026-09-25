@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -111,6 +111,7 @@ describe('RegisterComponent', () => {
 
       const france = component.allCountries.find(c => c.code === 'FR')!;
       component.selectCountry(france);
+      control?.setValue('12345');
       expect(control?.valid).toBeFalse();
 
       control?.setValue('06 12 34 56 78');

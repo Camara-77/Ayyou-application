@@ -1,5 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import {
   CatalogArticleItem,
   CatalogCategory,
@@ -7,330 +9,124 @@ import {
   CatalogStatsSummary,
   ModerationStatus
 } from '../models/admin-catalog.models';
+import { environment } from '../../../../environments/environment';
+
+function mapBackendProductToCatalogArticleItem(p: any): CatalogArticleItem {
+  const isAvailable = !!p.est_disponible;
+  const stockTotal = Number(p.stock_disponible || 0);
+  const stockAyoo = Number(p.stock_ayyou_reserve || 0);
+  const stockAvailable = Math.min(stockTotal, stockAyoo);
+
+  let stockStatus: 'EN_STOCK' | 'EN_ATTENTE' | 'RUPTURE' | 'EPUISE' = 'EN_STOCK';
+  let stockStatusLabel = 'En stock';
+  let stockStatusColor: 'green' | 'orange' | 'red' = 'green';
+
+  if (stockTotal <= 0) {
+    stockStatus = 'RUPTURE';
+    stockStatusLabel = 'Rupture';
+    stockStatusColor = 'red';
+  } else if (!isAvailable) {
+    stockStatus = 'EN_ATTENTE';
+    stockStatusLabel = 'En attente';
+    stockStatusColor = 'orange';
+  }
+
+  let moderationStatus: ModerationStatus = isAvailable ? 'VALIDE' : 'A_MODERER';
+  let moderationStatusLabel = isAvailable ? 'Validé' : 'À Modérer';
+  let moderationStatusColor: 'gray' | 'red' | 'orange' = isAvailable ? 'gray' : 'red';
+
+  const basePrice = Number(p.prix_base || 0);
+  const priceFormatted = `${new Intl.NumberFormat('fr-FR').format(basePrice)} FCFA`;
+  const sku = p.id ? `DKR-PLT-${String(p.id).padStart(3, '0')}` : 'DKR-PLT-000';
+
+  return {
+    id: p.id ? p.id.toString() : '',
+    sku,
+    name: p.nom || 'Produit sans nom',
+    subtitle: p.temps_preparation ? `Temps prépa: ${p.temps_preparation}` : undefined,
+    imageUrl: p.image_url || p.image || '',
+    establishmentName: p.etablissement_nom || p.vendeur_nom || 'Établissement',
+    establishmentDistrict: 'Dakar',
+    partnerType: 'RESTAURANT',
+    categoryName: p.categorie_nom || 'Général',
+    categoryId: p.categorie ? p.categorie.toString() : '',
+    basePrice,
+    priceFormatted,
+    stockStatus,
+    stockStatusLabel,
+    stockStatusColor,
+    stockTotal,
+    stockAyoo,
+    stockAvailable,
+    moderationStatus,
+    moderationStatusLabel,
+    moderationStatusColor,
+    description: p.description || ''
+  };
+}
+
+function mapBackendCategoryToCatalogCategory(c: any): CatalogCategory {
+  return {
+    id: c.id ? c.id.toString() : '',
+    codeId: c.slug ? c.slug.toUpperCase() : `CAT-${String(c.id || 1).padStart(3, '0')}`,
+    name: c.nom || 'Catégorie',
+    type: 'Plat',
+    subCategoryTag: 'CATÉGORIE PRINCIPALE',
+    imageUrl: c.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120&auto=format&fit=crop&q=80',
+    fileName: 'category.jpg',
+    isActive: !!c.est_active,
+    itemCount: Number(c.nombre_produits || 0),
+    linkedEstCount: 10,
+    displayOrder: Number(c.ordre || 0),
+    description: c.nom
+  };
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminCatalogService {
-  private mockCategories: CatalogCategory[] = [
-    {
-      id: 'cat-14',
-      codeId: 'CAT-014',
-      name: 'Thiéboudienne',
-      type: 'Plat',
-      subCategoryTag: 'PLAT • S-CATÉGORIE : RIZ',
-      parentCategoryId: 'cat-1',
-      parentCategoryName: 'Plats Traditionnels & Spécialités Locales',
-      imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120&auto=format&fit=crop&q=80',
-      fileName: 'thieb_rouge_dakar.jpg',
-      isActive: true,
-      itemCount: 142,
-      linkedEstCount: 38,
-      displayOrder: 1,
-      description: 'Plat national sénégalais décliné au poisson rouge ou blanc'
-    },
-    {
-      id: 'cat-3',
-      codeId: 'CAT-003',
-      name: 'Burgers',
-      type: 'Plat',
-      subCategoryTag: 'PLAT • CATÉGORIE PRINCIPALE',
-      imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=120&auto=format&fit=crop&q=80',
-      fileName: 'burgers.jpg',
-      isActive: true,
-      itemCount: 89,
-      linkedEstCount: 24,
-      displayOrder: 2,
-      description: 'Burgers gourmets, cheeseburgers et frites maison'
-    },
-    {
-      id: 'cat-2',
-      codeId: 'CAT-002',
-      name: 'Braisés & Grillades',
-      type: 'Restaurant',
-      subCategoryTag: 'RESTAURANT & PLAT • PRINCIPALE',
-      imageUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=120&auto=format&fit=crop&q=80',
-      fileName: 'braises_locale.jpg',
-      isActive: true,
-      itemCount: 115,
-      linkedEstCount: 42,
-      displayOrder: 3,
-      description: 'Poulet braisé, dibi d agneau et poisson grillé'
-    },
-    {
-      id: 'cat-7',
-      codeId: 'CAT-007',
-      name: 'Cuisine Sénégalaisse',
-      type: 'Restaurant',
-      subCategoryTag: 'RESTAURANT • PRINCIPALE',
-      imageUrl: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=120&auto=format&fit=crop&q=80',
-      fileName: 'cuisine_senegalaise.jpg',
-      isActive: true,
-      itemCount: 65,
-      linkedEstCount: 65,
-      displayOrder: 4,
-      description: 'Spécialités culinaires sénégalaises et ouest-africaines'
-    },
-    {
-      id: 'cat-4',
-      codeId: 'CAT-004',
-      name: 'Épicerie & Produits Locaux',
-      type: 'Commerce',
-      subCategoryTag: 'VENDEUR • PRINCIPALE',
-      imageUrl: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=120&auto=format&fit=crop&q=80',
-      fileName: 'epicerie_primeurs.jpg',
-      isActive: true,
-      itemCount: 28,
-      linkedEstCount: 28,
-      displayOrder: 5,
-      description: 'Fruits exotiques, légumes frais et épicerie fine'
-    },
-    {
-      id: 'cat-6',
-      codeId: 'CAT-006',
-      name: 'Jus & Boissons Locales',
-      type: 'Produit',
-      subCategoryTag: 'PRODUIT • S-CATÉGORIE : BOISSONS',
-      imageUrl: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=120&auto=format&fit=crop&q=80',
-      fileName: 'boissons.jpg',
-      isActive: true,
-      itemCount: 76,
-      linkedEstCount: 18,
-      displayOrder: 6,
-      description: 'Jus de bissap, bouye, gingembre et rafraîchissements'
-    },
-    {
-      id: 'cat-8',
-      codeId: 'CAT-008',
-      name: 'Fast-food & Street Food',
-      type: 'Restaurant',
-      subCategoryTag: 'RESTAURANT • PRINCIPALE',
-      imageUrl: 'https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=120&auto=format&fit=crop&q=80',
-      fileName: 'fast_food.jpg',
-      isActive: true,
-      itemCount: 34,
-      linkedEstCount: 34,
-      displayOrder: 7,
-      description: 'Sandwichs, tacos, paninis et restauration rapide'
-    },
-    {
-      id: 'cat-9',
-      codeId: 'CAT-009',
-      name: 'Pâtisserie & Boulangerie',
-      type: 'Commerce',
-      subCategoryTag: 'VENDEUR • PRINCIPALE',
-      imageUrl: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=120&auto=format&fit=crop&q=80',
-      fileName: 'patisserie.jpg',
-      isActive: true,
-      itemCount: 19,
-      linkedEstCount: 19,
-      displayOrder: 8,
-      description: 'Pains frais, viennoiseries et gâteaux d anniversaire'
-    },
-    {
-      id: 'cat-10',
-      codeId: 'CAT-010',
-      name: 'Seafood & Poissons',
-      type: 'Restaurant',
-      subCategoryTag: 'RESTAURANT • PRINCIPALE',
-      imageUrl: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=120&auto=format&fit=crop&q=80',
-      fileName: 'seafood.jpg',
-      isActive: false,
-      itemCount: 12,
-      linkedEstCount: 12,
-      displayOrder: 9,
-      description: 'Temporairement masquée du feed client'
-    }
-  ];
+  private http = inject(HttpClient);
 
-  private mockArticles: CatalogArticleItem[] = [
-    {
-      id: 'art-001',
-      sku: 'DKR-PLT-042',
-      name: 'Thiéboudienne Rouge Penda Mbaye',
-      imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120&auto=format&fit=crop&q=80',
-      establishmentName: 'Chez Loutcha',
-      establishmentDistrict: 'Plateau',
-      partnerType: 'RESTAURANT',
-      categoryName: 'Thiéboudienne',
-      categoryId: 'cat-14',
-      basePrice: 4500,
-      priceFormatted: '4 500 FCFA',
-      stockStatus: 'EN_STOCK',
-      stockStatusLabel: 'En stock',
-      stockStatusColor: 'green',
-      stockTotal: 100,
-      stockAyoo: 40,
-      stockAvailable: 38,
-      moderationStatus: 'VALIDE',
-      moderationStatusLabel: 'Validé',
-      moderationStatusColor: 'gray',
-      description: 'Plat national sénégalais préparé au poisson thiof frais, riz rouge parfumé et légumes du marché.',
-      variants: [
-        { id: 'v-1', name: 'Portion Individuelle', price: 4500 },
-        { id: 'v-2', name: 'Grand Plat Familial', price: 12000 }
-      ]
-    },
-    {
-      id: 'art-002',
-      sku: 'DKR-PLT-043',
-      name: 'Yassa au Poulet Braisé Fermier',
-      imageUrl: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=120&auto=format&fit=crop&q=80',
-      establishmentName: 'Chez Loutcha',
-      establishmentDistrict: 'Plateau',
-      partnerType: 'RESTAURANT',
-      categoryName: 'Braisés & Locale',
-      categoryId: 'cat-2',
-      basePrice: 3500,
-      priceFormatted: '3 500 FCFA',
-      stockStatus: 'EN_STOCK',
-      stockStatusLabel: 'En stock',
-      stockStatusColor: 'green',
-      stockTotal: 80,
-      stockAyoo: 30,
-      stockAvailable: 26,
-      moderationStatus: 'VALIDE',
-      moderationStatusLabel: 'Validé',
-      moderationStatusColor: 'gray',
-      description: 'Poulet fermier mariné au citron vert et oignons confits au feu de bois.'
-    },
-    {
-      id: 'art-003',
-      sku: 'DKR-ALM-009',
-      name: 'Burger Black Truffe Deluxe',
-      subtitle: 'Nouveau format • Soumis il y a 2h',
-      imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=120&auto=format&fit=crop&q=80',
-      establishmentName: 'Burger Black Bun',
-      establishmentDistrict: 'Almadies',
-      partnerType: 'RESTAURANT',
-      categoryName: 'Burgers',
-      categoryId: 'cat-3',
-      basePrice: 6500,
-      priceFormatted: '6 500 FCFA',
-      stockStatus: 'EN_ATTENTE',
-      stockStatusLabel: 'En attente',
-      stockStatusColor: 'orange',
-      stockTotal: 50,
-      stockAyoo: 20,
-      stockAvailable: 20,
-      moderationStatus: 'A_MODERER',
-      moderationStatusLabel: 'À Modérer',
-      moderationStatusColor: 'red',
-      isHighlightRow: true,
-      description: 'Pain brioché noir au charbon végétal, steak de bœuf fumé, sauce truffe noire et cheddar affiné.',
-      variants: [
-        { id: 'v-3', name: 'Simple Beef', price: 6500 },
-        { id: 'v-4', name: 'Double Bacon & Truffle', price: 8500 }
-      ]
-    },
-    {
-      id: 'art-004',
-      sku: 'DKR-BIO-109',
-      name: 'Panier Fruits Exotiques Bio',
-      imageUrl: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=120&auto=format&fit=crop&q=80',
-      establishmentName: 'Touba Primeurs',
-      establishmentDistrict: 'Mermoz',
-      partnerType: 'VENDEUR',
-      categoryName: 'Épicerie & Produits Locaux',
-      categoryId: 'cat-4',
-      basePrice: 8900,
-      priceFormatted: '8 900 FCFA',
-      stockStatus: 'EN_STOCK',
-      stockStatusLabel: 'En stock',
-      stockStatusColor: 'green',
-      stockTotal: 40,
-      stockAyoo: 15,
-      stockAvailable: 14,
-      moderationStatus: 'VALIDE',
-      moderationStatusLabel: 'Validé',
-      moderationStatusColor: 'gray',
-      description: 'Assortiment de mangues, papayes, ananas et fruits de la passion issus des vergers régionaux.'
-    },
-    {
-      id: 'art-005',
-      sku: 'DKR-OUA-018',
-      name: "Choukouya d'Agneau Feu de Bois",
-      imageUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=120&auto=format&fit=crop&q=80',
-      establishmentName: "L'Atelier du Choukouya",
-      establishmentDistrict: 'Ouakam',
-      partnerType: 'RESTAURANT',
-      categoryName: 'Braisés & Grillades',
-      categoryId: 'cat-2',
-      basePrice: 5000,
-      priceFormatted: '5 000 FCFA',
-      stockStatus: 'RUPTURE',
-      stockStatusLabel: 'Rupture',
-      stockStatusColor: 'red',
-      stockTotal: 0,
-      stockAyoo: 0,
-      stockAvailable: 0,
-      moderationStatus: 'VALIDE',
-      moderationStatusLabel: 'Validé',
-      moderationStatusColor: 'gray',
-      description: 'Morceaux d agneau marinés aux kankankan et grillés à feu doux.'
-    },
-    {
-      id: 'art-006',
-      sku: 'DKR-NGR-087',
-      name: 'Dibi d\'Agneau Grillé Spécial Dakar',
-      imageUrl: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=120&auto=format&fit=crop&q=80',
-      establishmentName: 'Chez Tantie Marie',
-      establishmentDistrict: 'Ngor',
-      partnerType: 'RESTAURANT',
-      categoryName: 'Braisés & Grillades',
-      categoryId: 'cat-2',
-      basePrice: 5500,
-      priceFormatted: '5 500 FCFA',
-      stockStatus: 'EN_STOCK',
-      stockStatusLabel: 'En stock',
-      stockStatusColor: 'green',
-      stockTotal: 60,
-      stockAyoo: 25,
-      stockAvailable: 22,
-      moderationStatus: 'VALIDE',
-      moderationStatusLabel: 'Validé',
-      moderationStatusColor: 'gray',
-      description: 'Dibi d agneau traditionnel servi dans du papier kraft avec oignons pimentés et moutarde douce.'
-    },
-    {
-      id: 'art-007',
-      sku: 'DKR-PLT-098',
-      name: 'Jus de Bissap Royal Menthe 50cl',
-      imageUrl: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=120&auto=format&fit=crop&q=80',
-      establishmentName: 'Chez Loutcha',
-      establishmentDistrict: 'Plateau',
-      partnerType: 'VENDEUR',
-      categoryName: 'Jus & Boissons Locales',
-      categoryId: 'cat-6',
-      basePrice: 1500,
-      priceFormatted: '1 500 FCFA',
-      stockStatus: 'EN_STOCK',
-      stockStatusLabel: 'En stock',
-      stockStatusColor: 'green',
-      stockTotal: 150,
-      stockAyoo: 60,
-      stockAvailable: 58,
-      moderationStatus: 'VALIDE',
-      moderationStatusLabel: 'Validé',
-      moderationStatusColor: 'gray',
-      description: 'Infusion de fleurs d hibiscus séchées avec feuilles de menthe fraîche et sucre de canne.'
-    }
-  ];
-
-  private selectedArticleSubject = new BehaviorSubject<CatalogArticleItem | null>(this.mockArticles[2]);
+  private selectedArticleSubject = new BehaviorSubject<CatalogArticleItem | null>(null);
   selectedArticle$ = this.selectedArticleSubject.asObservable();
 
-  private categoriesSubject = new BehaviorSubject<CatalogCategory[]>(this.mockCategories);
+  private articlesSubject = new BehaviorSubject<CatalogArticleItem[]>([]);
+  articles$ = this.articlesSubject.asObservable();
+
+  private categoriesSubject = new BehaviorSubject<CatalogCategory[]>([]);
   categories$ = this.categoriesSubject.asObservable();
 
   getStatsSummary(): Observable<CatalogStatsSummary> {
-    return of({
-      totalReferences: 4820,
-      articlesAvailable: 4615,
-      outOfStock: 205,
-      moderationRequired: 18,
-      averageDishPriceFcfa: 4250
-    });
+    const url = `${environment.apiUrl}/api/admin/catalog/products/`;
+    return this.http.get<any>(url).pipe(
+      map(res => {
+        const rawItems: any[] = Array.isArray(res) ? res : (res.results || []);
+        const items = rawItems.map(mapBackendProductToCatalogArticleItem);
+
+        const totalReferences = items.length;
+        const articlesAvailable = items.filter(a => a.stockStatus === 'EN_STOCK' && a.moderationStatus === 'VALIDE').length;
+        const outOfStock = items.filter(a => a.stockStatus === 'RUPTURE').length;
+        const moderationRequired = items.filter(a => a.moderationStatus === 'A_MODERER').length;
+        const sumPrices = items.reduce((acc, a) => acc + a.basePrice, 0);
+        const averageDishPriceFcfa = totalReferences > 0 ? Math.round(sumPrices / totalReferences) : 0;
+
+        return {
+          totalReferences,
+          articlesAvailable,
+          outOfStock,
+          moderationRequired,
+          averageDishPriceFcfa
+        };
+      }),
+      catchError(() => of({
+        totalReferences: 0,
+        articlesAvailable: 0,
+        outOfStock: 0,
+        moderationRequired: 0,
+        averageDishPriceFcfa: 0
+      }))
+    );
   }
 
   filterArticles(
@@ -339,37 +135,55 @@ export class AdminCatalogService {
     category: string,
     establishment: string
   ): Observable<CatalogArticleItem[]> {
-    let result = [...this.mockArticles];
-
-    if (tab === 'ACTIVE') {
-      result = result.filter(a => a.stockStatus === 'EN_STOCK' && a.moderationStatus === 'VALIDE');
-    } else if (tab === 'PENDING_VALIDATION') {
-      result = result.filter(a => a.moderationStatus === 'A_MODERER' || a.moderationStatus === 'A_CORRIGER');
-    } else if (tab === 'OUT_OF_STOCK') {
-      result = result.filter(a => a.stockStatus === 'RUPTURE' || a.stockStatus === 'EPUISE');
-    } else if (tab === 'FLAGGED') {
-      result = result.filter(a => a.moderationStatus === 'A_MODERER' || a.moderationStatus === 'A_CORRIGER' || a.moderationStatus === 'REFUSE');
-    }
+    let params = new HttpParams();
 
     if (search && search.trim() !== '') {
-      const q = search.toLowerCase().trim();
-      result = result.filter(a =>
-        a.name.toLowerCase().includes(q) ||
-        a.sku.toLowerCase().includes(q) ||
-        a.establishmentName.toLowerCase().includes(q) ||
-        a.categoryName.toLowerCase().includes(q)
-      );
+      params = params.set('search', search.trim());
     }
 
     if (category && category !== 'ALL') {
-      result = result.filter(a => a.categoryId === category || a.categoryName === category);
+      params = params.set('categorie', category);
     }
 
     if (establishment && establishment !== 'ALL') {
-      result = result.filter(a => a.establishmentName === establishment);
+      params = params.set('etablissement', establishment);
     }
 
-    return of(result);
+    const url = `${environment.apiUrl}/api/admin/catalog/products/`;
+
+    return this.http.get<any>(url, { params }).pipe(
+      map(res => {
+        const rawItems: any[] = Array.isArray(res) ? res : (res.results || []);
+        let items = rawItems.map(mapBackendProductToCatalogArticleItem);
+
+        if (tab === 'ACTIVE') {
+          items = items.filter(a => a.stockStatus === 'EN_STOCK' && a.moderationStatus === 'VALIDE');
+        } else if (tab === 'PENDING_VALIDATION') {
+          items = items.filter(a => a.moderationStatus === 'A_MODERER' || a.moderationStatus === 'A_CORRIGER');
+        } else if (tab === 'OUT_OF_STOCK') {
+          items = items.filter(a => a.stockStatus === 'RUPTURE' || a.stockStatus === 'EPUISE');
+        } else if (tab === 'FLAGGED') {
+          items = items.filter(a => a.moderationStatus === 'A_MODERER' || a.moderationStatus === 'A_CORRIGER' || a.moderationStatus === 'REFUSE');
+        }
+
+        this.articlesSubject.next(items);
+
+        const currentSelected = this.selectedArticleSubject.getValue();
+        if (items.length > 0) {
+          if (!currentSelected || !items.some(a => a.id === currentSelected.id)) {
+            this.selectedArticleSubject.next(items[0]);
+          }
+        } else {
+          this.selectedArticleSubject.next(null);
+        }
+
+        return items;
+      }),
+      catchError(err => {
+        console.error('Erreur chargement articles catalog:', err);
+        return of([]);
+      })
+    );
   }
 
   filterCategories(
@@ -377,104 +191,173 @@ export class AdminCatalogService {
     statusTab: string,
     search: string
   ): Observable<CatalogCategory[]> {
-    let result = [...this.categoriesSubject.value];
+    const url = `${environment.apiUrl}/api/admin/catalog/categories/`;
 
-    // Filter by Type Tab
-    if (typeTab === 'RESTAURANTS') {
-      result = result.filter(c => c.type === 'Restaurant');
-    } else if (typeTab === 'VENDEURS') {
-      result = result.filter(c => c.type === 'Commerce');
-    } else if (typeTab === 'PLATS') {
-      result = result.filter(c => c.type === 'Plat');
-    } else if (typeTab === 'PRODUITS') {
-      result = result.filter(c => c.type === 'Produit');
-    }
+    return this.http.get<any>(url).pipe(
+      map(res => {
+        const rawItems: any[] = Array.isArray(res) ? res : (res.results || []);
+        let items = rawItems.map(mapBackendCategoryToCatalogCategory);
 
-    // Filter by Status Tab
-    if (statusTab === 'ACTIVES') {
-      result = result.filter(c => c.isActive === true);
-    } else if (statusTab === 'DESACTIVESS') {
-      result = result.filter(c => c.isActive === false);
-    }
+        if (statusTab === 'ACTIVES') {
+          items = items.filter(c => c.isActive === true);
+        } else if (statusTab === 'DESACTIVESS') {
+          items = items.filter(c => c.isActive === false);
+        }
 
-    // Filter by Search Query
-    if (search && search.trim() !== '') {
-      const q = search.toLowerCase().trim();
-      result = result.filter(c =>
-        c.name.toLowerCase().includes(q) ||
-        (c.subCategoryTag && c.subCategoryTag.toLowerCase().includes(q)) ||
-        (c.description && c.description.toLowerCase().includes(q))
-      );
-    }
+        if (search && search.trim() !== '') {
+          const q = search.toLowerCase().trim();
+          items = items.filter(c => c.name.toLowerCase().includes(q) || (c.codeId && c.codeId.toLowerCase().includes(q)));
+        }
 
-    return of(result);
+        this.categoriesSubject.next(items);
+        return items;
+      }),
+      catchError(err => {
+        console.error('Erreur chargement catégories catalog:', err);
+        return of([]);
+      })
+    );
   }
 
   selectArticle(article: CatalogArticleItem | null): void {
     this.selectedArticleSubject.next(article);
   }
 
-  updateModerationStatus(articleId: string, status: ModerationStatus): void {
-    const item = this.mockArticles.find(a => a.id === articleId);
-    if (item) {
-      item.moderationStatus = status;
-      if (status === 'VALIDE') {
-        item.moderationStatusLabel = 'Validé';
-        item.moderationStatusColor = 'gray';
-        item.isHighlightRow = false;
-        item.stockStatus = 'EN_STOCK';
-        item.stockStatusLabel = 'En stock';
-        item.stockStatusColor = 'green';
-      } else if (status === 'A_CORRIGER') {
-        item.moderationStatusLabel = 'À Corriger';
-        item.moderationStatusColor = 'orange';
-      } else if (status === 'REFUSE') {
-        item.moderationStatusLabel = 'Refusé';
-        item.moderationStatusColor = 'red';
-      }
-      this.selectedArticleSubject.next({ ...item });
-    }
+  updateModerationStatus(articleId: string, status: ModerationStatus): Observable<CatalogArticleItem | null> {
+    const url = `${environment.apiUrl}/api/admin/catalog/products/${articleId}/moderate/`;
+    const est_disponible = status === 'VALIDE';
+
+    return this.http.patch<any>(url, { est_disponible }).pipe(
+      map(raw => {
+        const updated = mapBackendProductToCatalogArticleItem(raw);
+        const currentArticles = this.articlesSubject.getValue().map(a => a.id === articleId ? updated : a);
+        this.articlesSubject.next(currentArticles);
+
+        if (this.selectedArticleSubject.getValue()?.id === articleId) {
+          this.selectedArticleSubject.next(updated);
+        }
+        return updated;
+      }),
+      catchError(err => {
+        console.error('Erreur modération produit:', err);
+        return of(null);
+      })
+    );
   }
 
-  updateStockAllocation(articleId: string, stockAyoo: number): void {
-    const item = this.mockArticles.find(a => a.id === articleId);
-    if (item) {
-      item.stockAyoo = stockAyoo;
-      item.stockAvailable = Math.min(item.stockAvailable, stockAyoo);
-      this.selectedArticleSubject.next({ ...item });
-    }
+  updateStockAllocation(articleId: string, stockAyoo: number): Observable<CatalogArticleItem | null> {
+    const url = `${environment.apiUrl}/api/admin/catalog/products/${articleId}/moderate/`;
+
+    return this.http.patch<any>(url, { stock_ayyou_reserve: stockAyoo }).pipe(
+      map(raw => {
+        const updated = mapBackendProductToCatalogArticleItem(raw);
+        const currentArticles = this.articlesSubject.getValue().map(a => a.id === articleId ? updated : a);
+        this.articlesSubject.next(currentArticles);
+
+        if (this.selectedArticleSubject.getValue()?.id === articleId) {
+          this.selectedArticleSubject.next(updated);
+        }
+        return updated;
+      }),
+      catchError(err => {
+        console.error('Erreur réservation stock AYYOU:', err);
+        return of(null);
+      })
+    );
   }
 
-  addCategory(category: CatalogCategory): void {
-    const current = this.categoriesSubject.value;
-    this.categoriesSubject.next([category, ...current]);
+  addCategory(category: CatalogCategory): Observable<CatalogCategory | null> {
+    const url = `${environment.apiUrl}/api/admin/catalog/categories/`;
+    const body = {
+      nom: category.name,
+      est_active: category.isActive !== undefined ? category.isActive : true,
+      ordre: category.displayOrder || 0,
+      image_url: category.imageUrl || null
+    };
+
+    return this.http.post<any>(url, body).pipe(
+      map(raw => {
+        const created = mapBackendCategoryToCatalogCategory(raw);
+        const current = this.categoriesSubject.getValue();
+        this.categoriesSubject.next([created, ...current]);
+        return created;
+      }),
+      catchError(err => {
+        console.error('Erreur création catégorie:', err);
+        return of(null);
+      })
+    );
   }
 
-  updateCategory(category: CatalogCategory): void {
-    const current = this.categoriesSubject.value;
-    const index = current.findIndex(c => c.id === category.id);
-    if (index !== -1) {
-      const updated = [...current];
-      updated[index] = { ...category };
-      this.categoriesSubject.next(updated);
-    }
+  updateCategory(category: CatalogCategory): Observable<CatalogCategory | null> {
+    const url = `${environment.apiUrl}/api/admin/catalog/categories/${category.id}/`;
+    const body = {
+      nom: category.name,
+      est_active: category.isActive,
+      ordre: category.displayOrder,
+      image_url: category.imageUrl
+    };
+
+    return this.http.patch<any>(url, body).pipe(
+      map(raw => {
+        const updated = mapBackendCategoryToCatalogCategory(raw);
+        const current = this.categoriesSubject.getValue();
+        const idx = current.findIndex(c => c.id === category.id);
+        if (idx !== -1) {
+          const newCategories = [...current];
+          newCategories[idx] = updated;
+          this.categoriesSubject.next(newCategories);
+        }
+        return updated;
+      }),
+      catchError(err => {
+        console.error('Erreur modification catégorie:', err);
+        return of(null);
+      })
+    );
   }
 
-  toggleCategoryStatus(categoryId: string): void {
-    const current = this.categoriesSubject.value;
-    const cat = current.find(c => c.id === categoryId);
-    if (cat) {
-      cat.isActive = !cat.isActive;
-      this.categoriesSubject.next([...current]);
-    }
+  toggleCategoryStatus(categoryId: string): Observable<CatalogCategory | null> {
+    const currentCat = this.categoriesSubject.getValue().find(c => c.id === categoryId);
+    if (!currentCat) return of(null);
+
+    return this.updateCategory({
+      ...currentCat,
+      isActive: !currentCat.isActive
+    });
   }
 
-  deleteCategory(categoryId: string): void {
-    const current = this.categoriesSubject.value;
-    this.categoriesSubject.next(current.filter(c => c.id !== categoryId));
+  deleteCategory(categoryId: string): Observable<boolean> {
+    const url = `${environment.apiUrl}/api/admin/catalog/categories/${categoryId}/`;
+    return this.http.delete<void>(url).pipe(
+      map(() => {
+        const current = this.categoriesSubject.getValue();
+        this.categoriesSubject.next(current.filter(c => c.id !== categoryId));
+        return true;
+      }),
+      catchError(err => {
+        console.error('Erreur suppression catégorie:', err);
+        return of(false);
+      })
+    );
   }
 
-  reorderCategories(categories: CatalogCategory[]): void {
-    this.categoriesSubject.next([...categories]);
+  reorderCategories(categories: CatalogCategory[]): Observable<boolean> {
+    const url = `${environment.apiUrl}/api/admin/catalog/categories/reorder/`;
+    const orders = categories.map((c, idx) => ({
+      id: Number(c.id),
+      ordre: idx + 1
+    }));
+
+    return this.http.post<any>(url, { orders }).pipe(
+      map(() => {
+        this.categoriesSubject.next([...categories]);
+        return true;
+      }),
+      catchError(err => {
+        console.error('Erreur réordonnancement catégories:', err);
+        return of(false);
+      })
+    );
   }
 }

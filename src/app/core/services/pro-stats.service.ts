@@ -1,58 +1,75 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { Observable, of, map, catchError } from 'rxjs';
 import { ProStats } from '../models/pro';
+import { ProfessionalService } from './professional.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProStatsService {
-  private mockStats: ProStats = {
-    todayOrdersCount: 84,
-    todayRevenueFcfa: 1245000,
-    todayRevenue: 1245000,
-    pickupOrdersCount: 8,
-    urgentOrdersCount: 5,
-    weekRevenueFcfa: 1245000,
-    weeklyTotalRevenue: 1245000,
-    totalOrdersCount: 84,
-    weekOrdersCount: 84,
-    averageBasket: 14820,
-    acceptanceRate: 98,
-    rating: 4.8,
+  private professionalService = inject(ProfessionalService);
+
+  private defaultStats: ProStats = {
+    todayOrdersCount: 0,
+    todayRevenueFcfa: 0,
+    todayRevenue: 0,
+    pickupOrdersCount: 0,
+    urgentOrdersCount: 0,
+    weekRevenueFcfa: 0,
+    weeklyTotalRevenue: 0,
+    totalOrdersCount: 0,
+    weekOrdersCount: 0,
+    averageBasket: 0,
+    acceptanceRate: 100,
+    rating: 5.0,
     weeklyRevenue: [
-      { day: 'Lun', amount: 120000 },
-      { day: 'Mar', amount: 140000 },
-      { day: 'Mer', amount: 110000 },
-      { day: 'Jeu', amount: 160000 },
-      { day: 'Ven', amount: 190000 },
-      { day: 'Sam', amount: 200000 },
-      { day: 'Dim', amount: 145000 }
+      { day: 'Lun', amount: 0 },
+      { day: 'Mar', amount: 0 },
+      { day: 'Mer', amount: 0 },
+      { day: 'Jeu', amount: 0 },
+      { day: 'Ven', amount: 0 },
+      { day: 'Sam', amount: 0 },
+      { day: 'Dim', amount: 0 }
     ],
-    hourlyRevenue: [
-      { hour: '12h', amount: 30000 },
-      { hour: '13h', amount: 75000 },
-      { hour: '14h', amount: 55000 },
-      { hour: '15h', amount: 25000 },
-      { hour: '18h', amount: 40000 },
-      { hour: '19h', amount: 75000 },
-      { hour: '20h', amount: 65000 }
-    ],
-    topDishes: [
-      { name: 'Thiéboudienne Rouge', portionsSold: 42, count: 42, revenueFcfa: 252000, revenue: 252000 },
-      { name: 'Yassa Poulet', portionsSold: 28, count: 28, revenueFcfa: 140000, revenue: 140000 },
-      { name: 'Mafé Bœuf', portionsSold: 14, count: 14, revenueFcfa: 77000, revenue: 77000 }
-    ],
-    lowDemandDishes: [
-      { id: 'ld1', name: 'Soupou Kandja Végétarien', ordersCount: 2, count: 2, priceFcfa: 9000 },
-      { id: 'ld2', name: 'Brochettes de Poisson Capitaine', ordersCount: 1, count: 1, priceFcfa: 6500 }
-    ]
+    hourlyRevenue: [],
+    topDishes: [],
+    lowDemandDishes: []
   };
 
+  private currentStats: ProStats = { ...this.defaultStats };
+
   getStats(): ProStats {
-    return this.mockStats;
+    return this.currentStats;
   }
 
   getStatsObservable(period: 'today' | 'week' | 'month' = 'today'): Observable<ProStats> {
-    return of(this.mockStats);
+    return this.professionalService.getMerchantStats().pipe(
+      map(res => {
+        if (!res) {
+          return this.defaultStats;
+        }
+        const mapped: ProStats = {
+          todayOrdersCount: res.todayOrdersCount || 0,
+          todayRevenueFcfa: res.todayRevenueFcfa || 0,
+          todayRevenue: res.todayRevenue || 0,
+          pickupOrdersCount: res.pickupOrdersCount || 0,
+          urgentOrdersCount: res.urgentOrdersCount || 0,
+          weekRevenueFcfa: res.todayRevenueFcfa || 0,
+          weeklyTotalRevenue: res.todayRevenueFcfa || 0,
+          totalOrdersCount: res.todayOrdersCount || 0,
+          weekOrdersCount: res.todayOrdersCount || 0,
+          averageBasket: res.todayOrdersCount > 0 ? Math.round(res.todayRevenueFcfa / res.todayOrdersCount) : 0,
+          acceptanceRate: 100,
+          rating: res.rating || 5.0,
+          weeklyRevenue: this.defaultStats.weeklyRevenue,
+          hourlyRevenue: [],
+          topDishes: [],
+          lowDemandDishes: []
+        };
+        this.currentStats = mapped;
+        return mapped;
+      }),
+      catchError(() => of(this.defaultStats))
+    );
   }
 }

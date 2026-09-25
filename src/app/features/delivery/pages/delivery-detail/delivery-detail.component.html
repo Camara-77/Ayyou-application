@@ -1,170 +1,310 @@
-<div class="delivery-app-layout">
-  <!-- Top Navigation Header -->
-  <header class="delivery-header">
-    <button class="btn-header-square" (click)="goBack()" aria-label="Retour">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="19" y1="12" x2="5" y2="12"></line>
-        <polyline points="12 19 5 12 12 5"></polyline>
-      </svg>
-    </button>
-    
-    <h1 class="header-title">Détail Course</h1>
+<div class="stitch-detail-page">
 
-    <button class="btn-header-square rel" aria-label="Notifications">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-      </svg>
-      <span class="notification-dot-red"></span>
-    </button>
-  </header>
+  <!-- TOP HEADER BAR UNIFIÉ -->
+  <app-delivery-header [title]="'DÉTAIL COURSE'" [showBackButton]="true" (backClick)="goBack()"></app-delivery-header>
 
-  <!-- Main Scrollable Content -->
-  <main class="delivery-content">
-    <!-- Confirmation Header Section -->
-    <div class="confirmation-section">
-      <div class="confirmation-outer-box">
-        <div class="confirmation-inner-red">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
+  <!-- ALERTS FEEDBACK -->
+  <div class="alert alert-error" *ngIf="errorMessage">
+    <span>{{ errorMessage }}</span>
+  </div>
+  <div class="alert alert-success" *ngIf="successMessage">
+    <span>{{ successMessage }}</span>
+  </div>
+
+  <!-- LOADING SKELETON -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="skeleton-block"></div>
+    <div class="skeleton-block"></div>
+  </div>
+
+  <main class="detail-content" *ngIf="!isLoading && delivery">
+
+    <!-- 1. STATUS BANNER CARD -->
+    <div class="status-banner-card">
+      <div class="status-left">
+        <span class="status-dot online"></span>
+        <div class="status-meta">
+          <h3 class="status-title">Course en cours</h3>
+          <p class="status-sub">Mission prioritaire attribuée</p>
         </div>
       </div>
 
-      <h2 class="confirmation-title">Livraison terminée !</h2>
-      <p class="confirmation-sub">Félicitations pour cette course menée avec succès.</p>
-
-      <!-- Course Identification Capsule -->
-      <div class="course-capsule">
-        {{ course.orderRef }} • {{ course.completionTime }} · {{ course.deliveryLocationShort }}
+      <div class="status-badge-lock">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <span>VERROUILLÉE</span>
       </div>
     </div>
 
-    <!-- Remuneration Card -->
-    <div class="remuneration-card">
-      <!-- Total Instantane Gray Box -->
-      <div class="total-box">
-        <div class="total-top-line">
-          <span class="label-gray">Total instantané</span>
-          <span class="credited-pill">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+    <!-- 2. DARK HEADER CARD (COURSE # + PRICE) -->
+    <div class="dark-course-card">
+      <div class="course-ref-group">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#E51A29">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+        <span class="ref-title">COURSE #{{ delivery.commande_reference || ('AY-' + delivery.commande) }}</span>
+      </div>
+
+      <div class="price-badge-dark">
+        <span>{{ getFormattedPrice() }} FCFA</span>
+      </div>
+    </div>
+
+    <!-- 3. STEPPER PROGRESSION (4 ÉTAPES STITCH) -->
+    <div class="stepper-card">
+      <div class="stepper-track">
+        <!-- Step 1: Trajet -->
+        <div class="step-item" [class.active]="currentStep >= 1">
+          <div class="step-icon-circle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
             </svg>
-            CRÉDITÉ
+          </div>
+          <span class="step-label">1. TRAJET</span>
+        </div>
+
+        <div class="step-line" [class.active]="currentStep > 1"></div>
+
+        <!-- Step 2: Retrait -->
+        <div class="step-item" [class.active]="currentStep >= 2">
+          <div class="step-icon-circle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            </svg>
+          </div>
+          <span class="step-label">2. RETRAIT</span>
+        </div>
+
+        <div class="step-line" [class.active]="currentStep > 2"></div>
+
+        <!-- Step 3: Route -->
+        <div class="step-item" [class.active]="currentStep >= 3">
+          <div class="step-icon-circle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="6" cy="15" r="3"/>
+              <circle cx="18" cy="15" r="3"/>
+              <path d="M 5 11 L 8 6 H 14 L 17 11"/>
+            </svg>
+          </div>
+          <span class="step-label">3. ROUTE</span>
+        </div>
+
+        <div class="step-line" [class.active]="currentStep > 3"></div>
+
+        <!-- Step 4: Dépôt -->
+        <div class="step-item" [class.active]="currentStep >= 4">
+          <div class="step-icon-circle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <span class="step-label">4. DÉPÔT</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. ESTABLISHMENT / RESTAURANT CARD -->
+    <div class="resto-info-card">
+      <div class="resto-icon-square">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2">
+          <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+          <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+          <line x1="6" y1="1" x2="6" y2="4"/>
+          <line x1="10" y1="1" x2="10" y2="4"/>
+        </svg>
+      </div>
+
+      <div class="resto-details">
+        <h3 class="resto-name">{{ getEtablissementName() }}</h3>
+        <p class="resto-address">{{ getEtablissementAddress() }}</p>
+
+        <div class="resto-meta-row">
+          <span class="badge-time">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            ~4 min
           </span>
+          <span class="dot-sep">•</span>
+          <span class="dist-text">850 m de vous</span>
         </div>
-        <div class="total-amount">{{ course.instantTotalFcfa }}</div>
       </div>
 
-      <!-- Net Gain Row -->
-      <div class="gain-row">
-        <span class="gain-label">Gain net de course</span>
-        <span class="gain-value">{{ course.netGainFcfa }}</span>
+      <a class="btn-phone" *ngIf="getEtablissementPhone()" [href]="'tel:' + getEtablissementPhone()" aria-label="Appeler l'établissement">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+      </a>
+      <div class="btn-phone disabled" *ngIf="!getEtablissementPhone()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- 5. INTERACTIVE LEAFLET MAP CARD -->
+    <div class="map-card-wrapper">
+      <div class="leaflet-map-container" #leafletMap></div>
+
+      <!-- Traffic Overlay -->
+      <div class="traffic-overlay-badge">
+        <span>Trafic fluide sur Av. Peytavin</span>
       </div>
 
-      <!-- Payment Method Box -->
-      <div class="payment-box">
-        <div class="payment-left">
-          <div class="phone-icon-bg">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-              <line x1="12" y1="18" x2="12.01" y2="18"></line>
-            </svg>
+      <!-- Direction FAB Button -->
+      <button class="map-direction-fab" (click)="openExternalGps()" aria-label="Lancer la navigation GPS">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5">
+          <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 6. CONTENU DU SAC -->
+    <div class="bag-content-card">
+      <div class="bag-header">
+        <span class="label-muted">CONTENU DU SAC</span>
+        <span class="sealed-badge">Sac #{{ delivery.id }} scellé</span>
+      </div>
+
+      <div class="bag-items-list">
+        <div class="bag-item-row" *ngFor="let item of orderItems">
+          <div class="item-left">
+            <span class="item-name">{{ item.quantity }}× {{ item.name }}</span>
           </div>
-          <span class="payment-name">{{ course.paymentMethod }}</span>
-        </div>
-        <div class="payment-right">
-          <span class="dot-red-small"></span>
-          <span class="payment-status">{{ course.paymentStatus }}</span>
+          <div class="item-right">
+            <span class="item-options">{{ item.options }}</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Itinerary Details Card -->
-    <div class="itinerary-card">
-      <div class="itinerary-header">
-        <span class="section-title-label">DÉTAILS DE L'ITINÉRAIRE</span>
-        <span class="qr-validated-badge">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
-            <rect x="14" y="14" width="3" height="3"></rect>
-          </svg>
-          {{ course.validationMethod }}
-        </span>
-      </div>
+    <!-- 7. ACTION BUTTONS (NAVIGATION & WORKFLOW) -->
+    <div class="action-buttons-card">
+      <button class="btn-gps-secondary" (click)="openExternalGps()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2.5">
+          <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+        </svg>
+        <span>Ouvrir la Navigation (GPS Dakar)</span>
+      </button>
 
-      <!-- Vertical Timeline -->
-      <div class="timeline-container">
-        <!-- Pickup Node -->
-        <div class="timeline-step">
-          <div class="node-col">
-            <div class="node-circle dot-grey"></div>
-            <div class="line-connector"></div>
-          </div>
-          <div class="step-info">
-            <span class="step-label">PRISE EN CHARGE</span>
-            <span class="step-name">{{ course.pickupLocation.name }}</span>
-            <span class="step-address">{{ course.pickupLocation.address }}</span>
-          </div>
-        </div>
+      <button
+        class="btn-action-primary"
+        [disabled]="actionLoading"
+        (click)="handlePrimaryAction()"
+        *ngIf="currentStep <= 2"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" *ngIf="!actionLoading">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        </svg>
+        <span *ngIf="!actionLoading">{{ primaryActionButtonText }}</span>
+        <span *ngIf="actionLoading">Chargement...</span>
+      </button>
 
-        <!-- Dropoff Node -->
-        <div class="timeline-step">
-          <div class="node-col">
-            <div class="node-circle dot-red"></div>
-          </div>
-          <div class="step-info">
-            <span class="step-label label-red">LIVRÉ À</span>
-            <span class="step-name">{{ course.dropoffLocation.name }}</span>
-            <span class="step-address">{{ course.dropoffLocation.address }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Duration & Distance Box -->
-      <div class="stats-box">
-        <div class="stat-item">
-          <div class="stat-icon-circle">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-          </div>
-          <div class="stat-text-col">
-            <span class="stat-label">DURÉE</span>
-            <span class="stat-value">{{ course.durationMinutes }}</span>
-          </div>
-        </div>
-
-        <div class="stat-item">
-          <div class="stat-icon-circle">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 6L6 18"></path>
-              <path d="M8 6h10v10"></path>
-            </svg>
-          </div>
-          <div class="stat-text-col">
-            <span class="stat-label">DISTANCE</span>
-            <span class="stat-value">{{ course.distanceKm }}</span>
-          </div>
-        </div>
-      </div>
+      <!-- Appeler Client Button (Light Gray Button with Red Phone Icon) -->
+      <button class="btn-call-client" (click)="callClient()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2.2">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+        <span>Appeler client</span>
+      </button>
     </div>
+
+    <!-- 8. NOUVEAU BLOC : VALIDATION SÉCURISÉE (QR CODE & CODE PIN 4 CHIFFRES) -->
+    <div class="secure-validation-card">
+      <h3 class="validation-title">Validation sécurisée</h3>
+      <p class="validation-sub">Scannez le badge client ou saisissez son code à 4 chiffres.</p>
+
+      <!-- QR Code Scanner Main Button -->
+      <button class="btn-scan-qr" (click)="scanQrCode()" [disabled]="validatingPin">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/>
+          <path d="M14 14h3v3h-3zM17 17h3v3h-3zM14 17h3v3h-3z"/>
+        </svg>
+        <span>Scanner le QR Code du client</span>
+      </button>
+
+      <div class="divider-or">
+        <span class="divider-line"></span>
+        <span class="divider-text">OU AVEC CODE PIN</span>
+        <span class="divider-line"></span>
+      </div>
+
+      <!-- 4-Digit PIN Input Group -->
+      <div class="pin-inputs-row">
+        <input
+          #pinInput0
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          maxlength="4"
+          class="pin-box"
+          [(ngModel)]="pinDigits[0]"
+          (input)="onPinInput($event, 0)"
+          (keydown)="onPinKeyDown($event, 0)"
+          aria-label="Chiffre 1 PIN"
+        />
+        <input
+          #pinInput1
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          maxlength="1"
+          class="pin-box"
+          [(ngModel)]="pinDigits[1]"
+          (input)="onPinInput($event, 1)"
+          (keydown)="onPinKeyDown($event, 1)"
+          aria-label="Chiffre 2 PIN"
+        />
+        <input
+          #pinInput2
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          maxlength="1"
+          class="pin-box"
+          [(ngModel)]="pinDigits[2]"
+          (input)="onPinInput($event, 2)"
+          (keydown)="onPinKeyDown($event, 2)"
+          aria-label="Chiffre 3 PIN"
+        />
+        <input
+          #pinInput3
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          maxlength="1"
+          class="pin-box"
+          [(ngModel)]="pinDigits[3]"
+          (input)="onPinInput($event, 3)"
+          (keydown)="onPinKeyDown($event, 3)"
+          aria-label="Chiffre 4 PIN"
+        />
+      </div>
+
+      <div class="pin-error-alert" *ngIf="pinErrorMessage">
+        <span>{{ pinErrorMessage }}</span>
+      </div>
+
+      <!-- Valider le Code PIN Button -->
+      <button
+        class="btn-submit-pin"
+        [disabled]="!isPinComplete || validatingPin"
+        (click)="submitPinValidation()"
+      >
+        <span *ngIf="!validatingPin">Valider le code PIN ➔</span>
+        <span *ngIf="validatingPin">Validation en cours...</span>
+      </button>
+    </div>
+
   </main>
 
-  <!-- Bottom Final Action Button -->
-  <footer class="delivery-footer">
-    <button class="btn-next-course" (click)="readyForNextCourse()">
-      <span>Prêt pour une nouvelle course</span>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="5" y1="12" x2="19" y2="12"></line>
-        <polyline points="12 5 19 12 12 19"></polyline>
-      </svg>
-    </button>
-  </footer>
+  <!-- BOTTOM NAVIGATION BAR -->
+  <app-delivery-bottom-nav></app-delivery-bottom-nav>
 
-  <!-- Bottom Navigation Bar -->
-  <app-delivery-bottom-nav activeTab="deliveries"></app-delivery-bottom-nav>
 </div>

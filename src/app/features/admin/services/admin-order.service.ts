@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import {
   LogisticsCorridor,
   Order,
@@ -8,422 +9,216 @@ import {
   OrderStatsSummary,
   OrderStatus
 } from '../models/admin-order.models';
+import { environment } from '../../../../environments/environment';
+
+function mapBackendOrderToOrder(o: any): Order {
+  const ref = o.numero_commande ? `#${o.numero_commande}` : `#AYY-${o.id}`;
+
+  let status: OrderStatus = 'EN_PREPARATION';
+  let statusDotColor: 'blue' | 'green' | 'orange' | 'red' = 'orange';
+
+  const rawStatut = (o.statut || '').toUpperCase();
+  if (rawStatut === 'EN_LIVRAISON') {
+    status = 'EN_LIVRAISON';
+    statusDotColor = 'blue';
+  } else if (rawStatut === 'LIVREE') {
+    status = 'LIVREE';
+    statusDotColor = 'green';
+  } else if (rawStatut === 'PRETE') {
+    status = 'PRETE';
+    statusDotColor = 'green';
+  } else if (rawStatut === 'ANNULEE') {
+    status = 'ANNULEE';
+    statusDotColor = 'red';
+  } else if (rawStatut === 'A_PREPARER') {
+    status = 'A_PREPARER';
+    statusDotColor = 'orange';
+  } else {
+    status = 'EN_PREPARATION';
+    statusDotColor = 'orange';
+  }
+
+  const creationDate = o.date_creation ? new Date(o.date_creation) : new Date();
+  const createdTime = creationDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  const timeAgo = `Inscrit le ${creationDate.toLocaleDateString('fr-FR')}`;
+
+  const sousTotalNum = Number(o.sous_total || o.total || 0);
+  const totalNum = Number(o.total || 0);
+  const fraisNum = Number(o.frais_livraison || 0);
+
+  const amountFormatted = `${new Intl.NumberFormat('fr-FR').format(totalNum)} FCFA`;
+  const clientName = o.nom_destinataire || o.client_nom || 'Client';
+  const clientPhone = o.telephone_destinataire || '';
+  const deliveryAddress = o.adresse_livraison || 'Dakar, Sénégal';
+  const district = deliveryAddress.split(',')[0].trim() || 'Dakar';
+  const establishmentName = o.etablissement_nom || o.vendeur_nom || 'Établissement';
+
+  const subOrderItems: any[] = [];
+  if (o.lignes && Array.isArray(o.lignes) && o.lignes.length > 0) {
+    o.lignes.forEach((l: any, idx: number) => {
+      const priceNum = Number(l.prix_unitaire || l.prix || 0);
+      const qte = Number(l.quantite || 1);
+      const lineTotal = priceNum * qte;
+      subOrderItems.push({
+        id: `item-${l.id || idx}`,
+        name: l.nom_produit || l.produit_nom || `Produit #${l.id || idx}`,
+        quantity: qte,
+        priceFormatted: `${new Intl.NumberFormat('fr-FR').format(lineTotal || sousTotalNum)} FCFA`,
+        priceAmount: lineTotal || sousTotalNum,
+        description: l.variante_nom || (l.options && l.options.length > 0 ? l.options.map((opt: any) => opt.nom).join(', ') : `Ligne de commande ${ref}`)
+      });
+    });
+  } else {
+    subOrderItems.push({
+      id: `item-${o.id}`,
+      name: `Commande ${ref}`,
+      quantity: 1,
+      priceFormatted: `${new Intl.NumberFormat('fr-FR').format(sousTotalNum)} FCFA`,
+      priceAmount: sousTotalNum,
+      description: `Commande ${ref} enregistrée dans le système`
+    });
+  }
+
+  return {
+    id: o.id ? o.id.toString() : '',
+    reference: ref,
+    timeAgo,
+    createdTime,
+    estimatedTime: '30 min',
+    client: {
+      id: o.utilisateur ? o.utilisateur.toString() : 'c-001',
+      name: clientName,
+      phone: clientPhone,
+      deliveryAddress
+    },
+    establishmentName,
+    establishmentDistrict: district,
+    isMultiVendor: false,
+    amountFormatted,
+    articlesCount: subOrderItems.length,
+    status,
+    statusText: o.statut_display || o.statut || 'En cours',
+    statusDotColor,
+    subOrders: [
+      {
+        id: `so-${o.id}`,
+        establishmentName,
+        establishmentTypeLabel: 'RESTAURATEUR',
+        address: 'Dakar, Sénégal',
+        phone: clientPhone,
+        subtotalFormatted: `${new Intl.NumberFormat('fr-FR').format(sousTotalNum)} FCFA`,
+        items: subOrderItems
+      }
+    ],
+    payment: {
+      id: `p-${o.id}`,
+      method: 'WAVE',
+      methodLabel: 'Paiement en ligne',
+      reference: `#PAY-${o.id}`,
+      status: 'PAYE',
+      statusText: 'Payé via API',
+      subtotalFormatted: `${new Intl.NumberFormat('fr-FR').format(sousTotalNum)} FCFA`,
+      deliveryFeeFormatted: `${new Intl.NumberFormat('fr-FR').format(fraisNum)} FCFA`,
+      totalPaidFormatted: amountFormatted,
+      driverPayoutFormatted: `${new Intl.NumberFormat('fr-FR').format(fraisNum)} FCFA`,
+      merchantPayoutFormatted: `${new Intl.NumberFormat('fr-FR').format(sousTotalNum)} FCFA`,
+      commissionNote: '0% commission • Modèle AYYOU Abonnement Pro'
+    },
+    delivery: {
+      id: `d-${o.id}`,
+      driverName: o.livreur_nom || 'Non attribué',
+      driverPhone: o.livreur_telephone || '',
+      driverVehicle: o.livreur_vehicule || 'Moto Service',
+      distanceFromClientText: 'En cours',
+      statusText: o.statut_display || 'En livraison'
+    }
+  };
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminOrderService {
-  private mockOrders: Order[] = [
-    {
-      id: 'o-1094',
-      reference: '#AYY-1094',
-      timeAgo: 'il y a 6 min',
-      createdTime: '12:44',
-      estimatedTime: '13:12',
-      client: {
-        id: 'c-1094',
-        name: 'Fatou Bintou Sall',
-        phone: '+221 77 340 12 88',
-        deliveryAddress: 'Résidence Les Almadies, Entrée B, Apt 302, Dakar'
-      },
-      establishmentName: 'Chez Loutcha',
-      establishmentDistrict: 'Plateau',
-      isMultiVendor: false,
-      amountFormatted: '9 500 FCFA',
-      articlesCount: 3,
-      status: 'EN_LIVRAISON',
-      statusText: 'En cours de route',
-      statusDotColor: 'blue',
-      subOrders: [
-        {
-          id: 'so-1094',
-          establishmentName: 'Chez Loutcha',
-          establishmentTypeLabel: 'RESTAURATEUR',
-          address: '101 Rue Carnot, Dakar Plateau',
-          phone: '+221 33 821 03 08',
-          subtotalFormatted: '9 500 FCFA',
-          items: [
-            {
-              id: 'i-1',
-              name: 'Thiébouddienne Rouge Penda Mbaye',
-              quantity: 1,
-              priceFormatted: '4 500 FCFA',
-              priceAmount: 4500,
-              description: 'Riz rouge, Mérou blanc thiof, légumes'
-            },
-            {
-              id: 'i-2',
-              name: 'Yassa au Poulet Braisé Fermier',
-              quantity: 1,
-              priceFormatted: '3 500 FCFA',
-              priceAmount: 3500,
-              description: 'Oignons confits, citron vert, riz blanc'
-            },
-            {
-              id: 'i-3',
-              name: 'Jus de Bissap Royal Menthe Fraîche 50cl',
-              quantity: 2,
-              priceFormatted: '1 500 FCFA',
-              priceAmount: 1500,
-              description: 'Recette artisanale infusée'
-            }
-          ]
-        }
-      ],
-      payment: {
-        id: 'p-1094',
-        method: 'WAVE',
-        methodLabel: 'Wave',
-        reference: '#WV-8831',
-        status: 'PAYE',
-        statusText: 'Validé Wave Instantané • Reçu #WV-8831',
-        subtotalFormatted: '9 500 FCFA',
-        deliveryFeeFormatted: '1 500 FCFA (Zone Plateau ➔ Almadies)',
-        totalPaidFormatted: '11 000 FCFA',
-        driverPayoutFormatted: '1 500 FCFA',
-        merchantPayoutFormatted: '9 500 FCFA',
-        commissionNote: '0% commission • Modèle AYYOU Abonnement Pro'
-      },
-      delivery: {
-        id: 'd-1094',
-        driverName: 'Ibrahima Sow',
-        driverPhone: '+221 77 541 20 90',
-        driverVehicle: 'Yamaha Crypton DK-8492-AB',
-        distanceFromClientText: 'À 450m du client',
-        statusText: 'En cours de route'
-      }
-    },
-    {
-      id: 'o-1093',
-      reference: '#AYY-1093',
-      timeAgo: 'il y a 14 min',
-      createdTime: '12:36',
-      estimatedTime: '13:05',
-      client: {
-        id: 'c-1093',
-        name: 'Oumar Sy',
-        phone: '+221 78 119 54 20',
-        deliveryAddress: 'Route des Almadies, en face Ngor, Dakar'
-      },
-      establishmentName: 'Burger Black Bun',
-      establishmentDistrict: 'Almadies',
-      isMultiVendor: false,
-      amountFormatted: '14 200 FCFA',
-      articlesCount: 2,
-      status: 'EN_PREPARATION',
-      statusText: 'En préparation',
-      statusDotColor: 'orange',
-      subOrders: [
-        {
-          id: 'so-1093',
-          establishmentName: 'Burger Black Bun',
-          establishmentTypeLabel: 'RESTAURATEUR',
-          address: 'Zone des Almadies, Dakar',
-          phone: '+221 33 860 12 12',
-          subtotalFormatted: '14 200 FCFA',
-          items: [
-            {
-              id: 'i-4',
-              name: 'Double Cheeseburger Beef Angus',
-              quantity: 2,
-              priceFormatted: '10 000 FCFA',
-              priceAmount: 10000,
-              description: 'Pain au charbon végétal, cheddar affiné'
-            },
-            {
-              id: 'i-5',
-              name: 'Frites de Patate Douce XL',
-              quantity: 1,
-              priceFormatted: '4 200 FCFA',
-              priceAmount: 4200,
-              description: 'Sauce maison barbecue fumée'
-            }
-          ]
-        }
-      ],
-      payment: {
-        id: 'p-1093',
-        method: 'ORANGE_MONEY',
-        methodLabel: 'Orange Money',
-        reference: '#OM-4410',
-        status: 'PAYE',
-        statusText: 'Validé Orange Money • Reçu #OM-4410',
-        subtotalFormatted: '14 200 FCFA',
-        deliveryFeeFormatted: '1 000 FCFA',
-        totalPaidFormatted: '15 200 FCFA',
-        driverPayoutFormatted: '1 000 FCFA',
-        merchantPayoutFormatted: '14 200 FCFA',
-        commissionNote: '0% commission • Modèle AYYOU Abonnement Pro'
-      },
-      delivery: {
-        id: 'd-1093',
-        driverName: 'Mamadou Ndiaye',
-        driverPhone: '+221 77 632 11 00',
-        driverVehicle: 'Scooter Kymco Agility DK-1029-BC',
-        distanceFromClientText: 'À 1.2km du client',
-        statusText: 'Attente coursier'
-      }
-    },
-    {
-      id: 'o-1092',
-      reference: '#AYY-1092',
-      timeAgo: 'il y a 22 min',
-      createdTime: '12:28',
-      estimatedTime: '12:55',
-      client: {
-        id: 'c-1092',
-        name: 'Mariama Ba',
-        phone: '+221 76 502 99 11',
-        deliveryAddress: 'Av. Cheikh Anta Diop, Fann Residence, Dakar'
-      },
-      establishmentName: 'Touba Primeurs & Bio',
-      establishmentDistrict: 'Mermoz',
-      isMultiVendor: false,
-      amountFormatted: '18 500 FCFA',
-      articlesCount: 4,
-      status: 'PRETE',
-      statusText: 'Prête',
-      statusDotColor: 'green',
-      subOrders: [
-        {
-          id: 'so-1092',
-          establishmentName: 'Touba Primeurs & Bio',
-          establishmentTypeLabel: 'COMMERCE',
-          address: 'Avenue Cheikh Anta Diop, Mermoz',
-          phone: '+221 33 825 40 40',
-          subtotalFormatted: '18 500 FCFA',
-          items: [
-            {
-              id: 'i-6',
-              name: 'Panier Mangues Kent Bio (5kg)',
-              quantity: 1,
-              priceFormatted: '8 500 FCFA',
-              priceAmount: 8500,
-              description: 'Origine Niayes dakarois'
-            },
-            {
-              id: 'i-7',
-              name: 'Miel Sauvage de Casamance 500g',
-              quantity: 2,
-              priceFormatted: '10 000 FCFA',
-              priceAmount: 10000,
-              description: 'Récolte artisanale naturelle'
-            }
-          ]
-        }
-      ],
-      payment: {
-        id: 'p-1092',
-        method: 'WAVE',
-        methodLabel: 'Wave',
-        reference: '#WV-8820',
-        status: 'PAYE',
-        statusText: 'Validé Wave Instantané • Reçu #WV-8820',
-        subtotalFormatted: '18 500 FCFA',
-        deliveryFeeFormatted: '1 200 FCFA',
-        totalPaidFormatted: '19 700 FCFA',
-        driverPayoutFormatted: '1 200 FCFA',
-        merchantPayoutFormatted: '18 500 FCFA',
-        commissionNote: '0% commission • Modèle AYYOU Abonnement Pro'
-      },
-      delivery: {
-        id: 'd-1092',
-        driverName: 'Cheikh Tidiane Gaye',
-        driverPhone: '+221 77 210 88 77',
-        driverVehicle: 'Tricycle Boxer DK-4455-CD',
-        distanceFromClientText: 'À 800m du vendeur',
-        statusText: 'Prête pour ramassage'
-      }
-    },
-    {
-      id: 'o-1091',
-      reference: '#AYY-1091',
-      timeAgo: 'il y a 35 min',
-      createdTime: '12:15',
-      estimatedTime: '12:45',
-      client: {
-        id: 'c-1091',
-        name: 'Abdoulaye Diallo',
-        phone: '+221 77 601 22 45',
-        deliveryAddress: 'Cité Keur Gorgui, Immeuble B2, Dakar'
-      },
-      establishmentName: "L'Atelier du Choukouya",
-      establishmentDistrict: 'Ouakam',
-      isMultiVendor: false,
-      amountFormatted: '22 000 FCFA',
-      articlesCount: 3,
-      status: 'EN_LIVRAISON',
-      statusText: 'En livraison',
-      statusDotColor: 'blue',
-      subOrders: [
-        {
-          id: 'so-1091',
-          establishmentName: "L'Atelier du Choukouya",
-          establishmentTypeLabel: 'RESTAURATEUR',
-          address: 'Route de Ouakam, Dakar',
-          phone: '+221 33 864 55 99',
-          subtotalFormatted: '22 000 FCFA',
-          items: [
-            {
-              id: 'i-8',
-              name: 'Choukouya d\'Agneau Grillé au Feu de Bois (1kg)',
-              quantity: 1,
-              priceFormatted: '16 000 FCFA',
-              priceAmount: 16000,
-              description: 'Épices kankan, oignons, piment'
-            },
-            {
-              id: 'i-9',
-              name: 'Alloco Banane Plantain Frite',
-              quantity: 2,
-              priceFormatted: '6 000 FCFA',
-              priceAmount: 6000,
-              description: 'Portion généreuse'
-            }
-          ]
-        }
-      ],
-      payment: {
-        id: 'p-1091',
-        method: 'WAVE',
-        methodLabel: 'Wave',
-        reference: '#WV-8815',
-        status: 'PAYE',
-        statusText: 'Validé Wave Instantané • Reçu #WV-8815',
-        subtotalFormatted: '22 000 FCFA',
-        deliveryFeeFormatted: '1 500 FCFA',
-        totalPaidFormatted: '23 500 FCFA',
-        driverPayoutFormatted: '1 500 FCFA',
-        merchantPayoutFormatted: '22 000 FCFA',
-        commissionNote: '0% commission • Modèle AYYOU Abonnement Pro'
-      },
-      delivery: {
-        id: 'd-1091',
-        driverName: 'Babacar Diop',
-        driverPhone: '+221 77 889 00 11',
-        driverVehicle: 'TVS HLX 150cc DK-7788-DE',
-        distanceFromClientText: 'À 300m du client',
-        statusText: 'En cours de livraison'
-      }
-    },
-    {
-      id: 'o-1090',
-      reference: '#AYY-1090',
-      timeAgo: 'il y a 48 min',
-      createdTime: '12:02',
-      estimatedTime: '12:35',
-      client: {
-        id: 'c-1090',
-        name: 'Cheikh Anta Kane',
-        phone: '+221 77 410 88 02',
-        deliveryAddress: 'Point E, Rue 4 x Boulevard Sud, Dakar'
-      },
-      establishmentName: 'Le Relais de la Corniche',
-      establishmentDistrict: 'Fann',
-      isMultiVendor: false,
-      amountFormatted: '36 500 FCFA',
-      articlesCount: 5,
-      status: 'LIVREE',
-      statusText: 'Livrée',
-      statusDotColor: 'green',
-      subOrders: [
-        {
-          id: 'so-1090',
-          establishmentName: 'Le Relais de la Corniche',
-          establishmentTypeLabel: 'RESTAURATEUR',
-          address: 'Corniche Ouest, Fann Dakar',
-          phone: '+221 33 823 10 10',
-          subtotalFormatted: '36 500 FCFA',
-          items: [
-            {
-              id: 'i-10',
-              name: 'Filet de Capitaine Sauce Vierge',
-              quantity: 2,
-              priceFormatted: '24 000 FCFA',
-              priceAmount: 24000,
-              description: 'Légumes croquants vapeur'
-            },
-            {
-              id: 'i-11',
-              name: 'Tarte Fine aux Pommes & Glace Vanille',
-              quantity: 2,
-              priceFormatted: '12 500 FCFA',
-              priceAmount: 12500,
-              description: 'Dessert maison'
-            }
-          ]
-        }
-      ],
-      payment: {
-        id: 'p-1090',
-        method: 'CARTE_BANCAIRE',
-        methodLabel: 'Carte Bancaire',
-        reference: '#CB-9021',
-        status: 'PAYE',
-        statusText: 'Validé Carte Visa • Reçu #CB-9021',
-        subtotalFormatted: '36 500 FCFA',
-        deliveryFeeFormatted: '2 000 FCFA',
-        totalPaidFormatted: '38 500 FCFA',
-        driverPayoutFormatted: '2 000 FCFA',
-        merchantPayoutFormatted: '36 500 FCFA',
-        commissionNote: '0% commission • Modèle AYYOU Abonnement Pro'
-      },
-      delivery: {
-        id: 'd-1090',
-        driverName: 'Pathé Seck',
-        driverPhone: '+221 77 333 44 55',
-        driverVehicle: 'Honda PCX 150cc DK-9900-FF',
-        distanceFromClientText: 'Livré au client à 12:34',
-        statusText: 'Livrée avec succès'
-      }
-    }
-  ];
+  private http = inject(HttpClient);
 
-  private mockCorridors: LogisticsCorridor[] = [
-    {
-      id: 'cor-1',
-      name: 'Axe Plateau • Corniche Ouest',
-      deliveriesCount: 32,
-      averageTimeMinutes: 18,
-      barColor: 'green'
-    },
-    {
-      id: 'cor-2',
-      name: 'Zone Almadies • Ngor',
-      deliveriesCount: 19,
-      averageTimeMinutes: 14,
-      barColor: 'green'
-    },
-    {
-      id: 'cor-3',
-      name: 'Ceinture Mermoz • Ouakam',
-      deliveriesCount: 7,
-      averageTimeMinutes: 11,
-      barColor: 'green'
-    }
-  ];
-
-  private ordersSubject = new BehaviorSubject<Order[]>(this.mockOrders);
-  private selectedSubject = new BehaviorSubject<Order | null>(this.mockOrders[0]);
+  private ordersSubject = new BehaviorSubject<Order[]>([]);
+  private selectedSubject = new BehaviorSubject<Order | null>(null);
 
   orders$ = this.ordersSubject.asObservable();
   selectedOrder$ = this.selectedSubject.asObservable();
 
   getStatsSummary(): Observable<OrderStatsSummary> {
-    return of({
-      todayCount: 1240,
-      todayVolumeFormatted: 'Volume: 14 850 000 FCFA',
-      preparingCount: 38,
-      deliveringCount: 58,
-      deliveredCount: 1129,
-      deliveredSuccessRate: '98.6%',
-      canceledCount: 15,
-      canceledAuditRate: '1.2% • à auditer'
-    });
+    const url = `${environment.apiUrl}/api/admin/orders/`;
+    return this.http.get<any>(url).pipe(
+      map(res => {
+        const rawItems: any[] = Array.isArray(res) ? res : (res.results || []);
+        const items = rawItems.map(mapBackendOrderToOrder);
+
+        const todayCount = items.length;
+        const totalSum = rawItems.reduce((acc, o) => acc + Number(o.total || 0), 0);
+        const todayVolumeFormatted = `Volume: ${new Intl.NumberFormat('fr-FR').format(totalSum)} FCFA`;
+        const preparingCount = items.filter(o => o.status === 'EN_PREPARATION' || o.status === 'A_PREPARER').length;
+        const deliveringCount = items.filter(o => o.status === 'EN_LIVRAISON').length;
+        const deliveredCount = items.filter(o => o.status === 'LIVREE').length;
+        const canceledCount = items.filter(o => o.status === 'ANNULEE').length;
+
+        return {
+          todayCount,
+          todayVolumeFormatted,
+          preparingCount,
+          deliveringCount,
+          deliveredCount,
+          deliveredSuccessRate: todayCount > 0 ? `${((deliveredCount / todayCount) * 100).toFixed(1)}%` : '100%',
+          canceledCount,
+          canceledAuditRate: todayCount > 0 ? `${((canceledCount / todayCount) * 100).toFixed(1)}%` : '0%'
+        };
+      }),
+      catchError(() => of({
+        todayCount: 0,
+        todayVolumeFormatted: 'Volume: 0 FCFA',
+        preparingCount: 0,
+        deliveringCount: 0,
+        deliveredCount: 0,
+        deliveredSuccessRate: '0%',
+        canceledCount: 0,
+        canceledAuditRate: '0%'
+      }))
+    );
   }
 
   getCorridors(): Observable<LogisticsCorridor[]> {
-    return of(this.mockCorridors);
+    const orders = this.ordersSubject.getValue();
+    if (orders.length === 0) {
+      return of([
+        {
+          id: 'cor-1',
+          name: 'Axe Plateau • Corniche Ouest',
+          deliveriesCount: 0,
+          averageTimeMinutes: 18,
+          barColor: 'green'
+        }
+      ]);
+    }
+
+    const mapCor = new Map<string, number>();
+    orders.forEach(o => {
+      const name = `Axe ${o.establishmentDistrict}`;
+      mapCor.set(name, (mapCor.get(name) || 0) + 1);
+    });
+
+    const list: LogisticsCorridor[] = [];
+    let i = 1;
+    mapCor.forEach((count, name) => {
+      list.push({
+        id: `cor-${i++}`,
+        name,
+        deliveriesCount: count,
+        averageTimeMinutes: 15,
+        barColor: 'green'
+      });
+    });
+
+    return of(list);
   }
 
   selectOrder(order: Order | null): void {
@@ -436,91 +231,110 @@ export class AdminOrderService {
     paymentMethod: string,
     zone: string
   ): Observable<Order[]> {
-    return this.orders$.pipe(
-      map(items => {
-        return items.filter(item => {
-          // Tab Filter
+    let params = new HttpParams();
+
+    if (searchQuery && searchQuery.trim().length > 0) {
+      params = params.set('search', searchQuery.trim());
+    }
+
+    if (tab === 'EN_LIVRAISON') {
+      params = params.set('statut', 'EN_LIVRAISON');
+    } else if (tab === 'PRETES') {
+      params = params.set('statut', 'PRETE');
+    } else if (tab === 'LIVREES') {
+      params = params.set('statut', 'LIVREE');
+    } else if (tab === 'ANNULEES') {
+      params = params.set('statut', 'ANNULEE');
+    }
+
+    const url = `${environment.apiUrl}/api/admin/orders/`;
+
+    return this.http.get<any>(url, { params }).pipe(
+      map(res => {
+        const rawItems: any[] = Array.isArray(res) ? res : (res.results || []);
+        let items = rawItems.map(mapBackendOrderToOrder);
+
+        items = items.filter(item => {
           let matchTab = true;
           if (tab === 'EN_COURS') {
             matchTab = item.status === 'EN_PREPARATION' || item.status === 'PRETE' || item.status === 'EN_LIVRAISON';
           } else if (tab === 'A_PREPARER') {
             matchTab = item.status === 'A_PREPARER' || item.status === 'EN_PREPARATION';
-          } else if (tab === 'PRETES') {
-            matchTab = item.status === 'PRETE';
-          } else if (tab === 'EN_LIVRAISON') {
-            matchTab = item.status === 'EN_LIVRAISON';
-          } else if (tab === 'LIVREES') {
-            matchTab = item.status === 'LIVREE';
-          } else if (tab === 'ANNULEES') {
-            matchTab = item.status === 'ANNULEE' || item.status === 'LITIGE';
           }
 
-          // Search Filter
-          let matchSearch = true;
-          if (searchQuery && searchQuery.trim().length > 0) {
-            const q = searchQuery.toLowerCase().trim();
-            const ref = item.reference.toLowerCase();
-            const clientName = item.client.name.toLowerCase();
-            const clientPhone = item.client.phone.toLowerCase();
-            const estName = item.establishmentName.toLowerCase();
-            matchSearch = ref.includes(q) || clientName.includes(q) || clientPhone.includes(q) || estName.includes(q);
-          }
-
-          // Payment Filter
           let matchPayment = true;
           if (paymentMethod && paymentMethod !== '' && paymentMethod !== 'Tous') {
             matchPayment = item.payment.method.toLowerCase().includes(paymentMethod.toLowerCase()) ||
                            item.payment.methodLabel.toLowerCase().includes(paymentMethod.toLowerCase());
           }
 
-          // Zone Filter
           let matchZone = true;
           if (zone && zone !== '' && zone !== 'Tout Dakar') {
             matchZone = item.establishmentDistrict.toLowerCase().includes(zone.toLowerCase()) ||
                         item.client.deliveryAddress.toLowerCase().includes(zone.toLowerCase());
           }
 
-          return matchTab && matchSearch && matchPayment && matchZone;
+          return matchTab && matchPayment && matchZone;
         });
+
+        this.ordersSubject.next(items);
+
+        const currentSelected = this.selectedSubject.getValue();
+        if (items.length > 0) {
+          if (!currentSelected || !items.some(o => o.id === currentSelected.id)) {
+            this.selectedSubject.next(items[0]);
+          }
+        } else {
+          this.selectedSubject.next(null);
+        }
+
+        return items;
+      }),
+      catchError(err => {
+        console.error('Erreur chargement commandes admin:', err);
+        return of([]);
       })
     );
   }
 
-  updateOrderStatus(orderId: string, newStatus: OrderStatus): void {
-    const currentOrders = [...this.ordersSubject.value];
-    const target = currentOrders.find(o => o.id === orderId);
-    if (target) {
-      target.status = newStatus;
-      if (newStatus === 'EN_LIVRAISON') {
-        target.statusText = 'En cours de route';
-        target.statusDotColor = 'blue';
-      } else if (newStatus === 'LIVREE') {
-        target.statusText = 'Livrée';
-        target.statusDotColor = 'green';
-      } else if (newStatus === 'ANNULEE') {
-        target.statusText = 'Annulée';
-        target.statusDotColor = 'red';
-      }
-      this.ordersSubject.next(currentOrders);
-      if (this.selectedSubject.value?.id === orderId) {
-        this.selectedSubject.next({ ...target });
-      }
-    }
+  updateOrderStatus(orderId: string, newStatus: OrderStatus): Observable<Order | null> {
+    const url = `${environment.apiUrl}/api/admin/orders/${orderId}/status/`;
+    return this.http.patch<any>(url, { statut: newStatus }).pipe(
+      map(raw => {
+        const updated = mapBackendOrderToOrder(raw);
+        const currentOrders = this.ordersSubject.getValue().map(o => o.id === orderId ? updated : o);
+        this.ordersSubject.next(currentOrders);
+
+        if (this.selectedSubject.getValue()?.id === orderId) {
+          this.selectedSubject.next(updated);
+        }
+        return updated;
+      }),
+      catchError(err => {
+        console.error('Erreur mise à jour statut commande:', err);
+        return of(null);
+      })
+    );
   }
 
-  assignDriver(orderId: string, driverName: string): void {
-    const currentOrders = [...this.ordersSubject.value];
-    const target = currentOrders.find(o => o.id === orderId);
-    if (target) {
-      target.delivery.driverName = driverName;
-      target.delivery.driverPhone = '+221 77 541 20 90';
-      target.delivery.driverVehicle = 'Yamaha Crypton DK-8492-AB';
-      target.delivery.distanceFromClientText = 'À 450m du client';
-      this.ordersSubject.next(currentOrders);
-      if (this.selectedSubject.value?.id === orderId) {
-        this.selectedSubject.next({ ...target });
-      }
-    }
+  assignDriver(orderId: string, driverId: string): Observable<Order | null> {
+    const url = `${environment.apiUrl}/api/admin/orders/${orderId}/assign-driver/`;
+    return this.http.post<any>(url, { driver_id: Number(driverId) }).pipe(
+      map(raw => {
+        const updated = mapBackendOrderToOrder(raw);
+        const currentOrders = this.ordersSubject.getValue().map(o => o.id === orderId ? updated : o);
+        this.ordersSubject.next(currentOrders);
+
+        if (this.selectedSubject.getValue()?.id === orderId) {
+          this.selectedSubject.next(updated);
+        }
+        return updated;
+      }),
+      catchError(err => {
+        console.error('Erreur assignation livreur commande:', err);
+        return of(null);
+      })
+    );
   }
 
   exportCsv(): void {

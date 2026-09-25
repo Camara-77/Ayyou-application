@@ -96,6 +96,14 @@
     border-color: #E51A29;
   }
 
+  .preview-img {
+    max-height: 90px;
+    max-width: 100%;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-bottom: 8px;
+  }
+
   .dropzone-icon {
     margin-bottom: 6px;
     display: flex;

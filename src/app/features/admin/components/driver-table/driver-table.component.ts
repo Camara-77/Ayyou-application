@@ -11,19 +11,13 @@ import { DriverDetail } from '../../models/admin-driver.models';
 })
 export class DriverTableComponent {
   @Input() drivers: DriverDetail[] = [];
+  @Input() totalCount: number = 0;
   @Input() selectedDriver: DriverDetail | null = null;
   @Output() selectDriver = new EventEmitter<DriverDetail>();
 
   currentPage: number = 1;
-  totalPages: number = 32;
 
   onRowClick(driver: DriverDetail): void {
     this.selectDriver.emit(driver);
-  }
-
-  setPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-    }
   }
 }

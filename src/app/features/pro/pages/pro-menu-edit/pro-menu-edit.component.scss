@@ -149,6 +149,25 @@
       border-color: #E51A29;
     }
   }
+
+  &.subcategories-pills-row {
+    margin-top: 4px;
+
+    .sub-pill {
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: 16px;
+      border: 1px solid #FECDD3;
+      background: #FFF5F5;
+      color: #991B1B;
+
+      &.active {
+        background: #E51A29;
+        color: #FFFFFF;
+        border-color: #E51A29;
+      }
+    }
+  }
 }
 
 /* Variants Section Block */

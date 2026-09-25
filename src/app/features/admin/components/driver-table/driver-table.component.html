@@ -61,6 +61,10 @@
               </span>
             </div>
           </td>
+        <tr *ngIf="drivers.length === 0">
+          <td colspan="4" class="empty-table-cell" style="text-align: center; padding: 40px 20px; color: #64748b;">
+            <span>Aucun livreur ou dossier de candidature disponible.</span>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -69,64 +73,7 @@
   <!-- Pagination Footer -->
   <div class="table-pagination-footer">
     <span class="pagination-info">
-      Affichage 1 à {{ drivers.length }} sur 190 livreurs
+      Affichage {{ drivers.length > 0 ? 1 : 0 }} à {{ drivers.length }} sur {{ totalCount || drivers.length }} livreur(s)
     </span>
-
-    <div class="pagination-controls">
-      <button
-        type="button"
-        class="btn-page-nav"
-        [disabled]="currentPage === 1"
-        (click)="setPage(currentPage - 1)"
-      >
-        &lt;
-      </button>
-
-      <button
-        type="button"
-        class="btn-page-num"
-        [class.active]="currentPage === 1"
-        (click)="setPage(1)"
-      >
-        1
-      </button>
-
-      <button
-        type="button"
-        class="btn-page-num"
-        [class.active]="currentPage === 2"
-        (click)="setPage(2)"
-      >
-        2
-      </button>
-
-      <button
-        type="button"
-        class="btn-page-num"
-        [class.active]="currentPage === 3"
-        (click)="setPage(3)"
-      >
-        3
-      </button>
-
-      <span class="dots-separator">...</span>
-
-      <button
-        type="button"
-        class="btn-page-num"
-        (click)="setPage(32)"
-      >
-        32
-      </button>
-
-      <button
-        type="button"
-        class="btn-page-nav"
-        [disabled]="currentPage === totalPages"
-        (click)="setPage(currentPage + 1)"
-      >
-        &gt;
-      </button>
-    </div>
   </div>
 </div>

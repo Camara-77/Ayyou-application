@@ -1,207 +1,35 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, of, forkJoin } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 import { Category, Dish, FeedItem, PaymentMethod, Restaurant, SearchResult, Vendor, UserProfile, NotificationItem, OrderHistoryItem, ProductDetail, OrderTrackingData, OrderValidationData } from '../models/client';
+
+export interface BackendUserProfile {
+  id: number;
+  email: string;
+  numero_telephone: string;
+  prenom: string;
+  nom: string;
+  nom_complet: string;
+  est_actif: boolean;
+  est_verifie: boolean;
+  profil_client?: {
+    id: number;
+    photo_avatar?: string;
+    adresse_principale?: string;
+    latitude?: number;
+    longitude?: number;
+    date_naissance?: string;
+    notifications_activees?: boolean;
+  };
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClientDataService {
-
-  private categories: Category[] = [
-    {
-      id: 'all',
-      name: 'Tous',
-      imageUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=200&q=80',
-      active: true
-    },
-    {
-      id: 'viande',
-      name: 'Viande',
-      imageUrl: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=200&q=80'
-    },
-    {
-      id: 'burgers',
-      name: 'Burgers',
-      imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=200&q=80'
-    },
-    {
-      id: 'thiebou',
-      name: 'Thiébou',
-      imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80'
-    },
-    {
-      id: 'brunch',
-      name: 'Brunch',
-      imageUrl: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=200&q=80'
-    },
-    {
-      id: 'desserts',
-      name: 'Desserts',
-      imageUrl: 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=200&q=80'
-    }
-  ];
-
-  private dishes: Dish[] = [
-    {
-      id: 'd1',
-      name: 'Thiéboudienne Penda Mbaye',
-      description: 'Riz au poisson rouge traditionnel préparé avec légumes frais, tamarin et piment vert.',
-      price: 4500,
-      imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
-      categoryId: 'thiebou',
-      categoryName: 'Plats Nationaux',
-      restaurantId: 'rest1',
-      restaurantName: 'Chez Loutcha',
-      likesCount: 1245,
-      preparationTime: '25-30 min',
-      tags: ['Populaire', 'Sénégalais']
-    },
-    {
-      id: 'd2',
-      name: 'Yassa Poulet Gourmet',
-      description: 'Poulet mariné grillé au feu de bois avec sauce oignons caramélisés et moutarde à l’ancienne.',
-      price: 3500,
-      imageUrl: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=600&q=80',
-      categoryId: 'viande',
-      categoryName: 'Plats Nationaux',
-      restaurantId: 'rest1',
-      restaurantName: 'Chez Loutcha',
-      likesCount: 980,
-      preparationTime: '20-25 min',
-      tags: ['Incontournable']
-    },
-    {
-      id: 'd3',
-      name: 'Pastels au Poisson (6 pcs)',
-      description: 'Beignets croustillants farcis au thon frais épicé, servis avec sauce tomate maison.',
-      price: 2000,
-      imageUrl: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=600&q=80',
-      categoryId: 'brunch',
-      categoryName: 'Entrées',
-      restaurantId: 'rest1',
-      restaurantName: 'Chez Loutcha',
-      likesCount: 640,
-      preparationTime: '15 min'
-    },
-    {
-      id: 'd4',
-      name: 'Mafé Viande de Bœuf',
-      description: 'Riz blanc servi avec une onctueuse sauce à la pâte d’arachide et morceaux de bœuf tendres.',
-      price: 4000,
-      imageUrl: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80',
-      categoryId: 'viande',
-      categoryName: 'Plats Nationaux',
-      restaurantId: 'rest1',
-      restaurantName: 'Chez Loutcha',
-      likesCount: 812,
-      preparationTime: '30 min'
-    },
-    {
-      id: 'd5',
-      name: 'Burger Dakar XXL',
-      description: 'Double steak haché de bœuf, cheddar fondu, sauce spéciale AYYOU et frites maison.',
-      price: 5500,
-      imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80',
-      categoryId: 'burgers',
-      categoryName: 'Fast-Food',
-      restaurantId: 'rest2',
-      restaurantName: 'L’Atelier du Choix Gourmand',
-      likesCount: 1530,
-      preparationTime: '20 min'
-    }
-  ];
-
-  private restaurant: Restaurant = {
-    id: 'rest1',
-    name: 'Chez Loutcha',
-    logoUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=200&q=80',
-    coverUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
-    tagline: 'Spécialités Sénégalaises & Africaines',
-    description: 'Une véritable institution dakaroise proposant les meilleures recettes traditionnelles cuisinées avec authenticité.',
-    location: 'Plateau, Dakar',
-    rating: 4.8,
-    reviewsCount: 342,
-    status: 'open',
-    closingTime: '23h30',
-    phoneNumber: '+221 33 821 00 00',
-    videosCount: 14,
-    isFavorite: true,
-    categories: [
-      { id: 'nationaux', name: 'Plats Nationaux', active: true },
-      { id: 'entrees', name: 'Entrées' },
-      { id: 'boissons', name: 'Boissons & Desserts' }
-    ],
-    dishes: this.dishes.filter(d => d.restaurantId === 'rest1')
-  };
-
-  private restaurantsList: Restaurant[] = [
-    this.restaurant,
-    {
-      id: 'rest2',
-      name: 'L’Atelier du Choix Gourmand',
-      logoUrl: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=200&q=80',
-      coverUrl: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=800&q=80',
-      tagline: 'Burgers & Grillades',
-      location: 'Almadies, Dakar',
-      rating: 4.6,
-      reviewsCount: 215,
-      status: 'open',
-      closingTime: '00h00',
-      categories: [],
-      dishes: []
-    },
-    {
-      id: 'rest3',
-      name: 'Chez Tonton Marie',
-      logoUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=200&q=80',
-      coverUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80',
-      tagline: 'Grillades au feu de bois',
-      location: 'Mermoz, Dakar',
-      rating: 4.7,
-      reviewsCount: 189,
-      status: 'open',
-      closingTime: '22h30',
-      categories: [],
-      dishes: []
-    }
-  ];
-
-  private feedItems: FeedItem[] = [
-    {
-      id: 'f1',
-      restaurant: {
-        id: 'rest1',
-        name: 'Chez Loutcha',
-        avatarUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=200&q=80',
-        isVerified: true
-      },
-      dish: this.dishes[0],
-      mediaType: 'image',
-      mediaUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
-      likesCount: 1200,
-      isLiked: false,
-      sharesCount: 48,
-      timeAgo: 'Il y a 10 min'
-    },
-    {
-      id: 'f2',
-      restaurant: {
-        id: 'rest2',
-        name: 'L’Atelier du Choix Gourmand',
-        avatarUrl: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=200&q=80',
-        isVerified: true
-      },
-      dish: this.dishes[4],
-      mediaType: 'video',
-      mediaUrl: 'assets/branding/logoanimeayyou.mp4',
-      videoDuration: '2:30',
-      maxDurationSeconds: 180,
-      likesCount: 1530,
-      isLiked: true,
-      sharesCount: 92,
-      timeAgo: 'Il y a 25 min'
-    }
-  ];
+  constructor(private http: HttpClient) {}
 
   private paymentMethods: PaymentMethod[] = [
     {
@@ -220,81 +48,223 @@ export class ClientDataService {
     }
   ];
 
-  private vendorsList: Vendor[] = [
-    {
-      id: 'v1',
-      name: 'Chef Alexandre',
-      photoUrl: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=200&q=80',
-      specialty: 'Pâtisserie Fine',
-      location: 'Point E, Dakar',
-      rating: 4.9,
-      status: 'open',
-      dishesCount: 18
-    },
-    {
-      id: 'v2',
-      name: 'Pâtisserie & Brunch Dakar',
-      photoUrl: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=200&q=80',
-      specialty: 'Viennoiseries, Brunch & Jus Frais',
-      location: 'Ngor, Dakar',
-      rating: 4.7,
-      status: 'open',
-      dishesCount: 12
-    }
-  ];
-
   getFeed(): Observable<FeedItem[]> {
-    return of(this.feedItems);
+    return this.http.get<any>(`${environment.apiUrl}/api/catalog/feed/`).pipe(
+      map(res => {
+        const list = Array.isArray(res) ? res : (res?.results || []);
+        return list.map((f: any) => this.mapBackendToFeedItem(f));
+      }),
+      catchError(() => of([]))
+    );
   }
 
   getRestaurant(id: string): Observable<Restaurant> {
-    return of(this.restaurant);
+    return this.http.get<any>(`${environment.apiUrl}/api/catalog/establishments/${id}/`).pipe(
+      switchMap(est => {
+        const restaurant = this.mapBackendToRestaurant(est);
+        return this.http.get<any>(`${environment.apiUrl}/api/catalog/products/?etablissement=${id}`).pipe(
+          map(prodRes => {
+            const prods = Array.isArray(prodRes) ? prodRes : (prodRes?.results || []);
+            restaurant.dishes = prods.map((p: any) => this.mapBackendToDish(p));
+            return restaurant;
+          }),
+          catchError(() => of(restaurant))
+        );
+      }),
+      catchError(() => of({
+        id,
+        name: 'Établissement AYYOU',
+        logoUrl: '',
+        coverUrl: '',
+        tagline: '',
+        description: '',
+        location: '',
+        rating: 0,
+        reviewsCount: 0,
+        status: 'closed' as const,
+        closingTime: '',
+        categories: [],
+        dishes: []
+      }))
+    );
   }
 
-  getRestaurants(): Observable<Restaurant[]> {
-    return of(this.restaurantsList);
+  getRestaurants(params?: { search?: string; categoryId?: string }): Observable<Restaurant[]> {
+    let httpParams = new HttpParams().set('type_etablissement', 'RESTAURANT');
+    if (params?.search) {
+      httpParams = httpParams.set('search', params.search);
+    }
+    if (params?.categoryId && params.categoryId !== 'all') {
+      httpParams = httpParams.set('specialite', params.categoryId);
+    }
+    return this.http.get<any>(`${environment.apiUrl}/api/catalog/establishments/`, { params: httpParams }).pipe(
+      map(res => {
+        const list = Array.isArray(res) ? res : (res?.results || []);
+        return list.map((item: any) => this.mapBackendToRestaurant(item));
+      }),
+      catchError(() => of([]))
+    );
   }
 
-  getVendors(): Observable<Vendor[]> {
-    return of(this.vendorsList);
+  getVendors(params?: { search?: string }): Observable<Vendor[]> {
+    let httpParams = new HttpParams().set('type_etablissement', 'VENDEUR');
+    if (params?.search) {
+      httpParams = httpParams.set('search', params.search);
+    }
+    return this.http.get<any>(`${environment.apiUrl}/api/catalog/establishments/`, { params: httpParams }).pipe(
+      map(res => {
+        const list = Array.isArray(res) ? res : (res?.results || []);
+        return list.map((item: any) => this.mapBackendToVendor(item));
+      }),
+      catchError(() => of([]))
+    );
   }
 
   getCategories(): Observable<Category[]> {
-    return of(this.categories);
+    return this.http.get<any>(`${environment.apiUrl}/api/catalog/categories/`).pipe(
+      map(res => {
+        const list = Array.isArray(res) ? res : (res?.results || []);
+        return list
+          .filter((cat: any) => cat.est_active !== false && !cat.nom?.toLowerCase().includes('test'))
+          .map((cat: any) => ({
+            id: cat.id ? cat.id.toString() : cat.slug,
+            name: cat.nom,
+            icon: cat.icone,
+            imageUrl: cat.image_url || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=200&q=80',
+            active: cat.est_active
+          }));
+      }),
+      catchError(() => of([]))
+    );
   }
 
-  private recommendations: Dish[] = [
-    {
-      id: 'rec1',
-      name: 'Jus de Bissap',
-      description: 'Boisson rafraîchissante à la fleur d’hibiscus et menthe',
-      price: 1000,
-      imageUrl: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=400&q=80',
-      restaurantId: 'rest1',
-      restaurantName: 'Chez Loutcha'
-    },
-    {
-      id: 'rec2',
-      name: 'Jus de Bouye',
-      description: 'Jus naturel au fruit du baobab et lait concentré',
-      price: 1200,
-      imageUrl: 'https://images.unsplash.com/photo-1556881286-fc6915169721?auto=format&fit=crop&w=400&q=80',
-      restaurantId: 'rest1',
-      restaurantName: 'Chez Loutcha'
-    },
-    {
-      id: 'rec3',
-      name: 'Salade Méchouia',
-      description: 'Poivrons et tomates grillés assaisonnés à l’huile d’olive',
-      price: 1500,
-      imageUrl: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80',
-      restaurantId: 'rest1',
-      restaurantName: 'Chez Loutcha'
+  getDishes(params?: { categoryId?: string; establishmentId?: string; search?: string }): Observable<Dish[]> {
+    let httpParams = new HttpParams();
+    if (params?.categoryId && params.categoryId !== 'all') {
+      httpParams = httpParams.set('categorie', params.categoryId);
     }
-  ];
+    if (params?.establishmentId) {
+      httpParams = httpParams.set('etablissement', params.establishmentId);
+    }
+    if (params?.search) {
+      httpParams = httpParams.set('search', params.search);
+    }
+    return this.http.get<any>(`${environment.apiUrl}/api/catalog/products/`, { params: httpParams }).pipe(
+      map(res => {
+        const list = Array.isArray(res) ? res : (res?.results || []);
+        return list.map((item: any) => this.mapBackendToDish(item));
+      }),
+      catchError(() => of([]))
+    );
+  }
+
+  likeProduct(productId: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/api/catalog/likes/`, { produit: productId });
+  }
+
+  unlikeProduct(productId: string): Observable<any> {
+    return this.http.request('delete', `${environment.apiUrl}/api/catalog/likes/`, {
+      body: { produit: productId }
+    });
+  }
+
+  likeFeedPublication(publicationId: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/api/catalog/likes/`, { publication_feed: publicationId });
+  }
+
+  unlikeFeedPublication(publicationId: string): Observable<any> {
+    return this.http.request('delete', `${environment.apiUrl}/api/catalog/likes/`, {
+      body: { publication_feed: publicationId }
+    });
+  }
+
+  private mapBackendToRestaurant(item: any): Restaurant {
+    return {
+      id: item.id ? item.id.toString() : '',
+      name: item.nom || item.nom_etablissement || 'Établissement',
+      logoUrl: item.logo_url || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=200&q=80',
+      coverUrl: item.couverture_url || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
+      tagline: item.slogan || item.specialite || item.description || 'Spécialités AYYOU',
+      description: item.description || '',
+      location: item.adresse || 'Dakar, Sénégal',
+      rating: typeof item.note_moyenne === 'string' ? parseFloat(item.note_moyenne) : (item.note_moyenne || 4.8),
+      reviewsCount: item.nombre_avis || 0,
+      status: (item.statut === 'open' || item.statut === 'OUVERT') ? 'open' : 'closed',
+      closingTime: item.heure_fermeture || '23h30',
+      categories: [],
+      dishes: []
+    };
+  }
+
+  private mapBackendToVendor(item: any): Vendor {
+    return {
+      id: item.id ? item.id.toString() : '',
+      name: item.nom || item.nom_etablissement || 'Vendeur AYYOU',
+      photoUrl: item.logo_url || item.couverture_url || 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=200&q=80',
+      specialty: item.specialite || item.slogan || item.description || 'Produits & Plats faits maison',
+      location: item.adresse || 'Dakar, Sénégal',
+      rating: typeof item.note_moyenne === 'string' ? parseFloat(item.note_moyenne) : (item.note_moyenne || 4.8),
+      status: (item.statut === 'open' || item.statut === 'OUVERT') ? 'open' : 'closed',
+      dishesCount: item.nombre_produits || 0
+    };
+  }
+
+  private mapBackendToDish(p: any): Dish {
+    const rawPrice = p.prix_base ?? p.prix;
+    return {
+      id: p.id ? p.id.toString() : '',
+      name: p.nom || '',
+      description: p.description || '',
+      price: typeof rawPrice === 'string' ? parseFloat(rawPrice) : (rawPrice || 0),
+      imageUrl: p.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+      categoryId: typeof p.categorie === 'object' ? p.categorie?.id?.toString() : (p.categorie ? p.categorie.toString() : ''),
+      categoryName: typeof p.categorie === 'object' ? p.categorie?.nom : (p.categorie_nom || ''),
+      restaurantId: typeof p.etablissement === 'object' ? p.etablissement?.id?.toString() : (p.etablissement ? p.etablissement.toString() : ''),
+      restaurantName: typeof p.etablissement === 'object' ? (p.etablissement?.nom || p.etablissement?.nom_etablissement) : (p.etablissement_nom || 'AYYOU Établissement'),
+      likesCount: p.nombre_likes || 0,
+      preparationTime: p.temps_preparation || '20-30 min',
+      tags: p.tags || ['Sénégalais']
+    };
+  }
+
+  private mapBackendToFeedItem(f: any): FeedItem {
+    const etabName = f.etablissement?.nom || f.etablissement?.nom_etablissement || 'AYYOU Établissement';
+    return {
+      id: f.id ? f.id.toString() : '',
+      restaurant: {
+        id: f.etablissement?.id ? f.etablissement.id.toString() : '',
+        name: etabName,
+        avatarUrl: f.etablissement?.logo_url || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=200&q=80',
+        isVerified: f.etablissement?.est_verifie ?? true
+      },
+      dish: f.produit ? this.mapBackendToDish(f.produit) : {
+        id: f.id ? f.id.toString() : '',
+        name: f.description || 'Spécialité AYYOU',
+        description: f.description || '',
+        price: 0,
+        imageUrl: f.media_url,
+        restaurantId: f.etablissement?.id ? f.etablissement.id.toString() : '',
+        restaurantName: etabName
+      },
+      mediaType: (f.type_media === 'VIDEO' || f.type_media === 'video') ? 'video' : 'image',
+      mediaUrl: f.media_url,
+      videoDuration: f.duree_video || '2:00',
+      maxDurationSeconds: f.max_duree_secondes || 180,
+      likesCount: f.nombre_likes || (f.produit?.nombre_likes || 0),
+      isLiked: !!f.is_liked,
+      sharesCount: f.nombre_partages || 0,
+      timeAgo: 'Récemment'
+    };
+  }
 
   getRecommendations(): Observable<Dish[]> {
-    return of(this.recommendations);
+    return this.http.get<any>(`${environment.apiUrl}/api/catalog/products/`).pipe(
+      map(res => {
+        const list = Array.isArray(res) ? res : (res?.results || []);
+        return list.slice(0, 5).map((p: any) => this.mapBackendToDish(p));
+      }),
+      catchError(() => of([]))
+    );
   }
 
   getPaymentMethods(): Observable<PaymentMethod[]> {
@@ -302,351 +272,311 @@ export class ClientDataService {
   }
 
   getDeliveryAddresses(query: string): Observable<string[]> {
-    const addresses = [
-      'Appartement L02, Résidence les Palmiers, Dakar',
-      'Avenue Léopold Sédar Senghor, Plateau, Dakar',
-      'Route des Almadies, Zone 4, Dakar',
-      'Avenue Cheikh Anta Diop, Fann, Dakar',
-      'Rue 6 x 11, Médina, Dakar',
-      'Cité Keur Gorgui, Sacré-Cœur, Dakar'
-    ];
-    if (!query || !query.trim()) return of(addresses);
-    return of(addresses.filter(a => a.toLowerCase().includes(query.toLowerCase())));
+    return this.http.get<any>(`${environment.apiUrl}/api/users/me/location/`).pipe(
+      map(res => {
+        const addr = res?.adresse_principale;
+        return addr ? [addr] : [];
+      }),
+      catchError(() => of([]))
+    );
   }
 
   getSearchResults(query: string): Observable<SearchResult> {
-    const q = (query || '').toLowerCase().trim();
-    if (!q) {
-      return of({
-        restaurants: this.restaurantsList,
-        dishes: this.dishes,
-        vendors: this.vendorsList,
-        categories: this.categories,
-        recentSearches: ['Burger gourmet', 'Thiéboudienne', 'Pâtisserie & Brunch']
-      });
-    }
-
-    const filteredRestaurants = this.restaurantsList.filter(r =>
-      r.name.toLowerCase().includes(q) ||
-      (r.tagline && r.tagline.toLowerCase().includes(q)) ||
-      (r.location && r.location.toLowerCase().includes(q))
+    const q = (query || '').trim();
+    return forkJoin({
+      categories: this.getCategories(),
+      restaurants: this.getRestaurants({ search: q }),
+      dishes: this.getDishes({ search: q }),
+      vendors: this.getVendors({ search: q })
+    }).pipe(
+      map(res => ({
+        restaurants: res.restaurants,
+        dishes: res.dishes,
+        vendors: res.vendors,
+        categories: res.categories,
+        recentSearches: []
+      })),
+      catchError(() => of(this.localSearchFallback()))
     );
+  }
 
-    const filteredDishes = this.dishes.filter(d =>
-      d.name.toLowerCase().includes(q) ||
-      d.description.toLowerCase().includes(q) ||
-      d.restaurantName.toLowerCase().includes(q) ||
-      (d.tags && d.tags.some(t => t.toLowerCase().includes(q))) ||
-      (d.categoryName && d.categoryName.toLowerCase().includes(q))
+  private localSearchFallback(): SearchResult {
+    return {
+      restaurants: [],
+      dishes: [],
+      vendors: [],
+      categories: [],
+      recentSearches: []
+    };
+  }
+
+  getUserProfile(): Observable<UserProfile> {
+    return this.http.get<BackendUserProfile>(`${environment.apiUrl}/api/users/me/`).pipe(
+      map(res => ({
+        name: res.nom_complet || `${res.prenom} ${res.nom}`.trim() || 'Client AYYOU',
+        location: res.profil_client?.adresse_principale || 'Dakar, Sénégal',
+        avatarUrl: res.profil_client?.photo_avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+        notificationsEnabled: res.profil_client?.notifications_activees ?? true
+      })),
+      catchError(() => of({
+        name: 'Client AYYOU',
+        location: 'Dakar, Sénégal',
+        avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+        notificationsEnabled: true
+      }))
     );
+  }
 
-    const filteredVendors = this.vendorsList.filter(v =>
-      v.name.toLowerCase().includes(q) ||
-      v.specialty.toLowerCase().includes(q) ||
-      v.location.toLowerCase().includes(q)
-    );
+  getRawUserProfile(): Observable<BackendUserProfile> {
+    return this.http.get<BackendUserProfile>(`${environment.apiUrl}/api/users/me/`);
+  }
 
-    return of({
-      restaurants: filteredRestaurants,
-      dishes: filteredDishes,
-      vendors: filteredVendors,
-      categories: this.categories,
-      recentSearches: ['Burger gourmet', 'Thiéboudienne', 'Pâtisserie & Brunch']
+  updateUserProfile(data: any): Observable<BackendUserProfile> {
+    return this.http.patch<BackendUserProfile>(`${environment.apiUrl}/api/users/me/`, data);
+  }
+
+  updateLocation(latitude: number, longitude: number, adresse_principale?: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/api/users/me/location/`, {
+      latitude,
+      longitude,
+      adresse_principale
     });
   }
 
-  private userProfile: UserProfile = {
-    name: 'Moussa Diop',
-    location: 'Dakar, Sénégal',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-    notificationsEnabled: true
-  };
-
-  private notificationsList: NotificationItem[] = [
-    {
-      id: 'n1',
-      type: 'order_ready',
-      restaurantName: 'Chez Loutcha',
-      orderRef: '#AY-9482',
-      statusText: 'En cours',
-      timeAgo: "À l'instant",
-      message: 'Votre commande est prête au comptoir de retrait.',
-      pickupLimit: 'À retirer avant 13h15',
-      hasQrCode: true
-    },
-    {
-      id: 'n2',
-      type: 'message',
-      restaurantName: 'La Fourchette Dakar',
-      statusText: 'Service Relations Clientèle',
-      timeAgo: 'Hier, 20h25',
-      message: '« Merci pour votre fidélité Moussa ! Votre commande spéciale a été préparée avec soin. Nous espérons vous revoir très bientôt sur l\'application AYYOU. »',
-      deliveryStatus: 'Livré à l\'habitation'
-    },
-    {
-      id: 'n3',
-      type: 'click_collect',
-      restaurantName: 'Click & Collect #AY-9482',
-      statusText: 'Validé',
-      timeAgo: '13h15',
-      message: 'Votre code de retrait a été validé au comptoir de Chez Loutcha. Facture archivée automatiquement.',
-      hasReceipt: true
-    }
-  ];
-
-  private orderHistoryList: OrderHistoryItem[] = [
-    {
-      id: 'oh1',
-      restaurantName: 'Chez Loutcha',
-      restaurantIconType: 'food',
-      dateText: '12 Nov, 13:45',
-      status: 'Livrée',
-      items: [
-        { name: 'Poulet Yassa', quantity: 1, price: 5000 },
-        { name: 'Jus de Bissap', quantity: 2, price: 2000 },
-        { name: 'Thiéboudienne', quantity: 1, price: 7000 }
-      ],
-      deliveryFee: 1500,
-      totalPrice: 15500
-    },
-    {
-      id: 'oh2',
-      restaurantName: 'La Fourchette',
-      restaurantIconType: 'store',
-      dateText: '08 Nov, 20:15',
-      status: 'En cours',
-      items: [
-        { name: 'Burger Classic', quantity: 2, price: 14000 },
-        { name: 'Frites Maison', quantity: 2, price: 6000 },
-        { name: 'Milkshake Vanille', quantity: 2, price: 8000 }
-      ],
-      deliveryFee: 4000,
-      totalPrice: 32000,
-      paymentMethod: 'Visa **** 4242'
-    }
-  ];
-
-  getUserProfile(): Observable<UserProfile> {
-    return of(this.userProfile);
-  }
-
   getNotifications(): Observable<NotificationItem[]> {
-    return of(this.notificationsList);
+    return this.http.get<any>(`${environment.apiUrl}/api/notifications/`).pipe(
+      map(res => {
+        const list = Array.isArray(res) ? res : (res?.results || []);
+        return list.map((n: any) => ({
+          id: String(n.id),
+          type: n.type_notification || 'order_ready',
+          restaurantName: n.titre || 'AYYOU',
+          orderRef: n.reference_id ? `#AY-${n.reference_id}` : '',
+          statusText: n.statut_display || 'Notification',
+          timeAgo: n.created_at ? new Date(n.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '',
+          message: n.message || '',
+          pickupLimit: '',
+          hasQrCode: false
+        }));
+      }),
+      catchError(() => of([]))
+    );
   }
 
   getOrderHistory(): Observable<OrderHistoryItem[]> {
-    return of(this.orderHistoryList);
+    return this.http.get<any>(`${environment.apiUrl}/api/orders/`).pipe(
+      map(res => {
+        const list = Array.isArray(res) ? res : (res?.results || []);
+        return list.map((cmd: any) => {
+          const firstSub = cmd.sous_commandes?.[0];
+          const dateObj = cmd.date_creation ? new Date(cmd.date_creation) : new Date();
+          const items: Array<{ name: string; quantity: number; price: number }> = [];
+          (cmd.sous_commandes || []).forEach((sub: any) => {
+            (sub.lignes || []).forEach((l: any) => {
+              items.push({
+                name: l.nom_produit_snapshot,
+                quantity: l.quantite,
+                price: parseFloat(l.prix_unitaire || '0')
+              });
+            });
+          });
+
+          return {
+            id: String(cmd.id),
+            restaurantName: firstSub ? firstSub.etablissement_nom : 'Établissement AYYOU',
+            restaurantIconType: 'food',
+            dateText: dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
+            status: cmd.statut === 'LIVREE' ? 'Livrée' : (cmd.statut === 'ANNULEE' ? 'Annulée' : 'En cours'),
+            items: items.length > 0 ? items : [{ name: 'Commande AYYOU', quantity: 1, price: parseFloat(cmd.total || '0') }],
+            deliveryFee: parseFloat(cmd.frais_livraison || '1000'),
+            totalPrice: parseFloat(cmd.total || '0'),
+            paymentMethod: cmd.methode_paiement || 'Wave'
+          };
+        });
+      }),
+      catchError(() => of([]))
+    );
   }
 
   getFavorites(): Observable<FeedItem[]> {
-    const favoriteItems: FeedItem[] = [
-      {
-        id: 'fav1',
-        restaurant: {
-          id: 'rest1',
-          name: 'Chez Loutcha',
-          avatarUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=200&q=80',
-          isVerified: true
-        },
-        dish: {
-          id: 'd1',
-          name: 'Thiéboudienne Penda Mbaye',
-          description: 'Riz au poisson rouge traditionnel préparé avec légumes frais, tamarin et piment vert.',
-          price: 4500,
-          imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
-          restaurantId: 'rest1',
-          restaurantName: 'Chez Loutcha'
-        },
-        mediaType: 'image',
-        mediaUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
-        likesCount: 1200,
-        isLiked: true,
-        sharesCount: 48,
-        timeAgo: 'Favori'
-      },
-      {
-        id: 'fav2',
-        restaurant: {
-          id: 'rest1',
-          name: 'Chez Loutcha',
-          avatarUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=200&q=80',
-          isVerified: true
-        },
-        dish: {
-          id: 'd2_fav',
-          name: 'Thiéboudienne Penda Mbaye',
-          description: 'Riz au poisson rouge traditionnel préparé avec légumes frais.',
-          price: 4500,
-          imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
-          restaurantId: 'rest1',
-          restaurantName: 'Chez Loutcha'
-        },
-        mediaType: 'image',
-        mediaUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
-        likesCount: 1200,
-        isLiked: true,
-        sharesCount: 48,
-        timeAgo: 'Favori'
-      }
-    ];
-    return of(favoriteItems);
+    return this.http.get<any>(`${environment.apiUrl}/api/catalog/likes/`).pipe(
+      map(res => {
+        const list = Array.isArray(res) ? res : (res?.results || []);
+        return list.map((item: any) => this.mapBackendToFeedItem(item.publication_feed || item));
+      }),
+      catchError(() => of([]))
+    );
   }
 
   getProductDetail(id: string): Observable<ProductDetail> {
-    const mockProductDetail: ProductDetail = {
-      id: id || 'd1',
-      name: 'Thiéboudienne Rouge Royale',
-      price: 4500,
-      description: 'Véritable Ceebu Jën rouge authentique mijoté avec ses épices. Servi avec une darne de mérou blanc frais (Tiof), carottes fondantes, chou vert, manioc tendre et piment doux sur lit de riz cassé deux fois.',
-      imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
-      images: [
-        'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80'
-      ],
-      stockInfo: 'En stock',
-      preparationTime: 'Prépa ~25 min',
-      restaurant: {
-        id: 'rest1',
-        name: 'Chez Loutcha',
-        subtitle: 'Cuisine dakaroise authentique',
-        initials: 'CL'
-      },
-      variants: [
-        {
-          id: 'v1',
-          title: 'Classique (1 personne)',
-          subtitle: '1 pers. avec darne de Tiof 300g, légumes',
-          priceOffset: 0,
-          isRequired: true
-        },
-        {
-          id: 'v2',
-          title: 'Gourmand Tiof XL',
-          subtitle: 'Pimentée, double darne de Tiof, légumes chamarrés',
-          priceOffset: 1500
-        },
-        {
-          id: 'v3',
-          title: 'Plat Familial Teranga (3-4 pers.)',
-          subtitle: 'Grand plat traditionnel en inox pour partage',
-          priceOffset: 6000
-        }
-      ],
-      sauces: [
-        {
-          id: 's1',
-          title: 'Sauce Beugueul',
-          subtitle: 'Feuilles d\'oseille acidulées',
-          priceOffset: 0,
-          isIncluded: true
-        },
-        {
-          id: 's2',
-          title: 'Sauce Nététou',
-          subtitle: 'Graines de caroube fermentées',
-          priceOffset: 0
-        }
-      ],
-      supplements: [
-        {
-          id: 'sup1',
-          title: 'Croûte de riz chaud (Xoogn)',
-          priceOffset: 500
-        },
-        {
-          id: 'sup2',
-          title: 'Portion de légumes confits en plus',
-          priceOffset: 700
-        },
-        {
-          id: 'sup3',
-          title: 'Jus de Bissap Maison Frais (33cl)',
-          priceOffset: 1000
-        }
-      ]
-    };
-    return of(mockProductDetail);
+    return this.http.get<any>(`${environment.apiUrl}/api/catalog/products/${id}/`).pipe(
+      map(p => {
+        const rawPrice = p.prix_base ?? p.prix;
+        const parsedPrice = typeof rawPrice === 'string' ? parseFloat(rawPrice) : (rawPrice || 0);
+
+        return {
+          id: p.id ? p.id.toString() : id,
+          name: p.nom || '',
+          price: parsedPrice,
+          description: p.description || '',
+          imageUrl: p.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
+          images: [p.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80'],
+          stockInfo: p.est_disponible ? 'En stock' : 'Indisponible',
+          preparationTime: p.temps_preparation || 'Prépa ~25 min',
+          restaurant: {
+            id: p.etablissement?.id ? p.etablissement.id.toString() : (p.etablissement ? p.etablissement.toString() : ''),
+            name: p.etablissement?.nom_etablissement || p.etablissement?.nom || 'Établissement',
+            subtitle: p.etablissement?.specialite || 'Cuisine dakaroise',
+            avatarUrl: p.etablissement?.logo_url,
+            initials: (p.etablissement?.nom_etablissement || p.etablissement?.nom || 'AY').substring(0, 2).toUpperCase()
+          },
+          variants: (p.variantes || []).map((v: any) => {
+            const rawOffset = v.surcout_prix ?? v.prix_supplementaire;
+            return {
+              id: v.id ? v.id.toString() : '',
+              title: v.titre || v.nom || 'Option',
+              subtitle: v.sous_titre || v.description || '',
+              priceOffset: typeof rawOffset === 'string' ? parseFloat(rawOffset) : (rawOffset || 0),
+              isRequired: v.est_requis ?? v.est_obligatoire ?? false
+            };
+          }),
+          sauces: (p.sauces || []).map((s: any) => {
+            const rawOffset = s.surcout_prix ?? s.prix_supplementaire;
+            return {
+              id: s.id ? s.id.toString() : '',
+              title: s.titre || s.nom || 'Sauce',
+              subtitle: s.sous_titre || s.description || '',
+              priceOffset: typeof rawOffset === 'string' ? parseFloat(rawOffset) : (rawOffset || 0),
+              isIncluded: s.est_inclus ?? false
+            };
+          }),
+          supplements: (p.supplements || []).map((sp: any) => {
+            const rawOffset = sp.surcout_prix ?? sp.prix_supplementaire;
+            return {
+              id: sp.id ? sp.id.toString() : '',
+              title: sp.titre || sp.nom || 'Supplément',
+              priceOffset: typeof rawOffset === 'string' ? parseFloat(rawOffset) : (rawOffset || 0)
+            };
+          })
+        };
+      })
+    );
   }
 
   getOrderTracking(id: string): Observable<OrderTrackingData> {
-    const mockTracking: OrderTrackingData = {
-      id: id || 'ot1',
-      orderRef: 'AY-9482',
-      restaurant: {
-        name: 'Chez Loutcha',
-        status: 'Ouvert',
-        subtitle: 'Cuisine sénégalaise & Africaine',
-        address: '101 Rue de Sandaga, Dakar'
-      },
-      etaTime: '13h45',
-      etaRemainingMinutes: 12,
-      steps: [
-        { label: 'Validée', completed: true, active: false },
-        { label: 'En cuisine', completed: true, active: false },
-        { label: 'En route', completed: false, active: true },
-        { label: 'Livrée', completed: false, active: false }
-      ],
-      metrics: {
-        remainingTime: '12 min',
-        distance: '1.8 km',
-        condition: 'Fluide'
-      },
-      driver: {
-        name: 'Amadou Sali',
-        badge: 'Livreur Pro',
-        vehicle: 'Scooter Yamaha NMAX',
-        rating: 4.9,
-        phone: '+221 77 000 00 00'
-      },
-      items: [
-        { name: 'Thiéboudienne Penda Mbaye', quantity: 1, price: 3500 },
-        { name: 'Alloco & Sauce Piment', quantity: 1, price: 1200 },
-        { name: 'Jus de Bissap Maison (50cl)', quantity: 1, price: 800 }
-      ],
-      totalPrice: 5500,
-      deliveryAddress: {
-        recipientName: 'Alia Ndiaye',
-        addressText: 'Villa 14, Allées Seydou Nourou Tall, Point E',
-        instructions: 'Instructions : Sonner au portail noir, 1er étage.',
-        tag: 'Sans contact'
-      },
-      securityCode: '9482'
-    };
-    return of(mockTracking);
+    return this.http.get<any>(`${environment.apiUrl}/api/orders/${id}/`).pipe(
+      map(cmd => ({
+        id: String(cmd.id),
+        orderRef: cmd.numero_commande || `AY-${cmd.id}`,
+        restaurant: {
+          name: cmd.sous_commandes?.[0]?.etablissement_nom || 'Établissement AYYOU',
+          status: 'Ouvert',
+          subtitle: 'Cuisine sénégalaise',
+          address: 'Dakar'
+        },
+        etaTime: 'En cours',
+        etaRemainingMinutes: 15,
+        steps: [
+          { label: 'Validée', completed: true, active: false },
+          { label: 'En cuisine', completed: cmd.statut !== 'EN_ATTENTE_PAIEMENT', active: cmd.statut === 'EN_ATTENTE_PAIEMENT' },
+          { label: 'En route', completed: cmd.statut === 'LIVREE', active: cmd.statut === 'EN_COURS' },
+          { label: 'Livrée', completed: cmd.statut === 'LIVREE', active: cmd.statut === 'LIVREE' }
+        ],
+        metrics: {
+          remainingTime: '15 min',
+          distance: '2.0 km',
+          condition: 'Fluide'
+        },
+        driver: {
+          name: 'Livreur AYYOU',
+          badge: 'Livreur Pro',
+          vehicle: 'Scooter',
+          rating: 4.8,
+          phone: ''
+        },
+        items: (cmd.sous_commandes || []).flatMap((sub: any) => (sub.lignes || []).map((l: any) => ({
+          name: l.nom_produit_snapshot,
+          quantity: l.quantite,
+          price: parseFloat(l.prix_unitaire || '0')
+        }))),
+        totalPrice: parseFloat(cmd.total || '0'),
+        deliveryAddress: {
+          recipientName: cmd.nom_destinataire || 'Client AYYOU',
+          addressText: cmd.adresse_livraison || '',
+          instructions: cmd.instructions_livraison || '',
+          tag: 'Direct'
+        },
+        securityCode: String(cmd.id).padStart(4, '0')
+      })),
+      catchError(() => of({
+        id,
+        orderRef: `AY-${id}`,
+        restaurant: { name: 'Établissement AYYOU', status: 'Ouvert', subtitle: '', address: '' },
+        etaTime: '--',
+        etaRemainingMinutes: 0,
+        steps: [],
+        metrics: { remainingTime: '0 min', distance: '0 km', condition: 'Normal' },
+        driver: { name: 'Livreur AYYOU', badge: 'Pro', vehicle: '', rating: 5, phone: '' },
+        items: [],
+        totalPrice: 0,
+        deliveryAddress: { recipientName: '', addressText: '', instructions: '', tag: '' },
+        securityCode: '0000'
+      }))
+    );
   }
 
   getOrderValidation(id: string): Observable<OrderValidationData> {
-    const mockValidation: OrderValidationData = {
-      id: id || 'ov1',
-      orderRef: 'AY-9482',
-      priorityText: 'Prioritaire',
-      clientCode: 'AY • 9482',
-      readySinceTime: '12h45',
-      pickupLimitTime: '13h15',
-      timerRemainingMinutes: 30,
-      preparationStepCurrent: 3,
-      preparationStepTotal: 4,
-      steps: [
-        { label: 'Validée', completed: true, active: false },
-        { label: 'En cuisine', completed: true, active: false },
-        { label: 'Au comptoir', completed: false, active: true },
-        { label: 'Récupérée', completed: false, active: false }
-      ],
-      restaurant: {
-        name: 'Chez Loutcha',
-        status: 'Ouvert',
-        address: '101 Rue Carnot, Dakar Plateau',
-        phone: '+221 33 821 00 00'
-      },
-      items: [
-        { name: 'Thiéboudienne Rouge Royale', quantity: 1, price: 4500 },
-        { name: 'Yassa au Poulet Braisé', quantity: 1, price: 4500 },
-        { name: 'Bissap Royal Menthe Fraîche', quantity: 2, price: 1500 }
-      ],
-      itemCount: 3,
-      bagNumber: '#44',
-      paymentMethod: 'Wave',
-      totalPrice: 10500
-    };
-    return of(mockValidation);
+    return this.http.get<any>(`${environment.apiUrl}/api/orders/${id}/`).pipe(
+      map(cmd => ({
+        id: String(cmd.id),
+        orderRef: cmd.numero_commande || `AY-${cmd.id}`,
+        priorityText: 'Standard',
+        clientCode: `AY • ${cmd.id}`,
+        readySinceTime: '--',
+        pickupLimitTime: '--',
+        timerRemainingMinutes: 20,
+        preparationStepCurrent: 2,
+        preparationStepTotal: 4,
+        steps: [
+          { label: 'Validée', completed: true, active: false },
+          { label: 'En cuisine', completed: cmd.statut !== 'EN_ATTENTE_PAIEMENT', active: cmd.statut === 'EN_ATTENTE_PAIEMENT' },
+          { label: 'Au comptoir', completed: cmd.statut === 'PRETE', active: cmd.statut === 'EN_COURS' },
+          { label: 'Récupérée', completed: cmd.statut === 'LIVREE', active: cmd.statut === 'LIVREE' }
+        ],
+        restaurant: {
+          name: cmd.sous_commandes?.[0]?.etablissement_nom || 'Établissement AYYOU',
+          status: 'Ouvert',
+          address: 'Dakar',
+          phone: ''
+        },
+        items: (cmd.sous_commandes || []).flatMap((sub: any) => (sub.lignes || []).map((l: any) => ({
+          name: l.nom_produit_snapshot,
+          quantity: l.quantite,
+          price: parseFloat(l.prix_unitaire || '0')
+        }))),
+        itemCount: (cmd.sous_commandes || []).reduce((acc: number, sub: any) => acc + (sub.lignes || []).length, 0),
+        bagNumber: `#${cmd.id}`,
+        paymentMethod: cmd.methode_paiement || 'Wave',
+        totalPrice: parseFloat(cmd.total || '0')
+      })),
+      catchError(() => of({
+        id,
+        orderRef: `AY-${id}`,
+        priorityText: '',
+        clientCode: `AY • ${id}`,
+        readySinceTime: '',
+        pickupLimitTime: '',
+        timerRemainingMinutes: 0,
+        preparationStepCurrent: 0,
+        preparationStepTotal: 4,
+        steps: [],
+        restaurant: { name: '', status: '', address: '', phone: '' },
+        items: [],
+        itemCount: 0,
+        bagNumber: `#${id}`,
+        paymentMethod: 'Mobile',
+        totalPrice: 0
+      }))
+    );
   }
 }

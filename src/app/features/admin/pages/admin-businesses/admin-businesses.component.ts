@@ -52,13 +52,19 @@ export class AdminBusinessesComponent implements OnInit {
   }
 
   onApproveEstablishment(id: string): void {
-    this.businessService.approveEstablishment(id);
-    this.loadFiltered();
+    this.businessService.approveEstablishment(id).subscribe(() => {
+      this.loadFiltered();
+      this.stats$ = this.businessService.getStatsSummary();
+    });
   }
 
-  onRejectEstablishment(id: string): void {
-    this.businessService.rejectEstablishment(id);
-    this.loadFiltered();
+  onRejectEstablishment(event: { id: string; motif: string } | string): void {
+    const id = typeof event === 'string' ? event : event.id;
+    const motif = typeof event === 'string' ? undefined : event.motif;
+    this.businessService.rejectEstablishment(id, motif).subscribe(() => {
+      this.loadFiltered();
+      this.stats$ = this.businessService.getStatsSummary();
+    });
   }
 
   private loadFiltered(): void {

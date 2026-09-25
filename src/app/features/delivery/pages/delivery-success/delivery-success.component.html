@@ -1,0 +1,96 @@
+<div class="delivery-success-wrapper">
+  <!-- TOP HEADER -->
+  <header class="top-header">
+    <button type="button" class="btn-icon" (click)="goBack()" aria-label="Retour">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+    </button>
+
+    <h1 class="header-title">Validation de la course</h1>
+
+    <button type="button" class="btn-icon notification-btn" aria-label="Notifications">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      </svg>
+      <span class="notification-badge"></span>
+    </button>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="content-area">
+    <!-- LOADING STATE -->
+    <div class="state-card" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p class="state-text">Chargement des informations...</p>
+    </div>
+
+    <!-- ERROR STATE -->
+    <div class="state-card error-card" *ngIf="!isLoading && errorMessage">
+      <div class="error-icon">⚠️</div>
+      <p class="error-text">{{ errorMessage }}</p>
+      <button class="btn-retry" (click)="goHome()">Retour à l'accueil</button>
+    </div>
+
+    <!-- SUCCESS CONTENT -->
+    <div class="success-content" *ngIf="!isLoading && delivery">
+      <!-- SUCCESS ICON BADGE -->
+      <div class="success-icon-container">
+        <div class="success-badge">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+      </div>
+
+      <!-- HEADING -->
+      <div class="heading-section">
+        <h2 class="main-title">Livraison terminée !</h2>
+        <p class="subtitle">Félicitations pour cette course menée avec succès.</p>
+      </div>
+
+      <!-- SUMMARY PILL -->
+      <div class="summary-pill">
+        <span>#{{ delivery.commande_reference || ('AY-' + delivery.id) }}</span>
+        <span class="dot">•</span>
+        <span>{{ getFormattedTime() }}</span>
+        <span class="dot">•</span>
+        <span>{{ getDestinationSector() }}</span>
+      </div>
+
+      <!-- NET EARNINGS CARD -->
+      <div class="net-gain-card">
+        <div class="gain-header">
+          <span class="gain-label">Gain net de la course</span>
+          <span class="gain-amount">+{{ getFormattedGain() }} FCFA</span>
+        </div>
+
+        <div class="payout-subcard">
+          <div class="wave-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="#00D2FF"/>
+              <path d="M8 11.5c1.5 2 3.5 3 4 3s2.5-1 4-3" stroke="#FFFFFF" stroke-width="2"/>
+            </svg>
+          </div>
+          <span class="payout-info">Wave ({{ getPayoutPhoneFormatted() }})</span>
+        </div>
+      </div>
+
+      <!-- ACTION BUTTON -->
+      <div class="action-footer">
+        <button type="button" class="btn-primary-action" (click)="goHome()">
+          <span>Prêt pour une nouvelle course</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <app-delivery-bottom-nav [activeTab]="'home'"></app-delivery-bottom-nav>
+</div>

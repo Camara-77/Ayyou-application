@@ -7,25 +7,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 
 export type AuthState = 'no_account' | 'account_selected' | 'loading' | 'success' | 'failed' | 'cancelled' | 'network_error' | 'account_conflict';
 
-// Initial mockup accounts for visual representation (isolated for easy replacement with live GIS data)
-export const MOCK_GOOGLE_ACCOUNTS: GoogleUserAccount[] = [
-  {
-    sub: 'google_mock_1',
-    email: 'alex.martin.pro@gmail.com',
-    name: 'Alexandre Martin',
-    givenName: 'Alexandre',
-    familyName: 'Martin',
-    initials: 'AM'
-  },
-  {
-    sub: 'google_mock_2',
-    email: 'sarah.k@gmail.com',
-    name: 'Sarah K.',
-    givenName: 'Sarah',
-    familyName: 'K.',
-    initials: 'S'
-  }
-];
+export const MOCK_GOOGLE_ACCOUNTS: GoogleUserAccount[] = [];
 
 @Component({
   selector: 'app-google-auth',
@@ -46,12 +28,11 @@ export class GoogleAuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('googleBtnContainer') googleBtnContainer?: ElementRef<HTMLDivElement>;
 
-  // Initialize with mockup accounts for visual display fidelity
-  accounts: GoogleUserAccount[] = [...MOCK_GOOGLE_ACCOUNTS];
-  selectedAccount: GoogleUserAccount | null = this.accounts[0];
+  accounts: GoogleUserAccount[] = [];
+  selectedAccount: GoogleUserAccount | null = null;
   selectedCredentialToken: string | null = null;
 
-  authState: AuthState = 'account_selected';
+  authState: AuthState = 'no_account';
   errorMessage: string | null = null;
   infoMessage: string | null = null;
 

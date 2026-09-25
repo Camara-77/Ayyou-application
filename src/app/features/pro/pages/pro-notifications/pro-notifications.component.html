@@ -13,14 +13,29 @@
     </div>
 
     <!-- En-tête de section -->
-    <div class="section-label-row">
-      <span class="label-title">ACTIVITÉ RÉCENTE</span>
-      <span class="badge-live">En direct</span>
+    <div class="section-label-row" style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <span class="label-title">ACTIVITÉ RÉCENTE</span>
+        <span class="badge-live">En direct</span>
+      </div>
+      <button *ngIf="filteredNotifications.length > 0" type="button" (click)="markAllAsRead()" style="background: none; border: none; font-size: 13px; color: #E51A29; font-weight: 600; cursor: pointer;">
+        Tout marquer comme lu
+      </button>
     </div>
 
     <!-- Liste des notifications -->
     <div class="notifications-list">
-      <div class="notif-card" *ngFor="let item of filteredNotifications" [class.pinned]="item.isPinned" [class.unread]="!item.isRead">
+      <!-- Loading State -->
+      <div *ngIf="isLoading" style="padding: 24px; text-align: center; color: #757575;">
+        <p>Chargement des notifications...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="!isLoading && errorMessage" style="padding: 24px; text-align: center; color: #E51A29;">
+        <p>{{ errorMessage }}</p>
+      </div>
+
+      <div class="notif-card" *ngFor="let item of filteredNotifications" [class.pinned]="item.isPinned" [class.unread]="!item.isRead" (click)="toggleRead(item)">
         
         <!-- En-tête de Carte -->
         <div class="notif-header">
@@ -59,7 +74,7 @@
       </div>
 
       <!-- État vide si aucune notification trouvée -->
-      <div *ngIf="filteredNotifications.length === 0" class="empty-notif-state">
+      <div *ngIf="!isLoading && !errorMessage && filteredNotifications.length === 0" class="empty-notif-state">
         <p>Aucune notification correspondante.</p>
       </div>
     </div>

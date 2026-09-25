@@ -14,8 +14,25 @@
       <div class="header-spacer"></div>
     </div>
 
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading" style="text-align: center; padding: 40px 20px; color: #757575;">
+      <p>Chargement de votre historique de commandes...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state-card" *ngIf="!isLoading && orders.length === 0" style="text-align: center; padding: 40px 20px; background: #FFF; border-radius: 16px; border: 1px dashed #CBD5E1; margin: 20px 0;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #F1F5F9; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <h3 style="font-size: 1rem; font-weight: 700; color: #1E293B; margin-bottom: 6px;">Aucune commande trouvée</h3>
+      <p style="font-size: 0.85rem; color: #64748B; margin: 0;">Vous n'avez pas encore passé de commande sur AYYOU.</p>
+    </div>
+
     <!-- Orders Cards List -->
-    <div class="orders-list">
+    <div class="orders-list" *ngIf="!isLoading && orders.length > 0">
       <div class="order-card" *ngFor="let order of orders">
         <!-- Card Header Row -->
         <div class="order-card-header">
@@ -65,7 +82,7 @@
     </div>
 
     <!-- Load Full History Button -->
-    <button class="btn-load-more" (click)="loadFullHistory()">
+    <button class="btn-load-more" (click)="loadFullHistory()" *ngIf="!isLoading && orders.length > 0">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>

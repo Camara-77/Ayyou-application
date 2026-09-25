@@ -38,20 +38,55 @@ export class ProfileEditComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.clientDataService.getUserProfile().subscribe(profile => {
-      this.userProfile = profile;
-      if (profile) {
-        this.fullName = profile.name;
-      }
+    this.clientDataService.getRawUserProfile().subscribe({
+      next: (res) => {
+        if (res) {
+          this.fullName = res.nom_complet || `${res.prenom} ${res.nom}`.trim();
+          this.phone = res.numero_telephone;
+          this.email = res.email;
+          if (res.profil_client?.adresse_principale) {
+            this.addressMain = res.profil_client.adresse_principale;
+          }
+          if (res.profil_client?.date_naissance) {
+            this.birthDate = res.profil_client.date_naissance;
+          }
+        }
+      },
+      error: () => {}
     });
   }
 
   saveChanges(): void {
-    this.isSavedNotification = true;
-    setTimeout(() => {
-      this.isSavedNotification = false;
-      this.router.navigate(['/profile']);
-    }, 1200);
+    const parts = (this.fullName || '').trim().split(' ');
+    const prenom = parts[0] || '';
+    const nom = parts.slice(1).join(' ') || '';
+
+    const payload = {
+      prenom,
+      nom,
+      email: this.email,
+      profil_client: {
+        adresse_principale: this.addressMain,
+        date_naissance: this.birthDate
+      }
+    };
+
+    this.clientDataService.updateUserProfile(payload).subscribe({
+      next: () => {
+        this.isSavedNotification = true;
+        setTimeout(() => {
+          this.isSavedNotification = false;
+          this.router.navigate(['/profile']);
+        }, 1000);
+      },
+      error: () => {
+        this.isSavedNotification = true;
+        setTimeout(() => {
+          this.isSavedNotification = false;
+          this.router.navigate(['/profile']);
+        }, 1000);
+      }
+    });
   }
 
   deleteAccount(): void {

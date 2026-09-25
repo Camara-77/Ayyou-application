@@ -1,7 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { delay, tap } from 'rxjs/operators';
+import { catchError, delay, map, tap } from 'rxjs/operators';
 import { SystemRoleType } from '../models/admin-settings.models';
+import { environment } from '../../../../environments/environment';
 
 export interface AdminProfile {
   id: string;
@@ -18,6 +20,8 @@ export interface AdminProfile {
   providedIn: 'root'
 })
 export class AdminAuthService {
+  private http = inject(HttpClient);
+
   private currentAdminSubject = new BehaviorSubject<AdminProfile | null>(this.getStoredAdmin());
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(!!this.getStoredAdmin());
   private twoFactorRequiredSubject = new BehaviorSubject<boolean>(false);
@@ -31,33 +35,57 @@ export class AdminAuthService {
   login(email: string, password: string, rememberDevice: boolean = false): Observable<{ requires2FA: boolean; admin?: AdminProfile }> {
     const trimmedEmail = email.trim().toLowerCase();
 
-    // Basic domain check for demo (@ayyou.sn or standard email)
     if (!trimmedEmail || !password) {
       return throwError(() => new Error('Veuillez renseigner votre email et mot de passe.'));
     }
 
-    // Default mock admin profile
-    const mockAdmin: AdminProfile = {
-      id: 'admin-001',
-      firstName: 'Mamadou',
-      lastName: 'Diallo',
-      name: 'Mamadou Diallo',
-      email: trimmedEmail,
-      role: 'Super Administrateur',
-      scope: 'Accès Total (Tous modules & finances)'
+    const url = `${environment.apiUrl}/api/auth/login/`;
+    const payload = {
+      identifier: trimmedEmail,
+      password: password
     };
 
-    // Simulate 2FA required for Super Admins
-    const requires2FA = true;
-
-    return of({ requires2FA, admin: mockAdmin }).pipe(
-      delay(600),
-      tap(res => {
-        if (!res.requires2FA) {
-          this.setAuthenticatedAdmin(mockAdmin, rememberDevice);
-        } else {
-          this.twoFactorRequiredSubject.next(true);
+    return this.http.post<any>(url, payload).pipe(
+      map(res => {
+        if (!res || !res.access) {
+          throw new Error('Identifiants invalides ou jeton d\'accès manquant.');
         }
+
+        // Store tokens for JWT interceptor and session management
+        localStorage.setItem('ayyou_access_token', res.access);
+        if (res.refresh) {
+          localStorage.setItem('ayyou_refresh_token', res.refresh);
+        }
+        localStorage.setItem('ayyou_admin_token', res.access);
+
+        const u = res.utilisateur;
+        const admin: AdminProfile = {
+          id: u ? u.id.toString() : 'admin-001',
+          firstName: u?.prenom || 'Super',
+          lastName: u?.nom || 'Admin',
+          name: u ? `${u.prenom} ${u.nom}`.trim() : 'Super Administrateur',
+          email: u?.email || trimmedEmail,
+          role: 'Super Administrateur',
+          scope: 'Accès Total (API Backend Django)'
+        };
+
+        this.setAuthenticatedAdmin(admin, rememberDevice);
+        return { requires2FA: false, admin };
+      }),
+      catchError(err => {
+        let msg = 'Échec de la connexion. Vérifiez vos identifiants.';
+        if (err.error) {
+          if (typeof err.error.detail === 'string') {
+            msg = err.error.detail;
+          } else if (err.error.errors) {
+            if (typeof err.error.errors.detail === 'string') {
+              msg = err.error.errors.detail;
+            } else if (typeof err.error.errors === 'string') {
+              msg = err.error.errors;
+            }
+          }
+        }
+        return throwError(() => new Error(msg));
       })
     );
   }
@@ -67,32 +95,34 @@ export class AdminAuthService {
       return throwError(() => new Error('Code 2FA invalide. Saisissez les 6 chiffres TOTP.'));
     }
 
-    const mockAdmin: AdminProfile = {
-      id: 'admin-001',
-      firstName: 'Mamadou',
-      lastName: 'Diallo',
-      name: 'Mamadou Diallo',
-      email: 'mamadou.d@ayyou.sn',
+    const current = this.currentAdminSubject.value;
+    const activeAdmin: AdminProfile = current || {
+      id: 'admin-auth',
+      firstName: 'Administrateur',
+      lastName: 'AYYOU',
+      name: 'Administrateur AYYOU',
+      email: 'admin@ayyou.sn',
       role: 'Super Administrateur',
-      scope: 'Accès Total (Tous modules & finances)'
+      scope: 'Accès Total (API Backend)'
     };
 
     return of(true).pipe(
       delay(500),
       tap(() => {
         this.twoFactorRequiredSubject.next(false);
-        this.setAuthenticatedAdmin(mockAdmin, rememberDevice);
+        this.setAuthenticatedAdmin(activeAdmin, rememberDevice);
       })
     );
   }
 
   loginWithGoogle(): Observable<boolean> {
-    const mockAdmin: AdminProfile = {
+    const current = this.currentAdminSubject.value;
+    const activeAdmin: AdminProfile = current || {
       id: 'admin-google',
-      firstName: 'Mamadou',
-      lastName: 'Diallo',
-      name: 'Mamadou Diallo',
-      email: 'mamadou.d@ayyou.sn',
+      firstName: 'Administrateur',
+      lastName: 'AYYOU',
+      name: 'Administrateur AYYOU',
+      email: 'admin@ayyou.sn',
       role: 'Super Administrateur',
       scope: 'Accès Total (Google Workspace SSO)'
     };
@@ -100,7 +130,7 @@ export class AdminAuthService {
     return of(true).pipe(
       delay(800),
       tap(() => {
-        this.setAuthenticatedAdmin(mockAdmin, true);
+        this.setAuthenticatedAdmin(activeAdmin, true);
       })
     );
   }
@@ -115,13 +145,18 @@ export class AdminAuthService {
   logout(): void {
     localStorage.removeItem('ayyou_admin_user');
     sessionStorage.removeItem('ayyou_admin_user');
+    localStorage.removeItem('ayyou_admin_token');
+    localStorage.removeItem('ayyou_access_token');
+    localStorage.removeItem('ayyou_refresh_token');
     this.currentAdminSubject.next(null);
     this.isAuthenticatedSubject.next(false);
     this.twoFactorRequiredSubject.next(false);
   }
 
   isAuthenticated(): boolean {
-    return this.isAuthenticatedSubject.value;
+    const token = localStorage.getItem('ayyou_access_token') || localStorage.getItem('ayyou_admin_token');
+    const storedUser = this.getStoredAdmin();
+    return !!token && !!storedUser && this.isAuthenticatedSubject.value;
   }
 
   getCurrentAdmin(): AdminProfile | null {

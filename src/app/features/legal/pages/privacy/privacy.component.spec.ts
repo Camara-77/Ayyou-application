@@ -1,21 +1,23 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PrivacyComponent } from './privacy.component';
-import { provideRouter, Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('PrivacyComponent', () => {
   let component: PrivacyComponent;
   let fixture: ComponentFixture<PrivacyComponent>;
-  let routerSpy: jasmine.SpyObj<Router>;
+  let router: Router;
 
   beforeEach(async () => {
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-
     await TestBed.configureTestingModule({
-      imports: [PrivacyComponent],
+      imports: [PrivacyComponent, RouterTestingModule],
       providers: [
-        { provide: Router, useValue: routerSpy }
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map() } } }
       ]
     }).compileComponents();
+
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
 
     fixture = TestBed.createComponent(PrivacyComponent);
     component = fixture.componentInstance;
@@ -33,6 +35,6 @@ describe('PrivacyComponent', () => {
 
   it('should navigate to /login on back button click', () => {
     component.onBack();
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
+    expect(router.navigate).toHaveBeenCalledWith(['/login']);
   });
 });

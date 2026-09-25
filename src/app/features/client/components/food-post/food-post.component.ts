@@ -4,6 +4,8 @@ import { Router, RouterModule } from '@angular/router';
 import { OrderButtonComponent } from '../order-button/order-button.component';
 import { FoodInteractionComponent } from '../food-interaction/food-interaction.component';
 import { FeedItem, Dish } from '../../../../core/models/client';
+import { ClientDataService } from '../../../../core/services/client-data.service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-food-post',
@@ -25,6 +27,8 @@ export class FoodPostComponent {
 
   @ViewChild('videoElement') videoRef?: ElementRef<HTMLVideoElement>;
 
+  private clientDataService = inject(ClientDataService);
+  private authService = inject(AuthService);
   private router = inject(Router);
   private clickTimeout: any = null;
   private readonly DOUBLE_CLICK_DELAY = 280; // ms
@@ -74,17 +78,54 @@ export class FoodPostComponent {
   }
 
   private handleDoubleTapLike(): void {
+    if (!this.authService.requireAuth({
+      title: 'Connectez-vous pour liker',
+      message: 'Créez un compte ou connectez-vous pour enregistrer vos interactions.',
+      actionType: 'like',
+      actionPayload: { dishId: this.feedItem?.dish?.id, feedId: this.feedItem?.id }
+    })) {
+      return;
+    }
+
     if (this.feedItem) {
       if (!this.feedItem.isLiked) {
         this.feedItem.isLiked = true;
         this.feedItem.likesCount = (this.feedItem.likesCount || 0) + 1;
+        this.syncLikeStatusWithBackend(true);
       }
     }
   }
 
   onLikeToggle(isLiked: boolean): void {
+    if (!this.authService.requireAuth({
+      title: 'Connectez-vous pour liker',
+      message: 'Créez un compte ou connectez-vous pour enregistrer vos interactions.',
+      actionType: 'like',
+      actionPayload: { dishId: this.feedItem?.dish?.id, feedId: this.feedItem?.id }
+    })) {
+      return;
+    }
+
     if (this.feedItem) {
       this.feedItem.isLiked = isLiked;
+      this.syncLikeStatusWithBackend(isLiked);
+    }
+  }
+
+  private syncLikeStatusWithBackend(isLiked: boolean): void {
+    if (!this.feedItem) return;
+    if (this.feedItem.dish?.id) {
+      if (isLiked) {
+        this.clientDataService.likeProduct(this.feedItem.dish.id).subscribe({ error: () => {} });
+      } else {
+        this.clientDataService.unlikeProduct(this.feedItem.dish.id).subscribe({ error: () => {} });
+      }
+    } else if (this.feedItem.id) {
+      if (isLiked) {
+        this.clientDataService.likeFeedPublication(this.feedItem.id).subscribe({ error: () => {} });
+      } else {
+        this.clientDataService.unlikeFeedPublication(this.feedItem.id).subscribe({ error: () => {} });
+      }
     }
   }
 
@@ -97,11 +138,27 @@ export class FoodPostComponent {
 
   onOrder(event: Event): void {
     event.stopPropagation();
+    if (!this.authService.requireAuth({
+      title: 'Connectez-vous pour continuer',
+      message: 'Vous devez avoir un compte AYYOU pour ajouter des produits à votre panier et passer une commande.',
+      actionType: 'order',
+      returnUrl: '/cart'
+    })) {
+      return;
+    }
     this.orderDish.emit(this.feedItem.dish);
   }
 
   onQuickCart(event: Event): void {
     event.stopPropagation();
+    if (!this.authService.requireAuth({
+      title: 'Connectez-vous pour continuer',
+      message: 'Vous devez avoir un compte AYYOU pour ajouter des produits à votre panier et passer une commande.',
+      actionType: 'cart',
+      returnUrl: '/cart'
+    })) {
+      return;
+    }
     this.quickCart.emit(this.feedItem.dish);
   }
 

@@ -38,14 +38,11 @@ export class DriverLoginFormCardComponent implements OnInit {
   isIdentifierValid(): boolean {
     if (!this.identifier) return false;
     const clean = this.identifier.trim();
-    // Senegal phone validation (9 digits starting with 77, 78, 76, 70, 75, 33) or valid email
-    const senegalPhoneRegex = /^(?:\+?221)?\s?(7[067853]\d{7})$/;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return senegalPhoneRegex.test(clean.replace(/\s+/g, '')) || emailRegex.test(clean);
+    return clean.length >= 3;
   }
 
   isPasswordValid(): boolean {
-    return !!this.passwordPin && this.passwordPin.trim().length >= 4;
+    return !!this.passwordPin && this.passwordPin.trim().length >= 1;
   }
 
   isFormValid(): boolean {

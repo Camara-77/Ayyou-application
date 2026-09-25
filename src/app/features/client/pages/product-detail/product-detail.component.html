@@ -150,4 +150,20 @@
       </svg>
     </button>
   </div>
+
+  <!-- MODAL CONFLIT PANIER MONO-ÉTABLISSEMENT -->
+  <div class="cart-conflict-modal-overlay" *ngIf="showCartConflictModal" (click)="cancelConflictModal()">
+    <div class="cart-conflict-card" (click)="$event.stopPropagation()">
+      <div class="warning-badge-icon">⚠️</div>
+      <h3 class="modal-title">Changer d'établissement ?</h3>
+      <p class="modal-text">
+        Votre panier contient déjà des produits d'un autre établissement.<br/>
+        La règle AYYOU impose <strong>un seul établissement par commande</strong>.
+      </p>
+      <div class="modal-actions-row">
+        <button type="button" class="btn-cancel" (click)="cancelConflictModal()">Annuler</button>
+        <button type="button" class="btn-clear-add" (click)="confirmClearAndAdd()">Vider et ajouter</button>
+      </div>
+    </div>
+  </div>
 </div>

@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import {
   DeliveryCorridor,
   DeliveryFilterTab,
@@ -9,190 +10,192 @@ import {
   DeliveryStatus,
   DeliveryTimelineEvent
 } from '../models/admin-delivery.models';
+import { environment } from '../../../../environments/environment';
+
+function mapBackendDeliveryToDeliveryItem(d: any): DeliveryItem {
+  const rawStatut = (d.statut || '').toUpperCase();
+
+  let status: DeliveryStatus = 'EN_ACHEMINEMENT';
+  let statusDotColor: 'blue' | 'green' | 'orange' | 'red' | 'purple' | 'gray' = 'blue';
+
+  if (rawStatut === 'EN_ATTENTE_PRISE_EN_CHARGE') {
+    status = 'EN_ATTENTE_PRISE_EN_CHARGE';
+    statusDotColor = 'purple';
+  } else if (rawStatut === 'LIVREUR_ASSIGNE') {
+    status = 'LIVREUR_ASSIGNE';
+    statusDotColor = 'purple';
+  } else if (rawStatut === 'RECUPERATION_EN_COURS') {
+    status = 'RECUPERATION_EN_COURS';
+    statusDotColor = 'purple';
+  } else if (rawStatut === 'EN_ACHEMINEMENT') {
+    status = 'EN_ACHEMINEMENT';
+    statusDotColor = 'blue';
+  } else if (rawStatut === 'EN_APPROCHE_CLIENT') {
+    status = 'EN_APPROCHE_CLIENT';
+    statusDotColor = 'green';
+  } else if (rawStatut === 'LIVREE') {
+    status = 'LIVREE';
+    statusDotColor = 'green';
+  } else if (rawStatut === 'SIGNALEMENT_RETARD') {
+    status = 'SIGNALEMENT_RETARD';
+    statusDotColor = 'orange';
+  } else if (rawStatut === 'INCIDENT') {
+    status = 'INCIDENT';
+    statusDotColor = 'red';
+  } else if (rawStatut === 'ANNULEE') {
+    status = 'ANNULEE';
+    statusDotColor = 'gray';
+  }
+
+  const isIncident = rawStatut === 'INCIDENT' || rawStatut === 'SIGNALEMENT_RETARD';
+  const incidentReason = rawStatut === 'INCIDENT'
+    ? 'Incident signalé sur la course'
+    : rawStatut === 'SIGNALEMENT_RETARD'
+    ? 'Signalement de retard'
+    : undefined;
+
+  const courierName = d.livreur_nom || 'Non assigné';
+  const courierInitials = courierName
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase() || 'L';
+
+  const ref = d.commande_numero ? `#${d.commande_numero}` : `#AYY-${d.id}`;
+
+  return {
+    id: d.id ? d.id.toString() : '',
+    reference: ref,
+    courierName,
+    courierPhone: d.livreur_telephone || d.telephone_destinataire || 'Non renseigné',
+    courierVehicle: d.livreur_vehicule || 'Moto',
+    courierPlate: d.livreur_immatriculation || 'Non immatriculé',
+    courierBatteryPercent: 90,
+    courierSpeedKmH: 25,
+    courierSignalStatus: 'stable',
+    courierInitials,
+    originName: d.etablissement_nom || 'Établissement',
+    originDistrict: d.etablissement_adresse ? d.etablissement_adresse.split(',')[0].trim() : 'Dakar',
+    destinationName: d.nom_destinataire || d.client_nom || 'Client',
+    destinationDistrict: d.adresse_livraison ? d.adresse_livraison.split(',')[0].trim() : 'Dakar',
+    estimatedTimeText: '15 min',
+    isIncident,
+    incidentReason,
+    status,
+    statusText: d.statut_display || d.statut || 'En cours',
+    statusDotColor
+  };
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminDeliveryService {
-  private mockDeliveries: DeliveryItem[] = [
-    {
-      id: 'd-1094',
-      reference: '#AYY-1094',
-      courierName: 'Ibrahima Sow',
-      courierPhone: '+221 77 541 20 90',
-      courierVehicle: 'Yamaha Crypton',
-      courierPlate: 'DK-8492-AB',
-      courierBatteryPercent: 92,
-      courierSpeedKmH: 26,
-      courierSignalStatus: 'stable',
-      courierInitials: 'IS',
-      originName: 'Chez Loutcha',
-      originDistrict: 'Plateau',
-      destinationName: 'Fatou B. Sall',
-      destinationDistrict: 'Almadies',
-      estimatedTimeText: '14 min',
-      isIncident: false,
-      status: 'EN_ACHEMINEMENT',
-      statusText: 'En acheminement',
-      statusDotColor: 'blue'
-    },
-    {
-      id: 'd-1095',
-      reference: '#AYY-1095',
-      courierName: 'Modou Fall',
-      courierPhone: '+221 78 632 11 00',
-      courierVehicle: 'Boxer 150',
-      courierPlate: 'DK-1029-BC',
-      courierBatteryPercent: 95,
-      courierSpeedKmH: 22,
-      courierSignalStatus: 'stable',
-      courierInitials: 'MF',
-      originName: 'Touba Primeurs',
-      originDistrict: 'Mermoz',
-      destinationName: 'Aïmadou Kane',
-      destinationDistrict: 'Fann',
-      estimatedTimeText: '6 min',
-      isIncident: false,
-      status: 'EN_APPROCHE_CLIENT',
-      statusText: 'En approche client',
-      statusDotColor: 'green'
-    },
-    {
-      id: 'd-1096',
-      reference: '#AYY-1096',
-      courierName: 'Cheikh Ndiaye',
-      courierPhone: '+221 77 551 20 45',
-      courierVehicle: 'Kymco Agility',
-      courierPlate: 'DK-5512-AZ',
-      courierBatteryPercent: 88,
-      courierSpeedKmH: 14,
-      courierSignalStatus: 'stable',
-      courierInitials: 'CN',
-      originName: 'Burger Black Bun',
-      originDistrict: 'Almadies',
-      destinationName: 'Ousmane Ba',
-      destinationDistrict: 'Ngor',
-      estimatedTimeText: '+8 min Rond-point Almadies',
-      isIncident: true,
-      incidentReason: 'Retard signalé (Trafic)',
-      status: 'SIGNALEMENT_RETARD',
-      statusText: 'Signalement retard',
-      statusDotColor: 'orange'
-    },
-    {
-      id: 'd-1097',
-      reference: '#AYY-1097',
-      courierName: 'Babacar Diop',
-      courierPhone: '+221 77 889 00 11',
-      courierVehicle: 'TVS HLX',
-      courierPlate: 'DK-7788-DE',
-      courierBatteryPercent: 78,
-      courierSpeedKmH: 30,
-      courierSignalStatus: 'stable',
-      courierInitials: 'BD',
-      originName: "L'Atelier du Choukouya",
-      originDistrict: 'Ouakam',
-      destinationName: 'Aïcha Seck',
-      destinationDistrict: 'Point E',
-      estimatedTimeText: '18 min',
-      isIncident: false,
-      status: 'EN_ACHEMINEMENT',
-      statusText: 'En acheminement',
-      statusDotColor: 'blue'
-    },
-    {
-      id: 'd-1098',
-      reference: '#AYY-1098',
-      courierName: 'El Hadj Diallo',
-      courierPhone: '+221 76 210 44 33',
-      courierVehicle: 'Yamaha 125',
-      courierPlate: 'DK-4455-CD',
-      courierBatteryPercent: 84,
-      courierSpeedKmH: 18,
-      courierSignalStatus: 'stable',
-      courierInitials: 'ED',
-      originName: 'Dakar Sweets',
-      originDistrict: 'Point E',
-      destinationName: 'Malick Ndao',
-      destinationDistrict: 'Plateau',
-      estimatedTimeText: '2 min',
-      isIncident: false,
-      status: 'RECUPERATION_EN_COURS',
-      statusText: 'Récupération en cours',
-      statusDotColor: 'purple'
-    }
-  ];
+  private http = inject(HttpClient);
 
-  private mockCorridors: DeliveryCorridor[] = [
-    {
-      id: 'c-1',
-      name: 'Corniche Ouest / Plateau',
-      trafficLevel: 'fluide',
-      trafficLabel: 'Trafic fluide',
-      volumeCount: 32,
-      avgTimeMinutes: 18,
-      color: 'green'
-    },
-    {
-      id: 'c-2',
-      name: 'Almadies / Route Almadies',
-      trafficLevel: 'modere',
-      trafficLabel: 'Trafic modéré',
-      volumeCount: 24,
-      avgTimeMinutes: 22,
-      color: 'orange'
-    },
-    {
-      id: 'c-3',
-      name: 'VDN / Patte d\'Oie',
-      trafficLevel: 'ralentissements',
-      trafficLabel: 'Ralentissements',
-      volumeCount: 18,
-      avgTimeMinutes: 31,
-      color: 'red'
-    }
-  ];
-
-  private deliveriesSubject = new BehaviorSubject<DeliveryItem[]>(this.mockDeliveries);
-  private selectedSubject = new BehaviorSubject<DeliveryItem | null>(this.mockDeliveries[2]); // #AYY-1096 by default
+  private deliveriesSubject = new BehaviorSubject<DeliveryItem[]>([]);
+  private selectedSubject = new BehaviorSubject<DeliveryItem | null>(null);
 
   deliveries$ = this.deliveriesSubject.asObservable();
   selectedDelivery$ = this.selectedSubject.asObservable();
 
   getStatsSummary(): Observable<DeliveryStatsSummary> {
-    return of({
-      activeCoursesCount: 74,
-      avgDeliveryTimeMinutes: 23,
-      punctualityRate: '96,8 %',
-      incidentsCount: 3,
-      avgSpeedKmH: 28
-    });
+    const url = `${environment.apiUrl}/api/admin/deliveries/`;
+    return this.http.get<any>(url).pipe(
+      map(res => {
+        const rawItems: any[] = Array.isArray(res) ? res : (res.results || []);
+        const items = rawItems.map(mapBackendDeliveryToDeliveryItem);
+
+        const activeCoursesCount = items.filter(d =>
+          d.status === 'EN_ACHEMINEMENT' ||
+          d.status === 'EN_APPROCHE_CLIENT' ||
+          d.status === 'RECUPERATION_EN_COURS' ||
+          d.status === 'LIVREUR_ASSIGNE'
+        ).length;
+
+        const incidentsCount = items.filter(d => d.isIncident).length;
+
+        return {
+          activeCoursesCount: activeCoursesCount || items.length,
+          avgDeliveryTimeMinutes: 23,
+          punctualityRate: '96.8 %',
+          incidentsCount,
+          avgSpeedKmH: 28
+        };
+      }),
+      catchError(() => of({
+        activeCoursesCount: 0,
+        avgDeliveryTimeMinutes: 0,
+        punctualityRate: '100%',
+        incidentsCount: 0,
+        avgSpeedKmH: 0
+      }))
+    );
   }
 
   getCorridors(): Observable<DeliveryCorridor[]> {
-    return of(this.mockCorridors);
+    const items = this.deliveriesSubject.getValue();
+    if (items.length === 0) {
+      return of([
+        {
+          id: 'c-1',
+          name: 'Plateau / Centre-Ville',
+          trafficLevel: 'fluide',
+          trafficLabel: 'Trafic fluide',
+          volumeCount: 0,
+          avgTimeMinutes: 15,
+          color: 'green'
+        },
+        {
+          id: 'c-2',
+          name: 'Almadies / Ngor',
+          trafficLevel: 'fluide',
+          trafficLabel: 'Trafic fluide',
+          volumeCount: 0,
+          avgTimeMinutes: 20,
+          color: 'green'
+        }
+      ]);
+    }
+
+    const corridorMap = new Map<string, number>();
+    items.forEach(item => {
+      const name = `${item.originDistrict} / ${item.destinationDistrict}`;
+      corridorMap.set(name, (corridorMap.get(name) || 0) + 1);
+    });
+
+    const corridors: DeliveryCorridor[] = [];
+    let idx = 1;
+    corridorMap.forEach((count, name) => {
+      corridors.push({
+        id: `cor-${idx++}`,
+        name,
+        trafficLevel: count > 5 ? 'ralentissements' : (count > 2 ? 'modere' : 'fluide'),
+        trafficLabel: count > 5 ? 'Ralentissements' : (count > 2 ? 'Trafic modéré' : 'Trafic fluide'),
+        volumeCount: count,
+        avgTimeMinutes: 15 + count * 2,
+        color: count > 5 ? 'red' : (count > 2 ? 'orange' : 'green')
+      });
+    });
+
+    return of(corridors);
   }
 
   getTimelineForDelivery(reference: string): Observable<DeliveryTimelineEvent[]> {
     return of([
       {
-        time: '12:50',
+        time: 'Prise en charge',
         title: 'Prise en charge validée',
-        subtitle: 'Burger Black Bun (Almadies)',
+        subtitle: `Livraison ${reference}`,
         dotColor: 'gray'
       },
       {
-        time: '13:02',
-        title: 'Ralentissement détecté',
-        subtitle: 'Rond-Point Ngor / Route des Almadies (travaux)',
+        time: 'En cours',
+        title: 'Acheminement en cours',
+        subtitle: 'Suivi GPS actif',
         isHighlight: true,
         dotColor: 'orange'
-      },
-      {
-        time: '13:10 (Estimé)',
-        title: 'Arrivée client',
-        subtitle: 'Ousmane Ba (Villa 42, Ngor)',
-        dotColor: 'gray'
       }
     ]);
   }
@@ -207,22 +210,33 @@ export class AdminDeliveryService {
     corridor: string,
     vehicle: string
   ): Observable<DeliveryItem[]> {
-    return this.deliveries$.pipe(
-      map(items => {
-        return items.filter(item => {
-          // Tab Filter
+    let params = new HttpParams();
+
+    if (tab === 'EN_ACHEMINEMENT') {
+      params = params.set('statut', 'EN_ACHEMINEMENT');
+    } else if (tab === 'INCIDENTS') {
+      params = params.set('statut', 'INCIDENT');
+    }
+
+    const url = `${environment.apiUrl}/api/admin/deliveries/`;
+
+    return this.http.get<any>(url, { params }).pipe(
+      map(res => {
+        const rawItems: any[] = Array.isArray(res) ? res : (res.results || []);
+        let items = rawItems.map(mapBackendDeliveryToDeliveryItem);
+
+        items = items.filter(item => {
           let matchTab = true;
           if (tab === 'EN_ACHEMINEMENT') {
             matchTab = item.status === 'EN_ACHEMINEMENT' || item.status === 'EN_APPROCHE_CLIENT';
           } else if (tab === 'EN_ATTENTE') {
-            matchTab = item.status === 'EN_ATTENTE_PRISE_EN_CHARGE' || item.status === 'RECUPERATION_EN_COURS';
+            matchTab = item.status === 'EN_ATTENTE_PRISE_EN_CHARGE' || item.status === 'RECUPERATION_EN_COURS' || item.status === 'LIVREUR_ASSIGNE';
           } else if (tab === 'RETARD_POTENTIEL') {
             matchTab = item.status === 'SIGNALEMENT_RETARD' || item.isIncident;
           } else if (tab === 'INCIDENTS') {
             matchTab = item.isIncident || item.status === 'INCIDENT';
           }
 
-          // Search Query Filter
           let matchSearch = true;
           if (searchQuery && searchQuery.trim().length > 0) {
             const q = searchQuery.toLowerCase().trim();
@@ -232,14 +246,12 @@ export class AdminDeliveryService {
             matchSearch = ref.includes(q) || courier.includes(q) || dest.includes(q);
           }
 
-          // Corridor Filter
           let matchCorridor = true;
           if (corridor && corridor !== '' && corridor !== 'Tous les corridors') {
             matchCorridor = item.originDistrict.toLowerCase().includes(corridor.toLowerCase()) ||
                             item.destinationDistrict.toLowerCase().includes(corridor.toLowerCase());
           }
 
-          // Vehicle Filter
           let matchVehicle = true;
           if (vehicle && vehicle !== '' && vehicle !== 'Tous véhicules') {
             matchVehicle = item.courierVehicle.toLowerCase().includes(vehicle.toLowerCase());
@@ -247,6 +259,23 @@ export class AdminDeliveryService {
 
           return matchTab && matchSearch && matchCorridor && matchVehicle;
         });
+
+        this.deliveriesSubject.next(items);
+
+        const currentSelected = this.selectedSubject.getValue();
+        if (items.length > 0) {
+          if (!currentSelected || !items.some(d => d.id === currentSelected.id)) {
+            this.selectedSubject.next(items[0]);
+          }
+        } else {
+          this.selectedSubject.next(null);
+        }
+
+        return items;
+      }),
+      catchError(err => {
+        console.error('Erreur chargement livraisons admin:', err);
+        return of([]);
       })
     );
   }
@@ -267,18 +296,24 @@ export class AdminDeliveryService {
     }
   }
 
-  closeIncident(deliveryId: string): void {
-    const current = [...this.deliveriesSubject.value];
-    const target = current.find(d => d.id === deliveryId);
-    if (target) {
-      target.isIncident = false;
-      target.status = 'EN_ACHEMINEMENT';
-      target.statusText = 'En acheminement';
-      target.statusDotColor = 'blue';
-      this.deliveriesSubject.next(current);
-      if (this.selectedSubject.value?.id === deliveryId) {
-        this.selectedSubject.next({ ...target });
-      }
-    }
+  closeIncident(deliveryId: string): Observable<DeliveryItem | null> {
+    const url = `${environment.apiUrl}/api/admin/deliveries/${deliveryId}/close-incident/`;
+    return this.http.post<any>(url, { resolution: 'Incident résolu par l\'administrateur' }).pipe(
+      map(raw => {
+        const updated = mapBackendDeliveryToDeliveryItem(raw);
+        const currentDeliveries = this.deliveriesSubject.getValue().map(d => d.id === deliveryId ? updated : d);
+        this.deliveriesSubject.next(currentDeliveries);
+
+        if (this.selectedSubject.getValue()?.id === deliveryId) {
+          this.selectedSubject.next(updated);
+        }
+        return updated;
+      }),
+      catchError(err => {
+        console.error('Erreur clôture incident livraison:', err);
+        return of(null);
+      })
+    );
   }
 }
+

@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, delay, map, tap } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
+import { AuthService } from '../../../core/services/auth.service';
+import { LoginResponse } from '../../../core/models/auth';
 
 export type VendorAccountStatus =
   | 'EN_ATTENTE'
@@ -53,6 +55,8 @@ export class VendorAuthService {
    * Log in a Vendor / Merchant (VENDEUR) via Django REST Framework API.
    * Endpoint: POST ${environment.apiUrl}/api/v1/auth/vendor/login/
    */
+  private authService = inject(AuthService);
+
   loginVendor(identifier: string, passwordText: string, remember24h: boolean = true): Observable<VendorLoginResponse> {
     const cleanId = identifier.trim();
 
@@ -60,24 +64,30 @@ export class VendorAuthService {
       return throwError(() => new Error('Veuillez renseigner votre email ou téléphone et mot de passe.'));
     }
 
-    const payload = {
-      identifier: cleanId,
-      password: passwordText,
-      role: 'VENDEUR'
-    };
-
-    const apiUrl = `${environment.apiUrl}/api/v1/auth/vendor/login/`;
-
-    return this.http.post<VendorLoginResponse>(apiUrl, payload).pipe(
-      tap((res) => {
-        if (res.vendor && res.vendor.accountStatus === 'ACTIF') {
-          this.setAuthenticatedVendor(res.vendor, res.token || 'jwt_vendor_token', remember24h);
-        } else if (res.vendor) {
-          this.vendorStatusSubject.next(res.vendor.accountStatus);
-        }
+    return this.authService.login({ identifier: cleanId, password: passwordText }).pipe(
+      map((res: LoginResponse) => {
+        const dUser = res.utilisateur;
+        const statusStr: VendorAccountStatus = (dUser?.merchant_status === 'VALIDE') ? 'ACTIF' : 
+                          (dUser?.merchant_status === 'REFUSE') ? 'REJETE' : 'EN_ATTENTE';
+        const vendor: VendorProfile = {
+          id: dUser?.etablissement?.id || dUser?.id || 'vendor-1',
+          shopName: dUser?.etablissement?.nom || `${dUser?.prenom || ''} ${dUser?.nom || ''}`.trim(),
+          ownerName: `${dUser?.prenom || ''} ${dUser?.nom || ''}`.trim(),
+          phone: dUser?.numero_telephone || cleanId,
+          email: dUser?.email || '',
+          role: 'VENDEUR',
+          accountStatus: statusStr,
+          address: dUser?.etablissement?.adresse || ''
+        };
+        this.setAuthenticatedVendor(vendor, res.access || 'jwt_vendor_token', remember24h);
+        return {
+          token: res.access,
+          refresh: res.refresh,
+          vendor: vendor,
+          accountStatus: statusStr
+        };
       }),
       catchError((httpError) => {
-        // Fallback simulation for demonstration vendor accounts if backend API is not yet live
         return this.handleFallbackVendorLogin(cleanId, passwordText, remember24h, httpError);
       })
     );
@@ -138,6 +148,13 @@ export class VendorAuthService {
   }
 
   isAuthenticated(): boolean {
+    const user = this.authService.getCurrentUser();
+    if (user && this.authService.isAuthenticated()) {
+      const hasMerchantRole = user.roles?.some((r: string) => r === 'RESTAURANT' || r === 'VENDEUR');
+      if (hasMerchantRole) {
+        return user.merchantStatus === 'VALIDE';
+      }
+    }
     const vendor = this.getCurrentVendor();
     return !!vendor && vendor.role === 'VENDEUR' && vendor.accountStatus === 'ACTIF';
   }

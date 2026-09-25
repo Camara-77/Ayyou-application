@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LocationComponent } from './location.component';
 import { Router } from '@angular/router';
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+
 describe('LocationComponent', () => {
   let component: LocationComponent;
   let fixture: ComponentFixture<LocationComponent>;
@@ -11,7 +13,7 @@ describe('LocationComponent', () => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
-      imports: [LocationComponent],
+      imports: [LocationComponent, HttpClientTestingModule],
       providers: [
         { provide: Router, useValue: routerSpy }
       ]

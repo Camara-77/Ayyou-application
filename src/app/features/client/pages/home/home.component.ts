@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ViewChildren, QueryList, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ViewChildren, QueryList, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AppHeaderComponent } from '../../components/app-header/app-header.component';
@@ -7,6 +7,7 @@ import { ChatbotFloatingComponent } from '../../components/chatbot-floating/chat
 import { FoodPostComponent } from '../../components/food-post/food-post.component';
 import { ClientDataService } from '../../../../core/services/client-data.service';
 import { CartService } from '../../../../core/services/cart.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { Dish, FeedItem } from '../../../../core/models/client';
 
 @Component({
@@ -30,6 +31,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   @ViewChild('feedContent') feedContentRef!: ElementRef<HTMLElement>;
 
   private scrollEndTimer: any = null;
+  private authService = inject(AuthService);
 
   constructor(
     private clientDataService: ClientDataService,
@@ -99,12 +101,40 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   onOrderDish(dish: Dish): void {
-    this.cartService.addToCart(dish, 1);
-    this.router.navigate(['/checkout']);
+    if (!this.authService.requireAuth({
+      title: 'Connectez-vous pour continuer',
+      message: 'Vous devez avoir un compte AYYOU pour ajouter un produit et passer commande.',
+      actionType: 'order',
+      returnUrl: '/checkout'
+    })) {
+      return;
+    }
+
+    this.cartService.addToCart(dish, 1).subscribe({
+      next: () => {
+        this.router.navigate(['/checkout']);
+      },
+      error: () => {
+        this.router.navigate(['/cart']);
+      }
+    });
   }
 
   onQuickCart(dish: Dish): void {
-    this.cartService.addToCart(dish, 1);
-    this.router.navigate(['/cart']);
+    if (!this.authService.requireAuth({
+      title: 'Connectez-vous pour continuer',
+      message: 'Vous devez avoir un compte AYYOU pour ajouter des produits à votre panier.',
+      actionType: 'cart',
+      returnUrl: '/cart'
+    })) {
+      return;
+    }
+
+    this.cartService.addToCart(dish, 1).subscribe({
+      next: () => {
+        this.router.navigate(['/cart']);
+      },
+      error: () => {}
+    });
   }
 }

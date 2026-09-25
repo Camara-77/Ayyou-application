@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -9,6 +9,7 @@ import { RestaurantCardComponent } from '../../components/restaurant-card/restau
 import { DishCardComponent } from '../../components/dish-card/dish-card.component';
 import { ClientDataService } from '../../../../core/services/client-data.service';
 import { CartService } from '../../../../core/services/cart.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { Category, Dish, Restaurant, Vendor, SearchResult } from '../../../../core/models/client';
 
 export type ResultTypeFilter = 'all' | 'dishes' | 'restaurants' | 'vendors';
@@ -45,6 +46,8 @@ export class SearchComponent implements OnInit {
   vendors: Vendor[] = [];
 
   showBackToTop: boolean = false;
+
+  private authService = inject(AuthService);
 
   constructor(
     private clientDataService: ClientDataService,
@@ -176,7 +179,19 @@ export class SearchComponent implements OnInit {
   }
 
   onAddDishToCart(dish: Dish): void {
-    this.cartService.addToCart(dish);
+    if (!this.authService.requireAuth({
+      title: 'Connectez-vous pour continuer',
+      message: 'Vous devez avoir un compte AYYOU pour ajouter des produits à votre panier.',
+      actionType: 'cart',
+      returnUrl: '/cart'
+    })) {
+      return;
+    }
+
+    this.cartService.addToCart(dish).subscribe({
+      next: () => {},
+      error: () => {}
+    });
   }
 
   get totalResultsCount(): number {

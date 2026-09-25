@@ -1,10 +1,11 @@
 import { Routes } from '@angular/router';
 import { AUTH_ROUTES } from './features/auth/auth.routes';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'onboarding',
     pathMatch: 'full'
   },
   ...AUTH_ROUTES,
@@ -22,30 +23,46 @@ export const routes: Routes = [
   },
   {
     path: 'cart',
+    canActivate: [authGuard],
     loadComponent: () => import('./features/client/pages/cart/cart.component').then(m => m.CartComponent)
   },
   {
     path: 'checkout',
+    canActivate: [authGuard],
     loadComponent: () => import('./features/client/pages/checkout/checkout.component').then(m => m.CheckoutComponent)
   },
   {
+    path: 'checkout/confirm',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/client/pages/checkout-confirm/checkout-confirm.component').then(m => m.CheckoutConfirmComponent)
+  },
+  {
+    path: 'checkout/cancel',
+    redirectTo: 'cart'
+  },
+  {
     path: 'profile',
+    canActivate: [authGuard],
     loadComponent: () => import('./features/client/pages/profile/profile.component').then(m => m.ProfileComponent)
   },
   {
     path: 'profile/edit',
+    canActivate: [authGuard],
     loadComponent: () => import('./features/client/pages/profile-edit/profile-edit.component').then(m => m.ProfileEditComponent)
   },
   {
     path: 'favorites',
+    canActivate: [authGuard],
     loadComponent: () => import('./features/client/pages/favorites/favorites.component').then(m => m.FavoritesComponent)
   },
   {
     path: 'notifications',
+    canActivate: [authGuard],
     loadComponent: () => import('./features/client/pages/notifications/notifications.component').then(m => m.NotificationsComponent)
   },
   {
     path: 'order-history',
+    canActivate: [authGuard],
     loadComponent: () => import('./features/client/pages/orders-history/orders-history.component').then(m => m.OrdersHistoryComponent)
   },
   {
@@ -62,10 +79,12 @@ export const routes: Routes = [
   },
   {
     path: 'order-tracking/:id',
+    canActivate: [authGuard],
     loadComponent: () => import('./features/client/pages/order-tracking/order-tracking.component').then(m => m.OrderTrackingComponent)
   },
   {
     path: 'order-validation/:id',
+    canActivate: [authGuard],
     loadComponent: () => import('./features/client/pages/order-validation/order-validation.component').then(m => m.OrderValidationComponent)
   },
   {

@@ -27,7 +27,7 @@ export class OnboardingComponent implements AfterViewInit {
   }
 
   onContinue(): void {
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home']);
   }
 
   onLogin(): void {

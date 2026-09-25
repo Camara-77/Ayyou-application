@@ -27,15 +27,36 @@
         <input type="text" [(ngModel)]="dish.name" name="dishName" class="form-input font-serif-bold" placeholder="Nom du plat" required />
       </div>
 
-      <!-- CATÉGORIE -->
+      <!-- CATÉGORIE PRINCIPALE -->
       <div class="form-group">
         <div class="field-label-row">
-          <label class="field-label-upper">CATÉGORIE <span class="req-star">*</span></label>
-          <span class="field-sub-label">1 sélectionnée</span>
+          <label class="field-label-upper">CATÉGORIE PRINCIPALE <span class="req-star">*</span></label>
+          <span class="field-sub-label">{{ selectedMainCategory.name }}</span>
         </div>
         <div class="categories-pills-row">
-          <button type="button" class="category-pill" *ngFor="let cat of categories" [class.active]="selectedCategory === cat" (click)="selectCategory(cat)">
-            {{ cat }}
+          <button type="button" 
+                  class="category-pill" 
+                  *ngFor="let mainCat of categoriesHierarchy" 
+                  [class.active]="selectedMainCategory.id === mainCat.id" 
+                  (click)="selectMainCategory(mainCat)">
+            {{ mainCat.name }}
+          </button>
+        </div>
+      </div>
+
+      <!-- SOUS-CATÉGORIE -->
+      <div class="form-group" *ngIf="selectedMainCategory.subCategories.length > 0">
+        <div class="field-label-row">
+          <label class="field-label-upper">SOUS-CATÉGORIE / SPÉCIALITÉ <span class="req-star">*</span></label>
+          <span class="field-sub-label">{{ selectedSubCategory }}</span>
+        </div>
+        <div class="categories-pills-row subcategories-pills-row">
+          <button type="button" 
+                  class="category-pill sub-pill" 
+                  *ngFor="let subCat of selectedMainCategory.subCategories" 
+                  [class.active]="selectedSubCategory === subCat" 
+                  (click)="selectSubCategory(subCat)">
+            {{ subCat }}
           </button>
         </div>
       </div>

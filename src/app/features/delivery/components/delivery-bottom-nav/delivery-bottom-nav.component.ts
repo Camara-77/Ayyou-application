@@ -13,6 +13,7 @@ import { filter } from 'rxjs/operators';
 })
 export class DeliveryBottomNavComponent implements OnInit, OnDestroy {
   @Input() activeTab: 'home' | 'deliveries' | 'history' | 'profile' = 'home';
+  @Input() hasActiveDelivery: boolean = false;
 
   private routerSub?: Subscription;
 
@@ -29,13 +30,13 @@ export class DeliveryBottomNavComponent implements OnInit, OnDestroy {
   }
 
   private setActiveTabFromUrl(url: string): void {
-    if (url.includes('/delivery/history')) {
+    if (url.includes('/history') || url.includes('/livraisons')) {
       this.activeTab = 'history';
-    } else if (url.includes('/delivery/profile')) {
+    } else if (url.includes('/profile')) {
       this.activeTab = 'profile';
-    } else if (url.includes('/delivery/navigation') || url.includes('/delivery/arrival') || url.includes('/delivery/validation') || url.includes('/delivery/completed')) {
+    } else if (url.includes('/navigation') || url.includes('/arrival') || url.includes('/validation') || url.includes('/completed') || url.includes('/missions') || url.includes('/detail')) {
       this.activeTab = 'deliveries';
-    } else if (url.includes('/delivery/home') || url.includes('/delivery')) {
+    } else if (url.includes('/home') || url.includes('/delivery') || url.includes('/livreur')) {
       this.activeTab = 'home';
     }
   }
@@ -44,3 +45,4 @@ export class DeliveryBottomNavComponent implements OnInit, OnDestroy {
     this.routerSub?.unsubscribe();
   }
 }
+

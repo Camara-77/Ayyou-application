@@ -1,0 +1,109 @@
+<div class="confirm-container">
+  <!-- 1. CAS CHARGEMENT / POLLING EN COURS -->
+  <div class="card loading-card" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <h2>Paiement en cours de confirmation...</h2>
+    <p class="subtitle">Veuillez patienter pendant que nous vérifions la transaction auprès de PayTech / Wave.</p>
+    <div class="ref-badge" *ngIf="reference">
+      <span>Référence : {{ reference }}</span>
+    </div>
+  </div>
+
+  <!-- 2. CAS CONFIRMÉ AVEC SUCCÈS -->
+  <div class="card success-card" *ngIf="!isLoading && isSuccess">
+    <div class="icon-circle">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 6L9 17L4 12" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h2>Paiement Confirmé !</h2>
+    <p class="subtitle">Votre commande {{ orderData?.numero_commande ? ('#' + orderData?.numero_commande) : '' }} a été transmise au restaurant.</p>
+
+    <!-- Détails Réels de la Commande -->
+    <div class="order-summary-box" *ngIf="orderData">
+      <div class="summary-header">
+        <span class="order-num">Commande #{{ orderData.numero_commande }}</span>
+        <span class="badge-status status-payee">PAYÉE</span>
+      </div>
+
+      <!-- Articles Réels -->
+      <div class="items-list">
+        <div class="item-row" *ngFor="let item of getAllOrderLines()">
+          <span class="item-qty">{{ item.quantite }}x</span>
+          <span class="item-name">{{ item.nom_produit_snapshot }}</span>
+          <span class="item-price">{{ formatPrice(item.total_ligne) }}</span>
+        </div>
+      </div>
+
+      <!-- Totaux Réels -->
+      <div class="totals-breakdown">
+        <div class="total-row">
+          <span>Sous-total plats</span>
+          <span>{{ formatPrice(orderData.sous_total) }}</span>
+        </div>
+        <div class="total-row">
+          <span>Frais de livraison</span>
+          <span>{{ formatPrice(orderData.frais_livraison) }}</span>
+        </div>
+        <div class="total-row grand-total">
+          <span>TOTAL RÉGLÉ</span>
+          <span class="total-amount">{{ formatPrice(orderData.total) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Facture Officielle -->
+    <div class="invoice-box" *ngIf="invoiceData">
+      <div class="invoice-info">
+        <span class="invoice-label">Facture officielle :</span>
+        <span class="invoice-num">{{ invoiceData.numero_facture }}</span>
+      </div>
+      <button class="btn-invoice-pdf" (click)="downloadInvoicePdf()" [disabled]="isDownloadingPdf">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 15L12 3M12 15L8 11M12 15L16 11M2 17L2 19C2 20.1046 2.89543 21 4 21L20 21C21.1046 21 22 20.1046 22 19L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>{{ isDownloadingPdf ? 'Téléchargement...' : 'Télécharger la facture PDF' }}</span>
+      </button>
+      <p class="download-success" *ngIf="downloadSuccessMessage">✓ Facture téléchargée avec succès</p>
+    </div>
+
+    <button class="btn-primary" (click)="navigateToTracking()">
+      Suivre ma commande en direct
+    </button>
+  </div>
+
+  <!-- 3. CAS ATTENTE CONFIRMATION (DELAI RESEAU IPN) -->
+  <div class="card pending-card" *ngIf="!isLoading && !isSuccess && isPendingVerification">
+    <div class="icon-circle pending-circle">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" stroke="#FFFFFF" stroke-width="2"/>
+        <path d="M12 6V12L16 14" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h2>Nous attendons encore la confirmation de votre paiement</h2>
+    <p class="subtitle">Le traitement de votre paiement par l'opérateur mobile prend un peu plus de temps que prévu. Votre commande reste active.</p>
+
+    <div class="ref-badge" *ngIf="reference">
+      <span>Référence : {{ reference }}</span>
+    </div>
+
+    <button class="btn-primary" (click)="navigateToTracking()">
+      Consulter le statut de ma commande
+    </button>
+  </div>
+
+  <!-- 4. CAS ERREUR -->
+  <div class="card error-card" *ngIf="!isLoading && !isSuccess && !isPendingVerification">
+    <div class="icon-circle error-circle">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 6L6 18M6 6L18 18" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h2>Impossible de vérifier le statut</h2>
+    <p class="subtitle">{{ errorMessage || 'Une erreur est survenue lors de la vérification de la commande.' }}</p>
+
+    <button class="btn-primary" (click)="retryCheckout()">
+      Retourner au panier
+    </button>
+  </div>
+</div>

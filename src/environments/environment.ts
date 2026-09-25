@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: '', // Will be set when Django DRF backend is ready
+  apiUrl: 'http://127.0.0.1:8000',
   googleClientId: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
   googleMapsApiKey: 'YOUR_GOOGLE_MAPS_API_KEY'
 };

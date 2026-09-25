@@ -58,13 +58,19 @@ export class AdminDriversComponent implements OnInit {
   }
 
   onApproveCandidate(id: string): void {
-    this.driverService.approveCandidate(id);
-    this.loadFiltered();
+    this.driverService.approveCandidate(id).subscribe(() => {
+      this.loadFiltered();
+      this.stats$ = this.driverService.getStatsSummary();
+    });
   }
 
-  onRejectCandidate(id: string): void {
-    this.driverService.rejectCandidate(id);
-    this.loadFiltered();
+  onRejectCandidate(event: { id: string; motif: string } | string): void {
+    const id = typeof event === 'string' ? event : event.id;
+    const motif = typeof event === 'string' ? undefined : event.motif;
+    this.driverService.rejectCandidate(id, motif).subscribe(() => {
+      this.loadFiltered();
+      this.stats$ = this.driverService.getStatsSummary();
+    });
   }
 
   private loadFiltered(): void {

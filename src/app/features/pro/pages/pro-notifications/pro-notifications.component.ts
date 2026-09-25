@@ -1,13 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ProHeaderComponent } from '../../components/pro-header/pro-header.component';
 import { ProBottomNavComponent } from '../../components/pro-bottom-nav/pro-bottom-nav.component';
+import { NotificationService, NotificationApiItem } from '../../../../core/services/notification.service';
 
 export interface ProNotificationItem {
   id: string;
-  type: 'ORDER' | 'ORDER_READY' | 'CLIENT_MESSAGE' | 'PAYMENT' | 'SUBSCRIPTION' | 'SYSTEM';
+  type: string;
   title: string;
   subtitle?: string;
   message: string;
@@ -34,109 +35,85 @@ export interface ProNotificationItem {
   styleUrls: ['./pro-notifications.component.scss']
 })
 export class ProNotificationsComponent implements OnInit {
+  private notificationService = inject(NotificationService);
+  private router = inject(Router);
+
   searchQuery: string = '';
+  apiNotifications: NotificationApiItem[] = [];
   notifications: ProNotificationItem[] = [];
   filteredNotifications: ProNotificationItem[] = [];
+  isLoading = true;
+  errorMessage = '';
 
   ngOnInit(): void {
-    this.notifications = [
-      {
-        id: 'notif-sub-1',
-        type: 'SUBSCRIPTION',
-        isPinned: true,
-        isRead: false,
-        priority: 'high',
-        title: 'Paiement de l\'abonnement AYYOU PRO',
-        subtitle: 'Renouvellement mensuel — Épinglé',
-        timeFormatted: "Aujourd'hui",
-        message: 'Votre abonnement AYYOU PRO (Formule Restaurant Gourmet) a été renouvelé avec succès. Facture disponible.',
-        avatarBg: '#FFF1F2',
-        avatarText: 'AY',
-        statusBadgeText: 'Épinglé',
-        statusBadgeClass: 'badge-pinned',
-        footerLeftText: 'Statut : Actif',
-        footerLeftClass: 'text-green',
-        footerActionText: 'Voir la facture',
-        footerActionClass: 'btn-text-link'
-      },
-      {
-        id: 'notif-ord-1',
-        type: 'ORDER_READY',
-        isPinned: false,
-        isRead: false,
-        priority: 'high',
-        title: 'Chez Loutcha',
-        subtitle: 'Commande #AY-9482 • En cours',
-        timeFormatted: "À l'instant",
-        message: 'Votre commande est prête au comptoir de retrait.',
-        avatarBg: '#FEF3C7',
-        avatarText: 'CL',
-        footerLeftText: 'À retirer avant 13h15',
-        footerLeftClass: 'text-red-bold',
-        footerActionText: 'Voir le QR Code',
-        footerActionClass: 'btn-red-pill'
-      },
-      {
-        id: 'notif-client-1',
-        type: 'CLIENT_MESSAGE',
-        isPinned: false,
-        isRead: true,
-        priority: 'normal',
-        title: 'La Fourchette Dakar',
-        subtitle: 'Service Relations Clientèle',
-        timeFormatted: 'Hier, 20h25',
-        message: '« Merci pour votre fidélité Moussa ! Votre commande spéciale a été préparée avec soin. Nous espérons vous revoir très bientôt sur l\'application AYYOU. »',
-        avatarBg: '#1A1A1A',
-        avatarText: 'LF',
-        footerLeftText: 'Livré à l\'habitation',
-        footerLeftClass: 'badge-green-pill',
-        footerActionText: 'Contacter',
-        footerActionClass: 'btn-pink-pill'
-      },
-      {
-        id: 'notif-cc-1',
-        type: 'ORDER',
-        isPinned: false,
-        isRead: true,
-        priority: 'normal',
-        title: 'Click & Collect #AY-9482',
-        subtitle: 'Validé',
-        timeFormatted: '13h15',
-        message: 'Votre code de retrait a été validé au comptoir de Chez Loutcha. Facture archivée automatiquement.',
-        avatarBg: '#FFF1F2',
-        avatarText: 'CC',
-        statusBadgeText: 'Validé',
-        statusBadgeClass: 'badge-green',
-        footerActionText: 'Voir reçu',
-        footerActionClass: 'btn-text-link'
-      },
-      {
-        id: 'notif-new-1',
-        type: 'ORDER',
-        isPinned: false,
-        isRead: false,
-        priority: 'high',
-        title: 'Nouvelle commande reçue',
-        subtitle: 'Commande #AY-9490 • 3 articles',
-        timeFormatted: 'Il y a 5 min',
-        message: 'Nouvelle commande de Fatou Sall (5 500 FCFA). Veuillez valider la préparation.',
-        avatarBg: '#E0F2FE',
-        avatarText: 'NC',
-        footerLeftText: '5 500 FCFA',
-        footerLeftClass: 'text-dark-bold',
-        footerActionText: 'Voir la commande',
-        footerActionClass: 'btn-red-pill'
-      }
-    ];
+    this.loadNotifications();
+  }
 
-    this.applyFilter();
+  loadNotifications(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.notificationService.getNotifications().subscribe({
+      next: (items) => {
+        this.apiNotifications = items;
+        this.notifications = items.map(n => this.mapApiToProItem(n));
+        this.applyFilter();
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.errorMessage = err.error?.detail || "Erreur de chargement des notifications.";
+      }
+    });
+  }
+
+  private mapApiToProItem(n: NotificationApiItem): ProNotificationItem {
+    const isOrder = n.type_notification === 'ORDER' || n.reference_type === 'Commande';
+    const isDelivery = n.type_notification === 'DELIVERY' || n.reference_type === 'Livraison';
+    const isPro = n.type_notification === 'PRO_VALIDATION' || n.type_notification === 'SUBSCRIPTION';
+
+    let avatarText = 'AY';
+    let avatarBg = '#FFF1F2';
+    if (isOrder) {
+      avatarText = 'CMD';
+      avatarBg = '#FEF3C7';
+    } else if (isDelivery) {
+      avatarText = 'LIV';
+      avatarBg = '#E0F2FE';
+    } else if (isPro) {
+      avatarText = 'PRO';
+      avatarBg = '#F3E8FF';
+    }
+
+    const d = n.created_at ? new Date(n.created_at) : new Date();
+    const timeFormatted = `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+
+    return {
+      id: String(n.id),
+      type: n.type_notification,
+      title: n.titre,
+      subtitle: `${n.type_notification_display} • ${n.canal_display}`,
+      message: n.message,
+      timeFormatted,
+      isRead: n.est_lu,
+      isPinned: !n.est_lu,
+      priority: n.est_lu ? 'normal' : 'high',
+      orderRef: n.reference_id,
+      avatarBg,
+      avatarText,
+      statusBadgeText: n.est_lu ? 'Lue' : 'Nouveau',
+      statusBadgeClass: n.est_lu ? 'badge-green' : 'badge-pinned',
+      footerLeftText: n.reference_id ? `Réf : #${n.reference_id}` : undefined,
+      footerActionText: n.reference_id ? 'Consulter' : undefined,
+      footerActionClass: 'btn-text-link'
+    };
   }
 
   applyFilter(): void {
     if (!this.searchQuery.trim()) {
       this.filteredNotifications = [...this.notifications].sort((a, b) => {
-        if (a.isPinned && !b.isPinned) return -1;
-        if (!a.isPinned && b.isPinned) return 1;
+        if (!a.isRead && b.isRead) return -1;
+        if (a.isRead && !b.isRead) return 1;
         return 0;
       });
       return;
@@ -152,6 +129,23 @@ export class ProNotificationsComponent implements OnInit {
   }
 
   toggleRead(notif: ProNotificationItem): void {
-    notif.isRead = !notif.isRead;
+    const numericId = parseInt(notif.id, 10);
+    if (!isNaN(numericId) && !notif.isRead) {
+      this.notificationService.markAsRead(numericId).subscribe({
+        next: () => {
+          notif.isRead = true;
+          notif.statusBadgeText = 'Lue';
+          notif.statusBadgeClass = 'badge-green';
+        }
+      });
+    }
+  }
+
+  markAllAsRead(): void {
+    this.notificationService.markAllAsRead().subscribe({
+      next: () => {
+        this.loadNotifications();
+      }
+    });
   }
 }

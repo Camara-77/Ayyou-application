@@ -14,7 +14,7 @@
           <span>COMMANDES</span>
           <span>AUJOURD'HUI</span>
         </div>
-        <div class="kpi-value">42</div>
+        <div class="kpi-value">{{ stats ? stats.todayOrdersCount : 0 }}</div>
         <div class="kpi-subtitle">Commandes du jour</div>
       </div>
 
@@ -24,7 +24,7 @@
           <span>REVENUS</span>
           <span class="unit">FCFA</span>
         </div>
-        <div class="kpi-value">125 000</div>
+        <div class="kpi-value">{{ stats ? (stats.todayRevenueFcfa | number:'1.0-0') : '0' }}</div>
         <div class="kpi-subtitle">Recette totale</div>
       </div>
 
@@ -34,7 +34,7 @@
           <span>À EMPORTER</span>
           <span class="dot-orange">●</span>
         </div>
-        <div class="kpi-value">8</div>
+        <div class="kpi-value">{{ stats ? stats.pickupOrdersCount : 0 }}</div>
         <div class="kpi-subtitle">Commandes à récupérer</div>
       </div>
 
@@ -44,7 +44,7 @@
           <span class="text-red">PRIORITAIRE</span>
           <span class="badge-red">Urgent</span>
         </div>
-        <div class="kpi-value">5</div>
+        <div class="kpi-value">{{ stats ? stats.urgentOrdersCount : 0 }}</div>
         <div class="kpi-subtitle">À valider</div>
       </div>
 
@@ -55,7 +55,7 @@
       <div class="icon-circle">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/>
-          <polyline points="12 6 12 12 16 14"/>
+          <polyline points="12 6 12 16 14"/>
         </svg>
       </div>
       <div class="history-text">
@@ -74,7 +74,7 @@
       <div class="urgent-header-row">
         <div class="title-group">
           <h3>Commandes urgentes</h3>
-          <span class="count-badge-red">2</span>
+          <span class="count-badge-red">{{ urgentOrders.length }}</span>
         </div>
         <a routerLink="/pro/orders/history" class="link-see-all">Voir tout &gt;</a>
       </div>
@@ -82,47 +82,35 @@
       <!-- Filters Pills -->
       <div class="filter-pills-row">
         <button class="pill" [class.active]="selectedFilter === 'ALL'" (click)="setFilter('ALL')">
-          Toutes (5)
+          Toutes ({{ urgentOrders.length }})
         </button>
         <button class="pill" [class.active]="selectedFilter === 'PICKUP'" (click)="setFilter('PICKUP')">
-          À emporter (2)
+          À emporter
         </button>
         <button class="pill" [class.active]="selectedFilter === 'DELIVERY'" (click)="setFilter('DELIVERY')">
-          Livraison (3)
+          Livraison
         </button>
       </div>
 
       <!-- Urgent Order Cards List -->
       <div class="urgent-list">
         
-        <!-- Card 1: #142 -->
-        <div class="order-item-card">
-          <div class="badge-square badge-pickup">
-            <span class="ref-num">#142</span>
-            <span class="service-type">À EMPORTER</span>
+        <div *ngFor="let order of filteredUrgentOrders" class="order-item-card">
+          <div class="badge-square" [ngClass]="{'badge-pickup': order.type === 'pickup', 'badge-delivery': order.type !== 'pickup'}">
+            <span class="ref-num">{{ order.orderRef || ('#' + order.id) }}</span>
+            <span class="service-type">{{ order.type === 'pickup' ? 'À EMPORTER' : 'LIVRAISON' }}</span>
           </div>
           <div class="order-details">
-            <h4 class="dish-name">Thiéboudienne Rouge Rc</h4>
-            <p class="order-meta">Il y a 3 min · 6 500 FCFA</p>
+            <h4 class="dish-name">{{ order.clientName || 'Commande AYYOU' }}</h4>
+            <p class="order-meta">{{ order.timeAgo || 'À l’instant' }} · {{ (order.totalPrice || order.totalAmount || 0) | number:'1.0-0' }} FCFA</p>
           </div>
-          <button (click)="updateOrderStatus('#142', 'VALIDEE')" class="btn-valider">
+          <button (click)="updateOrderStatus(order.id, 'EN_PREPARATION')" class="btn-valider">
             Valider
           </button>
         </div>
 
-        <!-- Card 2: #143 -->
-        <div class="order-item-card">
-          <div class="badge-square badge-delivery">
-            <span class="ref-num">#143</span>
-            <span class="service-type">LIVRAISON</span>
-          </div>
-          <div class="order-details">
-            <h4 class="dish-name">Yassa Poulet Braisé</h4>
-            <p class="order-meta">Il y a 6 min · 4 500 FCFA</p>
-          </div>
-          <button (click)="updateOrderStatus('#143', 'VALIDEE')" class="btn-valider">
-            Valider
-          </button>
+        <div *ngIf="filteredUrgentOrders.length === 0" class="empty-urgent-orders">
+          <p>Aucune commande urgente en attente.</p>
         </div>
 
       </div>

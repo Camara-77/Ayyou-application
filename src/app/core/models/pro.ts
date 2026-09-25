@@ -47,12 +47,15 @@ export interface ProDish {
   description: string;
   price: number;
   category?: string;
+  subCategory?: string;
   categoryId?: string;
   categoryName?: string;
   imageUrl: string;
   isVisiblePublic: boolean;
   variants: ProDishVariant[];
   stockDailyLimit?: number;
+  stockGeneral?: number;
+  stockAyyouAllocated?: number;
 }
 
 export interface ProOrderItem {
@@ -99,7 +102,7 @@ export interface ProStats {
   weeklyRevenue: { day: string; amount: number }[];
   hourlyRevenue: { hour: string; amount: number }[];
   topDishes: { name: string; portionsSold: number; revenueFcfa: number; count?: number; revenue?: number }[];
-  lowDemandDishes: { id: string; name: string; ordersCount: number; priceFcfa: number; count?: number }[];
+  lowDemandDishes: { id: string; name: string; ordersCount: number; priceFcfa: number; count?: number; revenueFcfa?: number }[];
 }
 
 export interface ProVideoUpload {
@@ -109,6 +112,7 @@ export interface ProVideoUpload {
   dishName?: string;
   priceFcfa?: number;
   category?: string;
+  subCategory?: string;
   title: string;
   description: string;
   thumbnailUrl?: string;

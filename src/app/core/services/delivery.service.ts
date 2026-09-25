@@ -1,112 +1,143 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, interval, Subscription } from 'rxjs';
-import { DeliveryDriver, DeliveryAssignedCourse, DeliveryAvailableCourse } from '../models/delivery';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map, BehaviorSubject, tap } from 'rxjs';
+import { Livraison, ValidateQrPayload, ValidateCodePayload, LivreurProfile, LivreurDocument } from '../models/delivery';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DeliveryService {
-  private driverSubject = new BehaviorSubject<DeliveryDriver>({
-    id: 'd_abdoulaye',
-    name: 'Abdoulaye Diop',
-    rating: 4.9,
-    status: 'Prêt',
-    zone: 'Dakar Plateau',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80'
-  });
-  driver$: Observable<DeliveryDriver> = this.driverSubject.asObservable();
+  private http = inject(HttpClient);
+  private baseUrl = environment.apiUrl ? `${environment.apiUrl}/api/deliveries` : '/api/deliveries';
 
-  private initialAssignedCourse: DeliveryAssignedCourse = {
-    id: 'c_9482',
-    orderRef: 'AY-9482',
-    remunerationFcfa: 1000,
-    kitchenTimeText: 'Prêt dans 3 min',
-    restaurantName: 'Chez Loutcha',
-    restaurantAddress: 'Dakar Plateau, Rue de Thiong',
-    dishesCountText: '2 plats',
-    clientAddress: 'Résidence Teranga, Point E',
-    distanceTimeText: '1,8 km • 8 min',
-    itemsSummary: 'Thiébouddienne + Yassa Poulet',
-    timerSeconds: 106, // Initial 01:46 as in mockup
-    initialTimerSeconds: 120,
-    status: 'ASSIGNED'
-  };
-
-  private assignedCourseSubject = new BehaviorSubject<DeliveryAssignedCourse>(this.initialAssignedCourse);
-  assignedCourse$: Observable<DeliveryAssignedCourse> = this.assignedCourseSubject.asObservable();
-
-  private availableCoursesSubject = new BehaviorSubject<DeliveryAvailableCourse[]>([
-    {
-      id: 'c_9485',
-      orderRef: 'AY-9485',
-      remunerationFcfa: 1200,
-      restaurantName: 'Le Terrou-Bi Restaurant',
-      restaurantAddressNote: 'Corniche Ouest • Prête au comptoir',
-      clientAddress: 'Fann Résidence',
-      distanceTimeText: '2,4 km • ~12 min de trajet'
-    },
-    {
-      id: 'c_9490',
-      orderRef: 'AY-9490',
-      remunerationFcfa: 1500,
-      restaurantName: 'Épicerie Fine Almadies',
-      restaurantAddressNote: 'Route des Almadies • Sac isotherme',
-      clientAddress: 'Ngor Extension',
-      distanceTimeText: '3,1 km • ~15 min de trajet',
-      requiresInsulatedBag: true
-    },
-    {
-      id: 'c_9494',
-      orderRef: 'AY-9494',
-      remunerationFcfa: 1000,
-      restaurantName: 'Dibiterie Haoussa',
-      restaurantAddressNote: 'Fann • Prête dans 5 min',
-      clientAddress: 'Gueule Tapée',
-      distanceTimeText: '1,2 km • ~7 min de trajet'
-    }
-  ]);
-  availableCourses$: Observable<DeliveryAvailableCourse[]> = this.availableCoursesSubject.asObservable();
-
-  private timerSubscription?: Subscription;
-
-  constructor() {
-    this.startTimer();
+  /**
+   * GET /api/deliveries/available/
+   */
+  getAvailableDeliveries(): Observable<Livraison[]> {
+    return this.http.get<any>(`${this.baseUrl}/available/`).pipe(
+      map(res => (Array.isArray(res) ? res : res?.results || []))
+    );
   }
 
-  private startTimer(): void {
-    this.timerSubscription?.unsubscribe();
-    this.timerSubscription = interval(1000).subscribe(() => {
-      const current = this.assignedCourseSubject.value;
-      if (current.status === 'ASSIGNED' && current.timerSeconds > 0) {
-        const updatedSeconds = current.timerSeconds - 1;
-        const newStatus = updatedSeconds === 0 ? 'EXPIRED' : 'ASSIGNED';
-        this.assignedCourseSubject.next({
-          ...current,
-          timerSeconds: updatedSeconds,
-          status: newStatus
-        });
-        if (newStatus === 'EXPIRED') {
-          this.timerSubscription?.unsubscribe();
+  /**
+   * GET /api/deliveries/
+   */
+  getDeliveries(): Observable<Livraison[]> {
+    return this.http.get<any>(`${this.baseUrl}/`).pipe(
+      map(res => (Array.isArray(res) ? res : res?.results || []))
+    );
+  }
+
+  /**
+   * GET /api/deliveries/{id}/
+   */
+  getDeliveryById(id: number): Observable<Livraison> {
+    return this.http.get<Livraison>(`${this.baseUrl}/${id}/`);
+  }
+
+  /**
+   * POST /api/deliveries/{id}/accept/
+   */
+  acceptDelivery(id: number): Observable<Livraison> {
+    return this.http.post<Livraison>(`${this.baseUrl}/${id}/accept/`, {});
+  }
+
+  /**
+   * POST /api/deliveries/{id}/decline/
+   */
+  declineDelivery(id: number): Observable<Livraison> {
+    return this.http.post<Livraison>(`${this.baseUrl}/${id}/decline/`, {});
+  }
+
+  /**
+   * POST /api/deliveries/{id}/arrive-restaurant/
+   */
+  arriveRestaurant(id: number): Observable<Livraison> {
+    return this.http.post<Livraison>(`${this.baseUrl}/${id}/arrive-restaurant/`, {});
+  }
+
+  /**
+   * POST /api/deliveries/{id}/pickup/
+   */
+  pickupDelivery(id: number): Observable<Livraison> {
+    return this.http.post<Livraison>(`${this.baseUrl}/${id}/pickup/`, {});
+  }
+
+  /**
+   * GET /api/deliveries/stats/
+   */
+  getDriverStats(): Observable<{ courses_terminees: number; gain_total: string; distance_km: string | null; temps_connecte: string | null }> {
+    return this.http.get<any>(`${this.baseUrl}/stats/`);
+  }
+
+  /**
+   * POST /api/deliveries/validate-qr/
+   */
+  validateByQr(payload: ValidateQrPayload): Observable<Livraison> {
+    return this.http.post<Livraison>(`${this.baseUrl}/validate-qr/`, payload);
+  }
+
+  /**
+   * POST /api/deliveries/validate-code/
+   */
+  validateByCode(payload: ValidateCodePayload): Observable<Livraison> {
+    return this.http.post<Livraison>(`${this.baseUrl}/validate-code/`, payload);
+  }
+
+  private driverProfileSubject = new BehaviorSubject<LivreurProfile | null>(null);
+  public driverProfile$ = this.driverProfileSubject.asObservable();
+
+  /**
+   * GET /api/deliveries/profile/
+   */
+  getDriverProfile(): Observable<LivreurProfile> {
+    return this.http.get<LivreurProfile>(`${this.baseUrl}/profile/`).pipe(
+      tap(profile => this.driverProfileSubject.next(profile))
+    );
+  }
+
+  /**
+   * PATCH /api/deliveries/profile/
+   */
+  updateDriverProfile(data: Partial<LivreurProfile>): Observable<LivreurProfile> {
+    return this.http.patch<LivreurProfile>(`${this.baseUrl}/profile/`, data).pipe(
+      tap(profile => this.driverProfileSubject.next(profile))
+    );
+  }
+
+  /**
+   * POST /api/deliveries/profile/photo/
+   */
+  uploadDriverPhoto(file: File): Observable<{ photo_url: string }> {
+    const formData = new FormData();
+    formData.append('photo', file);
+    return this.http.post<{ photo_url: string }>(`${this.baseUrl}/profile/photo/`, formData).pipe(
+      tap(res => {
+        const current = this.driverProfileSubject.value;
+        if (current && res.photo_url) {
+          const updated = { ...current, photo_avatar: res.photo_url, permis_conduire: res.photo_url };
+          this.driverProfileSubject.next(updated);
         }
-      }
-    });
+      })
+    );
   }
 
-  acceptCourse(courseId: string): void {
-    this.timerSubscription?.unsubscribe();
-    const current = this.assignedCourseSubject.value;
-    this.assignedCourseSubject.next({
-      ...current,
-      status: 'ACCEPTED'
-    });
+  /**
+   * PATCH /api/deliveries/profile/availability/
+   */
+  updateAvailability(est_disponible: boolean): Observable<LivreurProfile> {
+    return this.http.patch<LivreurProfile>(`${this.baseUrl}/profile/availability/`, { est_disponible }).pipe(
+      tap(profile => this.driverProfileSubject.next(profile))
+    );
   }
 
-  declineCourse(courseId: string): void {
-    this.timerSubscription?.unsubscribe();
-    const current = this.assignedCourseSubject.value;
-    this.assignedCourseSubject.next({
-      ...current,
-      status: 'DECLINED'
-    });
+  /**
+   * GET /api/deliveries/profile/documents/
+   */
+  getDriverDocuments(): Observable<LivreurDocument[]> {
+    return this.http.get<any>(`${this.baseUrl}/profile/documents/`).pipe(
+      map(res => (Array.isArray(res) ? res : res?.results || []))
+    );
   }
 }

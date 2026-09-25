@@ -81,7 +81,7 @@
   <!-- Pagination Footer -->
   <div class="table-pagination-footer">
     <span class="pagination-info">
-      Affichage de 1 à {{ establishments.length }} sur 259 établissements
+      Affichage de {{ establishments.length > 0 ? 1 : 0 }} à {{ establishments.length }} sur {{ establishments.length }} établissement(s)
     </span>
 
     <div class="pagination-controls">

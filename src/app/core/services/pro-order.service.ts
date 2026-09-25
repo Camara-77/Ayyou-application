@@ -1,84 +1,46 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { ProOrder } from '../models/pro';
+import { map, catchError, tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
+import { ProOrder, ProOrderItem } from '../models/pro';
+
+export interface BackendSousCommande {
+  id: number;
+  commande: number;
+  numero_commande: string;
+  etablissement: number;
+  statut: string;
+  statut_display: string;
+  sous_total: string;
+  frais_livraison: string;
+  total: string;
+  client_nom: string;
+  client_telephone: string;
+  adresse_livraison: string;
+  instructions_livraison: string;
+  lignes: {
+    id: number;
+    produit: number | null;
+    nom_produit: string;
+    quantite: number;
+    prix_unitaire: string;
+    total_ligne: string;
+    variante?: string;
+    options?: string[];
+  }[];
+  date_creation: string;
+  date_modification: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProOrderService {
-  private initialOrders: ProOrder[] = [
-    {
-      id: 'ORD-9482',
-      orderRef: 'AY-9482',
-      type: 'delivery',
-      serviceMode: 'LIVRAISON',
-      isUrgent: false,
-      status: 'LIVREE',
-      clientName: 'Amadou Diallo',
-      deliveryAddress: 'Avenue Cheikh Anta Diop, Fann Hock',
-      timeAgo: 'Il y a 35 min',
-      timeFormatted: '13:45',
-      dateGroup: "AUJOURD'HUI — 12 NOVEMBRE",
-      createdAt: new Date().toISOString(),
-      itemsText: '1x Thiéboudienne Rouge Royale, 1x Yassa Poulet, 1x Bissap Royal',
-      items: [
-        { name: 'Thiéboudienne Rouge Royale', quantity: 1, totalPrice: 4500 },
-        { name: 'Yassa Poulet', quantity: 1, totalPrice: 5000 },
-        { name: 'Bissap Royal', quantity: 1, totalPrice: 2000 }
-      ],
-      paymentMethodText: 'Payé via Wave',
-      paymentDotClass: 'dot-green',
-      totalPrice: 11500,
-      totalAmount: 11500
-    },
-    {
-      id: 'ORD-9478',
-      orderRef: 'AY-9478',
-      type: 'pickup',
-      serviceMode: 'CLICK_AND_COLLECT',
-      isUrgent: false,
-      status: 'A_EMPORTER',
-      clientName: 'Fatou Sall',
-      deliveryAddress: 'Comptoir Chez Loutcha',
-      timeAgo: 'Il y a 1h 15min',
-      timeFormatted: '12:30',
-      dateGroup: "AUJOURD'HUI — 12 NOVEMBRE",
-      createdAt: new Date().toISOString(),
-      itemsText: '2x Thiéboudienne Rouge, 2x Pastels Thon',
-      items: [
-        { name: 'Thiéboudienne Rouge', quantity: 2, totalPrice: 7000 },
-        { name: 'Pastels Thon', quantity: 2, totalPrice: 4000 }
-      ],
-      paymentMethodText: 'Payé comptoir / Wave',
-      paymentDotClass: 'dot-orange',
-      totalPrice: 11000,
-      totalAmount: 11000
-    },
-    {
-      id: 'ORD-9475',
-      orderRef: 'AY-9475',
-      type: 'delivery',
-      serviceMode: 'LIVRAISON',
-      isUrgent: false,
-      status: 'LIVREE',
-      clientName: 'Ousmane Ba',
-      deliveryAddress: 'Almadies, Dakar',
-      timeAgo: 'Hier 20:15',
-      timeFormatted: '20:15',
-      dateGroup: "HIER — 11 NOVEMBRE",
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-      itemsText: "1x Dibi d'Agneau Prestige, 1x Alloco, 2x Jus de Bouye",
-      items: [
-        { name: "Dibi d'Agneau Prestige", quantity: 1, totalPrice: 7500 },
-        { name: 'Alloco', quantity: 1, totalPrice: 2000 },
-        { name: 'Jus de Bouye', quantity: 2, totalPrice: 4000 }
-      ],
-      paymentMethodText: 'Orange Money',
-      paymentDotClass: 'dot-green',
-      totalPrice: 13500,
-      totalAmount: 13500
-    }
-  ];
+  private http = inject(HttpClient);
+  private proMerchantApiUrl = environment.apiUrl ? `${environment.apiUrl}/api/pro/merchant` : '/api/pro/merchant';
+
+  private initialOrders: ProOrder[] = [];
 
   private ordersSubject = new BehaviorSubject<ProOrder[]>(this.initialOrders);
   allOrders$: Observable<ProOrder[]> = this.ordersSubject.asObservable();
@@ -89,27 +51,79 @@ export class ProOrderService {
 
   constructor() {
     this.updateUrgentList();
+    this.fetchMerchantOrders().subscribe();
   }
 
   get orders(): ProOrder[] {
     return this.ordersSubject.value;
   }
 
-  private updateUrgentList(): void {
-    const urgent = this.ordersSubject.value.filter(o => 
-      o.status === 'EN_ATTENTE' || o.status === 'VALIDEE' || o.status === 'PREPARATION' || o.status === 'PRETE' || o.status === 'pending'
+  /**
+   * GET /api/pro/merchant/orders/
+   * Charge les sous-commandes réelles du marchand connecté et met à jour le BehaviorSubject.
+   */
+  fetchMerchantOrders(): Observable<ProOrder[]> {
+    return this.http.get<any>(`${this.proMerchantApiUrl}/orders/`).pipe(
+      map(res => {
+        const backendOrders: BackendSousCommande[] = Array.isArray(res) ? res : (res?.results || []);
+        const mappedOrders = (backendOrders || []).map(b => this.mapBackendToProOrder(b));
+        this.ordersSubject.next(mappedOrders);
+        this.updateUrgentList();
+        return mappedOrders;
+      }),
+      catchError(() => {
+        this.ordersSubject.next([]);
+        this.updateUrgentList();
+        return of([]);
+      })
     );
-    this.urgentSubject.next(urgent);
   }
 
+  /**
+   * PATCH /api/pro/merchant/orders/{id}/status/
+   * Met à jour le statut d'une sous-commande marchand et met à jour les streams réactifs.
+   */
   updateOrderStatus(orderId: string, status: string): void {
+    // Mise à jour optimiste locale
     const current = [...this.ordersSubject.value];
-    const index = current.findIndex(o => o.id === orderId);
+    const index = current.findIndex(o => o.id === orderId || o.orderRef === orderId);
     if (index > -1) {
       current[index] = { ...current[index], status };
       this.ordersSubject.next(current);
       this.updateUrgentList();
     }
+
+    // Appel API backend réactif
+    this.http.patch<BackendSousCommande>(`${this.proMerchantApiUrl}/orders/${orderId}/status/`, { statut: status }).pipe(
+      tap(updatedBackendOrder => {
+        const updated = this.mapBackendToProOrder(updatedBackendOrder);
+        const latest = [...this.ordersSubject.value];
+        const idx = latest.findIndex(o => o.id === orderId || o.orderRef === orderId);
+        if (idx > -1) {
+          latest[idx] = updated;
+          this.ordersSubject.next(latest);
+          this.updateUrgentList();
+        }
+      }),
+      catchError(err => {
+        return of(null);
+      })
+    ).subscribe();
+  }
+
+  private updateUrgentList(): void {
+    const urgent = this.ordersSubject.value.filter(o =>
+      o.status === 'EN_ATTENTE' ||
+      o.status === 'VALIDEE' ||
+      o.status === 'PREPARATION' ||
+      o.status === 'PRETE' ||
+      o.status === 'BROUILLON' ||
+      o.status === 'EN_ATTENTE_PAIEMENT' ||
+      o.status === 'PAYEE' ||
+      o.status === 'EN_PREPARATION' ||
+      o.status === 'pending'
+    );
+    this.urgentSubject.next(urgent);
   }
 
   getUrgentOrders(): Observable<ProOrder[]> {
@@ -122,5 +136,41 @@ export class ProOrderService {
       list = list.filter(o => o.status === 'LIVREE' || o.status === 'delivered');
     }
     return of(list);
+  }
+
+  /**
+   * Transforme un objet SousCommande Backend Django DRF au format ProOrder UI Angular.
+   */
+  private mapBackendToProOrder(b: BackendSousCommande): ProOrder {
+    const dateObj = b.date_creation ? new Date(b.date_creation) : new Date();
+    const timeFormatted = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const items: ProOrderItem[] = (b.lignes || []).map(l => ({
+      name: l.nom_produit,
+      quantity: l.quantite,
+      totalPrice: parseFloat(l.total_ligne || '0')
+    }));
+
+    const itemsText = items.map(i => `${i.quantity}x ${i.name}`).join(', ');
+
+    return {
+      id: b.id.toString(),
+      orderRef: b.numero_commande || `AY-${b.id}`,
+      type: 'delivery',
+      serviceMode: 'LIVRAISON',
+      isUrgent: b.statut === 'PAYEE' || b.statut === 'BROUILLON' || b.statut === 'EN_ATTENTE_PAIEMENT',
+      status: b.statut,
+      clientName: b.client_nom || 'Client AYYOU',
+      deliveryAddress: b.adresse_livraison || '',
+      timeAgo: timeFormatted,
+      timeFormatted: timeFormatted,
+      createdAt: b.date_creation,
+      itemsText: itemsText,
+      items: items,
+      paymentMethodText: 'Payé via AYYOU',
+      paymentDotClass: 'dot-green',
+      totalPrice: parseFloat(b.total || '0'),
+      totalAmount: parseFloat(b.total || '0'),
+      dateGroup: "AUJOURD'HUI — " + dateObj.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }).toUpperCase()
+    };
   }
 }

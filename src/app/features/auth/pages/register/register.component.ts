@@ -6,6 +6,7 @@ import { isValidNumber, getCountries, getCountryCallingCode, CountryCode } from 
 import { AuthInputComponent } from '../../components/auth-input/auth-input.component';
 import { AuthButtonComponent } from '../../components/auth-button/auth-button.component';
 import { AuthService } from '../../../../core/services/auth.service';
+import { RegisterFormValue } from '../../../../core/models/auth';
 
 export interface CountryInfo {
   code: CountryCode;
@@ -280,9 +281,40 @@ export class RegisterComponent implements OnInit {
     this.loading = true;
     this.errorMessage = null;
 
-    setTimeout(() => {
-      this.loading = false;
-      this.router.navigate(['/verify-sms']);
-    }, 500);
+    const phoneRaw = (this.registerForm.get('phone')?.value || '').trim();
+    const prefix = this.selectedCountry.prefix || '+221';
+    const cleanPhone = phoneRaw.replace(/\s+/g, '');
+    const fullPhone = cleanPhone.startsWith('+') ? cleanPhone : `${prefix}${cleanPhone}`;
+
+    const formVal: RegisterFormValue = {
+      ...this.registerForm.value,
+      phone: fullPhone
+    };
+
+    this.authService.register(formVal).subscribe({
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/verify-sms']);
+      },
+      error: (err) => {
+        this.loading = false;
+        if (err.error?.errors) {
+          const errors = err.error.errors;
+          if (typeof errors === 'string') {
+            this.errorMessage = errors;
+          } else if (errors.email) {
+            this.errorMessage = Array.isArray(errors.email) ? errors.email[0] : errors.email;
+          } else if (errors.numero_telephone) {
+            this.errorMessage = Array.isArray(errors.numero_telephone) ? errors.numero_telephone[0] : errors.numero_telephone;
+          } else if (errors.detail) {
+            this.errorMessage = errors.detail;
+          } else {
+            this.errorMessage = 'Erreur lors de l\'inscription. Veuillez vérifier vos données.';
+          }
+        } else {
+          this.errorMessage = 'Impossible de contacter le serveur backend. Veuillez vérifier votre connexion.';
+        }
+      }
+    });
   }
 }

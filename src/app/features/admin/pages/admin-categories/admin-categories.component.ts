@@ -84,19 +84,19 @@ export class AdminCategoriesComponent implements OnInit {
 
   onSaveCategory(category: CatalogCategory): void {
     if (this.editingCategory) {
-      this.adminCatalogService.updateCategory(category);
+      this.adminCatalogService.updateCategory(category).subscribe(() => this.onCloseManagementModal());
     } else {
-      this.adminCatalogService.addCategory(category);
+      this.adminCatalogService.addCategory(category).subscribe(() => this.onCloseManagementModal());
     }
   }
 
   onToggleStatus(category: CatalogCategory): void {
-    this.adminCatalogService.toggleCategoryStatus(category.id);
+    this.adminCatalogService.toggleCategoryStatus(category.id).subscribe();
   }
 
   onDeleteCategory(categoryIdOrCategory: string | CatalogCategory): void {
     const id = typeof categoryIdOrCategory === 'string' ? categoryIdOrCategory : categoryIdOrCategory.id;
-    this.adminCatalogService.deleteCategory(id);
+    this.adminCatalogService.deleteCategory(id).subscribe();
   }
 
   onOpenReorderModal(): void {
@@ -108,6 +108,6 @@ export class AdminCategoriesComponent implements OnInit {
   }
 
   onSaveReorder(categories: CatalogCategory[]): void {
-    this.adminCatalogService.reorderCategories(categories);
+    this.adminCatalogService.reorderCategories(categories).subscribe(() => this.onCloseReorderModal());
   }
 }

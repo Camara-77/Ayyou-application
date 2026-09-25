@@ -1,0 +1,313 @@
+<header class="profile-header">
+  <button class="icon-btn back-btn" (click)="goBack()" aria-label="Retour">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m15 18-6-6 6-6"/>
+    </svg>
+  </button>
+  
+  <h1 class="header-title">Modifier mon profil</h1>
+
+  <button class="icon-btn notif-btn" aria-label="Notifications">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+    </svg>
+    <span class="notif-badge-dot"></span>
+  </button>
+</header>
+
+<main class="profile-edit-container" *ngIf="!isLoading; else loadingState">
+  
+  <!-- Banner d'erreur ou succès -->
+  <div class="alert-banner alert-error" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+  <div class="alert-banner alert-success" *ngIf="successMessage">
+    {{ successMessage }}
+  </div>
+
+  <!-- CARTE 1: HEADER PROFIL & AVATAR UPLOAD -->
+  <div class="card profile-header-card">
+    <div class="avatar-upload-row">
+      <div class="avatar-relative">
+        <img *ngIf="avatarPreviewUrl; else defaultAvatar" [src]="avatarPreviewUrl" alt="Photo Livreur" class="avatar-img" />
+        <ng-template #defaultAvatar>
+          <div class="avatar-placeholder">
+            {{ (firstName.charAt(0) + lastName.charAt(0)) || 'AD' }}
+          </div>
+        </ng-template>
+
+        <!-- Bouton Caméra Rouge Overlay Upload -->
+        <label class="camera-btn-overlay" title="Changer de photo">
+          <input type="file" accept="image/*" (change)="onPhotoSelected($event)" hidden />
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+        </label>
+      </div>
+
+      <div class="profile-header-info">
+        <h2 class="driver-name-title">{{ driverName }}</h2>
+        <p class="matricule-sub">Matricule coursier : {{ driverMatricule }}</p>
+        <div class="duty-badge-inline">
+          <span class="duty-dot" [class.active]="profile?.est_disponible"></span>
+          <span class="duty-text">{{ profile?.est_disponible ? 'En service' : 'Hors service' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARTE 2: IDENTITÉ & COORDONNÉES -->
+  <div class="card card-section">
+    <div class="card-header-row">
+      <h3 class="card-section-title">IDENTITÉ & COORDONNÉES</h3>
+      <span class="ayyou-subbadge">AYYOU Sénégal</span>
+    </div>
+
+    <!-- Prénom et Nom -->
+    <div class="form-row-2col">
+      <div class="form-group">
+        <label>Prénom</label>
+        <input type="text" [(ngModel)]="firstName" placeholder="Abdoulaye" class="input-control" />
+      </div>
+      <div class="form-group">
+        <label>Nom</label>
+        <input type="text" [(ngModel)]="lastName" placeholder="Diop" class="input-control" />
+      </div>
+    </div>
+
+    <!-- Numéro mobile des courses -->
+    <div class="form-group">
+      <label>Numéro mobile des courses</label>
+      <div class="phone-input-wrap">
+        <span class="country-prefix">+221</span>
+        <input type="tel" [(ngModel)]="phoneNumber" placeholder="77 654 3210" class="input-control phone-field" />
+      </div>
+      <p class="field-hint">Numéro prioritaire pour les alertes de courses SMS et appels.</p>
+    </div>
+
+    <!-- Adresse Email -->
+    <div class="form-group">
+      <label>Adresse email</label>
+      <div class="input-with-badge">
+        <input type="email" [(ngModel)]="email" placeholder="abdoulaye.diop@ayyou.sn" class="input-control" />
+        <span class="badge badge-conforme" *ngIf="isEmailVerified">✓ Vérifié</span>
+      </div>
+    </div>
+
+    <!-- Secteurs d'intervention actifs -->
+    <div class="form-group">
+      <div class="label-with-counter">
+        <label>Secteurs d'intervention actifs</label>
+        <span class="counter-text">{{ zonesList.length }} zones sélectionnées</span>
+      </div>
+
+      <div class="zones-tags-wrap">
+        <span class="zone-pill" *ngFor="let zone of zonesList; let i = index">
+          {{ zone }}
+          <button class="remove-pill-btn" (click)="removeZone(i)" aria-label="Supprimer zone">×</button>
+        </span>
+      </div>
+
+      <button type="button" class="btn-add-zone-dashed" (click)="openAddZoneModal()">
+        ＋ Ajouter une zone
+      </button>
+    </div>
+  </div>
+
+  <!-- CARTE 3: MON VÉHICULE & ÉQUIPEMENTS -->
+  <div class="card card-section">
+    <div class="card-header-row">
+      <h3 class="card-section-title">MON VÉHICULE & ÉQUIPEMENTS</h3>
+      <span class="badge badge-conforme">Vérifié</span>
+    </div>
+
+    <div class="form-row-2col">
+      <div class="form-group">
+        <label>Modèle d'engin</label>
+        <input type="text" [(ngModel)]="vehicleModel" placeholder="Honda CG 125 Scooter" class="input-control" />
+      </div>
+      <div class="form-group">
+        <label>Immatriculation</label>
+        <input type="text" [(ngModel)]="vehiclePlate" placeholder="DK-4892-AZ" class="input-control font-semibold" />
+      </div>
+    </div>
+
+    <!-- Équipements certifiés obligatoires -->
+    <div class="form-group">
+      <label>Équipements certifiés obligatoires</label>
+      <div class="equipments-certified-row">
+        <div class="equipment-certified-pill" *ngFor="let eq of equipmentList">
+          <svg class="check-icon-green" width="16" height="16" viewBox="0 0 24 24" fill="#059669">
+            <circle cx="12" cy="12" r="10" fill="#059669"/>
+            <path d="M8 12l3 3 5-5" stroke="#FFFFFF" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+          </svg>
+          <span>{{ eq }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARTE 4: REVERSEMENT DES GAINS -->
+  <div class="card card-section">
+    <div class="card-header-row">
+      <div>
+        <h3 class="card-section-title margin-0">REVERSEMENT DES GAINS</h3>
+        <p class="card-sub-hint">Versement hebdomadaire le lundi</p>
+      </div>
+      <button type="button" class="btn-link-red" (click)="openAddAccountModal()">+ Ajouter</button>
+    </div>
+
+    <div class="payout-accounts-list">
+      <div 
+        class="payout-account-card" 
+        *ngFor="let acc of payoutAccounts; let i = index" 
+        [class.is-principal]="acc.is_principal"
+        (click)="selectPrincipalAccount(i)"
+      >
+        <div class="payout-card-left">
+          <div class="provider-logo-box" [ngClass]="{'bg-wave': acc.provider === 'WAVE', 'bg-om': acc.provider === 'ORANGE_MONEY'}">
+            <ng-container *ngIf="acc.provider === 'WAVE'">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect width="24" height="24" rx="6" fill="#00AAFF"/>
+                <path d="M12 6c-2.5 0-4.5 2-4.5 4.5 0 2 1.3 3.7 3.1 4.3l-1.1 2.2c-.2.4.1.9.6.9h3.8c.5 0 .8-.5.6-.9l-1.1-2.2c1.8-.6 3.1-2.3 3.1-4.3C16.5 8 14.5 6 12 6z" fill="#FFFFFF"/>
+              </svg>
+            </ng-container>
+            <ng-container *ngIf="acc.provider === 'ORANGE_MONEY'">
+              <div class="om-text-logo">OM</div>
+            </ng-container>
+          </div>
+
+          <div class="payout-card-info">
+            <div class="payout-title-row">
+              <span class="payout-provider-name">{{ acc.provider_name }}</span>
+              <span class="badge-principal-red" *ngIf="acc.is_principal">PRINCIPAL</span>
+              <span class="badge-secondary-gray" *ngIf="!acc.is_principal">Secondaire</span>
+            </div>
+            <span class="payout-card-num">{{ acc.numero }}</span>
+          </div>
+        </div>
+
+        <div class="radio-indicator">
+          <span class="radio-dot" [class.selected]="acc.is_principal"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARTE 5: DOCUMENTS OFFICIELS -->
+  <div class="card card-section">
+    <div class="card-header-row">
+      <h3 class="card-section-title">DOCUMENTS OFFICIELS</h3>
+      <span class="counter-badge-green">{{ documentsValidesCount }}/{{ totalDocumentsCount }} Validés</span>
+    </div>
+
+    <div class="docs-list">
+      <div class="gray-block doc-item">
+        <div class="doc-left">
+          <div class="doc-icon-wrapper">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
+              <rect width="18" height="18" x="3" y="3" rx="2"/>
+              <circle cx="9" cy="9" r="2"/>
+              <path d="m21 15-3-3a2 2 0 0 0-3 0L6 21"/>
+            </svg>
+          </div>
+          <div class="doc-text">
+            <span class="doc-name">Pièce d'identité (CNI)</span>
+            <span class="doc-sub">République du Sénégal</span>
+          </div>
+        </div>
+        <span class="badge badge-conforme">✓ Vérifié</span>
+      </div>
+
+      <div class="gray-block doc-item">
+        <div class="doc-left">
+          <div class="doc-icon-wrapper">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
+              <rect width="18" height="14" x="3" y="5" rx="2"/>
+              <path d="M7 15h4M15 15h2"/>
+            </svg>
+          </div>
+          <div class="doc-text">
+            <span class="doc-name">Permis moto (Catégorie A)</span>
+            <span class="doc-sub">Ministère des Transports</span>
+          </div>
+        </div>
+        <span class="badge badge-conforme">✓ Vérifié</span>
+      </div>
+
+      <div class="gray-block doc-item">
+        <div class="doc-left">
+          <div class="doc-icon-wrapper">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+          </div>
+          <div class="doc-text">
+            <span class="doc-name">Casier judiciaire (Extrait n°3)</span>
+            <span class="doc-sub">Délivré &lt; 3 mois</span>
+          </div>
+        </div>
+        <span class="badge badge-conforme">✓ Validé</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOUTON DE SAUVEGARDE GLOBALE -->
+  <div class="save-actions-wrap">
+    <button type="button" class="btn-save-red" (click)="saveProfile()" [disabled]="isSaving">
+      <span *ngIf="!isSaving">Enregistrer les modifications</span>
+      <span *ngIf="isSaving">Enregistrement en cours...</span>
+    </button>
+  </div>
+
+</main>
+
+<!-- MODAL AJOUT ZONE -->
+<div class="modal-overlay" *ngIf="showAddZoneModal" (click)="closeAddZoneModal()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <h3 class="modal-title">Ajouter une zone d'intervention</h3>
+    <div class="form-group margin-top-12">
+      <label>Nom de la zone / secteur</label>
+      <input type="text" [(ngModel)]="newZoneName" placeholder="Ex: Yoff, Almadies, Ouakam" class="input-control" />
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn-modal-cancel" (click)="closeAddZoneModal()">Annuler</button>
+      <button type="button" class="btn-modal-confirm" (click)="confirmAddZone()">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AJOUT COMPTE REVERSEMENT -->
+<div class="modal-overlay" *ngIf="showAddAccountModal" (click)="closeAddAccountModal()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <h3 class="modal-title">Ajouter un compte de reversement</h3>
+
+    <div class="form-group margin-top-12">
+      <label>Prestataire</label>
+      <select [(ngModel)]="newAccountProvider" class="input-control">
+        <option value="WAVE">Wave Sénégal</option>
+        <option value="ORANGE_MONEY">Orange Money</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Numéro de téléphone du compte</label>
+      <input type="tel" [(ngModel)]="newAccountNumber" placeholder="+221 77 000 00 00" class="input-control" />
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn-modal-cancel" (click)="closeAddAccountModal()">Annuler</button>
+      <button type="button" class="btn-modal-confirm" (click)="confirmAddAccount()">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingState>
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Chargement du profil...</p>
+  </div>
+</ng-template>

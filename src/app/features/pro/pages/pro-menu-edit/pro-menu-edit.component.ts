@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ProHeaderComponent } from '../../components/pro-header/pro-header.component';
 import { ProBottomNavComponent } from '../../components/pro-bottom-nav/pro-bottom-nav.component';
 import { ProMenuService } from '../../../../core/services/pro-menu.service';
+import { ProfessionalService } from '../../../../core/services/professional.service';
 import { ProDish, ProDishVariant } from '../../../../core/models/pro';
+import { MainCategory, CATEGORIES_HIERARCHY, getCategoryByName } from '../../../../core/constants/taxonomy';
 
 @Component({
   selector: 'app-pro-menu-edit',
@@ -15,77 +17,172 @@ import { ProDish, ProDishVariant } from '../../../../core/models/pro';
   styleUrls: ['./pro-menu-edit.component.scss']
 })
 export class ProMenuEditComponent implements OnInit {
+  private proMenuService = inject(ProMenuService);
+  private professionalService = inject(ProfessionalService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
   isEditMode: boolean = false;
   dishId: string | null = null;
 
-  categories: string[] = ['Plats nationaux', 'Entrées', 'Desserts', 'Boissons'];
-  selectedCategory: string = 'Plats nationaux';
+  categoriesHierarchy: MainCategory[] = CATEGORIES_HIERARCHY;
+  selectedMainCategory: MainCategory = CATEGORIES_HIERARCHY[0];
+  selectedSubCategory: string = CATEGORIES_HIERARCHY[0].subCategories[0] || '';
+  categories: string[] = CATEGORIES_HIERARCHY.map(c => c.name);
+  backendCategories: any[] = [];
+  selectedCategory: string = CATEGORIES_HIERARCHY[0].name;
 
   dish: ProDish = {
     id: '',
     name: 'Thiéboudienne Rouge Royale',
     description: 'Riz rouge parfumé accompagné de mérou frais, manioc, carottes et piment doux mijoté.',
     price: 4500,
-    category: 'Plats nationaux',
+    category: CATEGORIES_HIERARCHY[0].name,
+    subCategory: CATEGORIES_HIERARCHY[0].subCategories[0],
     imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
     isVisiblePublic: true,
+    stockGeneral: 100,
+    stockAyyouAllocated: 50,
     variants: [
       {
         id: 'v1',
         name: 'Classique — 1 personne',
         price: 4500,
+        extraPrice: 0,
         quantityAllocated: 20,
         formatTag: 'Format individuel'
-      },
-      {
-        id: 'v2',
-        name: 'Gourmand XL',
-        price: 6000,
-        quantityAllocated: 10
-      },
-      {
-        id: 'v3',
-        name: 'Familiale — 3 à 4 personnes',
-        price: 10000,
-        quantityAllocated: 5
       }
     ]
   };
 
-  constructor(
-    private proMenuService: ProMenuService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {}
-
   ngOnInit(): void {
+    // Charger les catégories réelles depuis le backend Django
+    this.professionalService.getCategories().subscribe({
+      next: (cats) => {
+        if (cats && cats.length > 0) {
+          this.backendCategories = cats;
+          const found = cats.find(c => c.nom.toLowerCase() === this.selectedCategory.toLowerCase());
+          if (found) {
+            this.dish.categoryId = found.id.toString();
+          }
+        }
+      },
+      error: () => {}
+    });
+
     this.dishId = this.route.snapshot.paramMap.get('id');
     if (this.dishId) {
-      const existing = this.proMenuService.getDishById(this.dishId);
-      if (existing) {
-        this.isEditMode = true;
-        this.dish = JSON.parse(JSON.stringify(existing));
-        if (this.dish.category) {
-          this.selectedCategory = this.dish.category;
-        }
-      }
+      this.proMenuService.getDish(this.dishId).subscribe({
+        next: (existing) => {
+          if (existing) {
+            this.isEditMode = true;
+            this.dish = JSON.parse(JSON.stringify(existing));
+            
+            // Sync category hierarchy
+            if (this.dish.category) {
+              const matchedMain = getCategoryByName(this.dish.category);
+              if (matchedMain) {
+                this.selectedMainCategory = matchedMain;
+                this.selectedCategory = matchedMain.name;
+              }
+            }
+            if (this.dish.subCategory && this.selectedMainCategory.subCategories.includes(this.dish.subCategory)) {
+              this.selectedSubCategory = this.dish.subCategory;
+            } else if (this.selectedMainCategory.subCategories.length > 0) {
+              this.selectedSubCategory = this.selectedMainCategory.subCategories[0];
+            }
+          }
+        },
+        error: () => {}
+      });
+    } else {
+      this.isEditMode = false;
+      this.dish = {
+        id: '',
+        name: '',
+        description: '',
+        price: 4500,
+        category: this.selectedMainCategory.name,
+        subCategory: this.selectedSubCategory,
+        imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+        isVisiblePublic: true,
+        stockGeneral: 100,
+        stockAyyouAllocated: 50,
+        variants: [
+          {
+            id: 'v_1',
+            name: 'Classique — 1 personne',
+            price: 4500,
+            extraPrice: 0,
+            quantityAllocated: 20,
+            formatTag: 'Format individuel'
+          }
+        ]
+      };
     }
   }
 
-  selectCategory(cat: string): void {
-    this.selectedCategory = cat;
-    this.dish.category = cat;
+  selectMainCategory(mainCat: MainCategory): void {
+    this.selectedMainCategory = mainCat;
+    this.selectedCategory = mainCat.name;
+    this.dish.category = mainCat.name;
+    if (mainCat.subCategories && mainCat.subCategories.length > 0) {
+      this.selectedSubCategory = mainCat.subCategories[0];
+      this.dish.subCategory = this.selectedSubCategory;
+    } else {
+      this.selectedSubCategory = '';
+      this.dish.subCategory = '';
+    }
+    const catObj = this.backendCategories.find(c => c.nom.toLowerCase() === mainCat.name.toLowerCase());
+    if (catObj) {
+      this.dish.categoryId = catObj.id.toString();
+    }
   }
+
+  selectSubCategory(subCat: string): void {
+    this.selectedSubCategory = subCat;
+    this.dish.subCategory = subCat;
+  }
+
+  selectCategory(cat: string): void {
+    const matched = getCategoryByName(cat);
+    if (matched) {
+      this.selectMainCategory(matched);
+    }
+  }
+
+  selectedImageFile: File | null = null;
+  isUploadingImage: boolean = false;
+  imageUploadError: string = '';
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
+      this.selectedImageFile = file;
+      this.isUploadingImage = true;
+      this.imageUploadError = '';
+
+      // Aperçu instantané local
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.dish.imageUrl = e.target.result;
       };
       reader.readAsDataURL(file);
+
+      // Envoi réel vers le backend / Cloudinary
+      this.professionalService.uploadProductImage(file).subscribe({
+        next: (res) => {
+          this.isUploadingImage = false;
+          if (res?.image_url) {
+            this.dish.imageUrl = res.image_url;
+          }
+        },
+        error: (err) => {
+          this.isUploadingImage = false;
+          this.imageUploadError = err?.error?.detail || "Échec du téléversement de l'image sur Cloudinary.";
+        }
+      });
     }
   }
 
@@ -96,6 +193,7 @@ export class ProMenuEditComponent implements OnInit {
       id: 'v_' + Date.now(),
       name: `Nouvelle variante ${count}`,
       price: 5000,
+      extraPrice: 500,
       quantityAllocated: 10
     });
   }
@@ -109,18 +207,25 @@ export class ProMenuEditComponent implements OnInit {
   saveDish(): void {
     if (!this.dish.name.trim()) return;
 
-    this.dish.category = this.selectedCategory;
+    this.dish.category = this.selectedMainCategory.name;
+    this.dish.subCategory = this.selectedSubCategory;
+    const catObj = this.backendCategories.find(c => c.nom.toLowerCase() === this.selectedMainCategory.name.toLowerCase());
+    if (catObj) {
+      this.dish.categoryId = catObj.id.toString();
+    }
+
     if (this.dish.variants && this.dish.variants.length > 0) {
       this.dish.price = this.dish.variants[0].price || this.dish.price;
     }
 
-    if (this.isEditMode) {
-      this.proMenuService.updateDish(this.dish);
-    } else {
-      this.dish.id = 'd_' + Date.now();
-      this.proMenuService.addDish(this.dish);
-    }
-
-    this.router.navigate(['/pro/profile']);
+    this.proMenuService.saveDish(this.dish).subscribe({
+      next: () => {
+        this.router.navigate(['/pro/profile']);
+      },
+      error: (err) => {
+        console.error('Erreur lors de la sauvegarde du plat:', err);
+        this.router.navigate(['/pro/profile']);
+      }
+    });
   }
 }

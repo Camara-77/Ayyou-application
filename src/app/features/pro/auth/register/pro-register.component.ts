@@ -19,6 +19,16 @@ interface PhotoCategory {
   previewUrl: string | null;
 }
 
+import { DriverAuthService, DriverProfile } from '../../../delivery/services/driver-auth.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import {
+  ProRegisterService,
+  RestaurantRegisterPayload,
+  VendeurRegisterPayload,
+  LivreurRegisterPayload,
+  RegisterProResponse
+} from '../../services/pro-register.service';
+
 @Component({
   selector: 'app-pro-register',
   standalone: true,
@@ -27,13 +37,21 @@ interface PhotoCategory {
   styleUrls: ['./pro-register.component.scss']
 })
 export class ProRegisterComponent implements OnInit {
-  selectedType: AccountType = 'LIVREUR';
+  selectedType: AccountType = 'RESTAURANT';
   registerForm!: FormGroup;
   isSubmitting: boolean = false;
   submitSuccess: boolean = false;
   errorMessage: string = '';
 
   isMobileMenuOpen: boolean = false;
+
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private driverAuthService: DriverAuthService,
+    private authService: AuthService,
+    private proRegisterService: ProRegisterService
+  ) {}
 
   toggleMobileMenu(): void {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
@@ -47,9 +65,9 @@ export class ProRegisterComponent implements OnInit {
   hygieneDoc: UploadedDocument = { name: '', file: null, status: 'NONE' };
 
   // Documents for Livreur
-  cniDoc: UploadedDocument = { name: 'CNI_recto_verso.pdf (1.8 Mo)', file: null, status: 'VALIDATED' };
-  permisDoc: UploadedDocument = { name: 'Permis_Conduire_Moussa.jpg (2.4 Mo)', file: null, status: 'VALIDATED' };
-  casierDoc: UploadedDocument = { name: '', file: null, status: 'PENDING' };
+  cniDoc: UploadedDocument = { name: '', file: null, status: 'NONE' };
+  permisDoc: UploadedDocument = { name: '', file: null, status: 'NONE' };
+  casierDoc: UploadedDocument = { name: '', file: null, status: 'NONE' };
   carteGriseDoc: UploadedDocument = { name: '', file: null, status: 'NONE' };
 
   // Photo Categories for Restaurant (4) and Vendeur (3)
@@ -92,11 +110,6 @@ export class ProRegisterComponent implements OnInit {
     'Voiture utilitaire'
   ];
 
-  constructor(
-    private fb: FormBuilder,
-    private router: Router
-  ) {}
-
   ngOnInit(): void {
     this.initForm();
   }
@@ -109,8 +122,8 @@ export class ProRegisterComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       phoneCountryCode: ['+221'],
       phone: ['', [Validators.required, Validators.pattern(/^[0-9\s]{8,12}$/)]],
-      password: [''],
-      confirmPassword: [''],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', Validators.required],
 
       // Section 2: Détails Établissement / Véhicule
       businessName: [''],
@@ -186,25 +199,213 @@ export class ProRegisterComponent implements OnInit {
     return true;
   }
 
+  private formatPhone(phone: string): string {
+    const cleaned = (phone || '').replace(/\s+/g, '');
+    if (!cleaned) return '+221770000000';
+    if (cleaned.startsWith('+221')) return cleaned;
+    if (cleaned.startsWith('221')) return `+${cleaned}`;
+    return `+221${cleaned}`;
+  }
+
+  private mapVehicleType(vehicleStr: string): 'MOTO' | 'VOITURE' | 'VELO' | 'AUTRE' {
+    const lower = (vehicleStr || '').toLowerCase();
+    if (lower.includes('moto') || lower.includes('scooter')) {
+      return 'MOTO';
+    }
+    if (lower.includes('vélo') || lower.includes('velo')) {
+      return 'VELO';
+    }
+    if (lower.includes('voiture') || lower.includes('utilitaire')) {
+      return 'VOITURE';
+    }
+    return 'AUTRE';
+  }
+
   onSubmit(): void {
     if (!this.isFormValid) {
       this.errorMessage = 'Veuillez remplir tous les champs obligatoires avant de soumettre.';
       return;
     }
 
+    const val = this.registerForm.value;
+
+    if (val.password !== val.confirmPassword) {
+      this.errorMessage = 'Les mots de passe ne correspondent pas.';
+      return;
+    }
+
     this.isSubmitting = true;
     this.errorMessage = '';
 
-    setTimeout(() => {
-      this.isSubmitting = false;
-      this.submitSuccess = true;
-      if (this.selectedType === 'RESTAURANT') {
-        this.router.navigate(['/pro/restaurant/dashboard']);
-      } else if (this.selectedType === 'VENDEUR') {
-        this.router.navigate(['/pro/vendor/dashboard']);
-      } else {
-        this.router.navigate(['/pro/delivery/home']);
+    const phone = this.formatPhone(val.phone);
+    const password = val.password;
+    const confirmPassword = val.confirmPassword;
+
+    if (this.selectedType === 'RESTAURANT') {
+      const nomEtablissement = val.businessName || `Restaurant ${val.firstName}`;
+      const email = (val.email || '').trim().toLowerCase();
+
+      const formData = new FormData();
+      formData.append('email', email);
+      formData.append('numero_telephone', phone);
+      formData.append('password', password);
+      formData.append('password_confirm', confirmPassword);
+      formData.append('prenom', val.firstName || '');
+      formData.append('nom', val.lastName || '');
+      formData.append('nom_etablissement', nomEtablissement);
+      formData.append('adresse', val.address || val.district || 'Dakar');
+      formData.append('slogan', '');
+      formData.append('specialite', val.speciality || '');
+      formData.append('telephone_etablissement', phone);
+
+      if (this.nineaDoc.file) formData.append('ninea_file', this.nineaDoc.file);
+      if (this.hygieneDoc.file) formData.append('hygiene_file', this.hygieneDoc.file);
+
+      const facade = this.photoCategoriesRestaurant.find(c => c.key === 'facade')?.file;
+      if (facade) formData.append('photo_facade', facade);
+
+      const interior = this.photoCategoriesRestaurant.find(c => c.key === 'interior')?.file;
+      if (interior) formData.append('photo_interior', interior);
+
+      const dining = this.photoCategoriesRestaurant.find(c => c.key === 'dining')?.file;
+      if (dining) formData.append('photo_dining', dining);
+
+      const kitchen = this.photoCategoriesRestaurant.find(c => c.key === 'kitchen')?.file;
+      if (kitchen) formData.append('photo_kitchen', kitchen);
+
+      this.proRegisterService.registerRestaurant(formData).subscribe({
+        next: (res: RegisterProResponse) => {
+          this.isSubmitting = false;
+          this.submitSuccess = true;
+          this.router.navigate(['/pro/register/confirmation'], {
+            state: {
+              summary: {
+                reference: `#AYY-REST-${res.etablissement_id || res.user_id}`,
+                accountType: 'Restaurant',
+                structureName: nomEtablissement,
+                contactEmail: email,
+                contactPhone: phone,
+                documentsCountText: 'Dossier soumis avec succès',
+                attachedBadges: ['En attente de validation Super Admin']
+              }
+            }
+          });
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          this.errorMessage = err.message || 'Échec de l\'inscription. Veuillez vérifier les informations.';
+        }
+      });
+
+    } else if (this.selectedType === 'VENDEUR') {
+      const nomEtablissement = val.businessName || `Boutique ${val.firstName}`;
+      const email = (val.email || '').trim().toLowerCase();
+
+      const formData = new FormData();
+      formData.append('email', email);
+      formData.append('numero_telephone', phone);
+      formData.append('password', password);
+      formData.append('password_confirm', confirmPassword);
+      formData.append('prenom', val.firstName || '');
+      formData.append('nom', val.lastName || '');
+      formData.append('nom_etablissement', nomEtablissement);
+      formData.append('adresse', val.address || val.district || 'Dakar');
+      formData.append('slogan', '');
+      formData.append('specialite', val.category || '');
+      formData.append('telephone_etablissement', phone);
+
+      if (this.nineaDoc.file) formData.append('ninea_file', this.nineaDoc.file);
+      if (this.hygieneDoc.file) formData.append('hygiene_file', this.hygieneDoc.file);
+
+      const facade = this.photoCategoriesVendeur.find(c => c.key === 'facade')?.file;
+      if (facade) formData.append('photo_facade', facade);
+
+      const stock = this.photoCategoriesVendeur.find(c => c.key === 'stock')?.file;
+      if (stock) formData.append('photo_stock', stock);
+
+      const products = this.photoCategoriesVendeur.find(c => c.key === 'products')?.file;
+      if (products) formData.append('photo_products', products);
+
+      this.proRegisterService.registerVendeur(formData).subscribe({
+        next: (res: RegisterProResponse) => {
+          this.isSubmitting = false;
+          this.submitSuccess = true;
+          this.router.navigate(['/pro/register/confirmation'], {
+            state: {
+              summary: {
+                reference: `#AYY-VND-${res.etablissement_id || res.user_id}`,
+                accountType: 'Vendeur / Commerce',
+                structureName: nomEtablissement,
+                contactEmail: email,
+                contactPhone: phone,
+                documentsCountText: 'Dossier soumis avec succès',
+                attachedBadges: ['En attente de validation Super Admin']
+              }
+            }
+          });
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          this.errorMessage = err.message || 'Échec de l\'inscription. Veuillez vérifier les informations.';
+        }
+      });
+
+    } else { // LIVREUR
+      if (!this.cniDoc.file || !(this.cniDoc.file instanceof File)) {
+        this.isSubmitting = false;
+        this.errorMessage = 'Veuillez téléverser votre pièce d\'identité (CNI / Passeport) obligatoire.';
+        return;
       }
-    }, 1200);
+      if (!this.permisDoc.file || !(this.permisDoc.file instanceof File)) {
+        this.isSubmitting = false;
+        this.errorMessage = 'Veuillez téléverser votre permis de conduire obligatoire.';
+        return;
+      }
+
+      const email = (val.email || '').trim().toLowerCase();
+      const prenom = val.firstName || '';
+      const nom = val.lastName || '';
+
+      const formData = new FormData();
+      formData.append('email', email);
+      formData.append('numero_telephone', phone);
+      formData.append('password', password);
+      formData.append('password_confirm', confirmPassword);
+      formData.append('prenom', prenom);
+      formData.append('nom', nom);
+      formData.append('type_vehicule', this.mapVehicleType(val.vehicleType));
+      formData.append('marque', val.vehicleModel || '');
+      formData.append('modele', val.vehicleModel || '');
+      formData.append('immatriculation', val.licensePlate || '');
+
+      if (this.cniDoc.file instanceof File) formData.append('cni_file', this.cniDoc.file);
+      if (this.permisDoc.file instanceof File) formData.append('permis_file', this.permisDoc.file);
+      if (this.casierDoc.file instanceof File) formData.append('casier_file', this.casierDoc.file);
+      if (this.carteGriseDoc.file instanceof File) formData.append('carte_grise_file', this.carteGriseDoc.file);
+
+      this.proRegisterService.registerLivreur(formData).subscribe({
+        next: (res: RegisterProResponse) => {
+          this.isSubmitting = false;
+          this.submitSuccess = true;
+          this.router.navigate(['/pro/register/confirmation'], {
+            state: {
+              summary: {
+                reference: `#AYY-LIV-${res.profil_livreur_id || res.user_id}`,
+                accountType: 'Livreur / Flotte',
+                structureName: `${prenom} ${nom}`,
+                contactEmail: email,
+                contactPhone: phone,
+                documentsCountText: 'Dossier soumis avec succès',
+                attachedBadges: ['En attente de validation Super Admin']
+              }
+            }
+          });
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          this.errorMessage = err.message || 'Échec de l\'inscription. Veuillez vérifier les informations.';
+        }
+      });
+    }
   }
 }

@@ -20,10 +20,12 @@ export class ProStatisticsComponent implements OnInit {
   constructor(private proStatsService: ProStatsService) {}
 
   ngOnInit(): void {
-    this.stats = this.proStatsService.getStats();
+    this.proStatsService.getStatsObservable().subscribe(s => this.stats = s);
   }
 
   setPeriod(period: 'TODAY' | 'WEEK' | 'MONTH'): void {
     this.selectedPeriod = period;
+    const pStr = period === 'TODAY' ? 'today' : (period === 'WEEK' ? 'week' : 'month');
+    this.proStatsService.getStatsObservable(pStr as any).subscribe(s => this.stats = s);
   }
 }

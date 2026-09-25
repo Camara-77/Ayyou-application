@@ -95,11 +95,11 @@ export class AdminCatalogComponent implements OnInit {
   }
 
   onUpdateModeration(event: { id: string; status: ModerationStatus }): void {
-    this.adminCatalogService.updateModerationStatus(event.id, event.status);
+    this.adminCatalogService.updateModerationStatus(event.id, event.status).subscribe();
   }
 
   onUpdateStock(event: { id: string; stockAyoo: number }): void {
-    this.adminCatalogService.updateStockAllocation(event.id, event.stockAyoo);
+    this.adminCatalogService.updateStockAllocation(event.id, event.stockAyoo).subscribe();
   }
 
   onOpenAddCategoryModal(): void {
@@ -115,7 +115,6 @@ export class AdminCatalogComponent implements OnInit {
     if (category) {
       this.editingCategory = category;
     } else {
-      // Default to CAT-014 (Thiéboudienne) for demonstration if no category passed
       const thiebCat = {
         id: 'cat-14',
         codeId: 'CAT-014',
@@ -140,13 +139,13 @@ export class AdminCatalogComponent implements OnInit {
 
   onSaveCategory(category: CatalogCategory): void {
     if (this.editingCategory) {
-      this.adminCatalogService.updateCategory(category);
+      this.adminCatalogService.updateCategory(category).subscribe(() => this.onCloseCategoryModal());
     } else {
-      this.adminCatalogService.addCategory(category);
+      this.adminCatalogService.addCategory(category).subscribe(() => this.onCloseCategoryModal());
     }
   }
 
   onDeleteCategory(categoryId: string): void {
-    this.adminCatalogService.deleteCategory(categoryId);
+    this.adminCatalogService.deleteCategory(categoryId).subscribe();
   }
 }

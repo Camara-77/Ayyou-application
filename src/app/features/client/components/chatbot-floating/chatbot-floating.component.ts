@@ -1,16 +1,35 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ElementRef, ViewChild, AfterViewChecked, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AiChatService, ChatMessage, RecommendationCard } from '../../../../core/services/ai-chat.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { VoiceTranscriptionService } from '../../../../core/services/voice-transcription.service';
 
 @Component({
   selector: 'app-chatbot-floating',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './chatbot-floating.component.html',
   styleUrls: ['./chatbot-floating.component.scss']
 })
-export class ChatbotFloatingComponent implements OnInit {
+export class ChatbotFloatingComponent implements OnInit, AfterViewChecked {
+  @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
+
+  private aiChatService = inject(AiChatService);
+  private voiceService = inject(VoiceTranscriptionService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   badgeCount: number = 1;
   isOpen: boolean = false;
+  isLoading: boolean = false;
+  isRecording: boolean = false;
+  isTranscribing: boolean = false;
+  userInput: string = '';
+
+  messages: ChatMessage[] = [];
+  private shouldScrollBottom: boolean = false;
 
   // Dragging state
   isDragging: boolean = false;
@@ -30,6 +49,21 @@ export class ChatbotFloatingComponent implements OnInit {
     const initialLeft = Math.max(16, (screenWidth - containerWidth) / 2 + 16);
     this.posX = initialLeft;
     this.posY = 140;
+
+    // Welcome message initialization
+    this.messages.push({
+      id: 'welcome',
+      sender: 'ai',
+      text: 'Bonjour ! Je suis votre Conseiller Gastronomique AYYOU 🇸🇳. Vous pouvez m’écrire ou cliquer sur le micro 🎙️ pour me parler ! Que souhaitez-vous déguster à Dakar aujourd’hui ?',
+      timestamp: new Date()
+    });
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.shouldScrollBottom) {
+      this.scrollToBottom();
+      this.shouldScrollBottom = false;
+    }
   }
 
   toggleChat(event?: Event): void {
@@ -38,7 +72,140 @@ export class ChatbotFloatingComponent implements OnInit {
     }
     if (!this.hasDragged) {
       this.isOpen = !this.isOpen;
+      if (this.isOpen) {
+        this.badgeCount = 0;
+        this.shouldScrollBottom = true;
+      }
     }
+  }
+
+  async toggleVoiceRecording(): Promise<void> {
+    if (this.isLoading || this.isTranscribing) return;
+
+    if (this.isRecording) {
+      // Arrêt de l'enregistrement et envoi pour transcription
+      this.isRecording = false;
+      this.isTranscribing = true;
+
+      const { blob: audioBlob, durationMs } = await this.voiceService.stopRecording();
+      if (durationMs < 600 || !audioBlob || audioBlob.size < 500) {
+        this.isTranscribing = false;
+        return;
+      }
+
+      this.voiceService.transcribeAudio(audioBlob).subscribe({
+        next: (res) => {
+          this.isTranscribing = false;
+          if (res.status === 'success' && res.text) {
+            this.userInput = res.text;
+            // Envoi automatique de la recherche transcrite au chatbot IA
+            this.sendMessage();
+          } else {
+            this.messages.push({
+              sender: 'ai',
+              text: res.message || "Désolé, je n'ai pas pu comprendre votre message vocal. N'hésitez pas à me réenregistrer ou à l'écrire au clavier.",
+              timestamp: new Date()
+            });
+            this.shouldScrollBottom = true;
+          }
+        },
+        error: (err) => {
+          this.isTranscribing = false;
+          this.messages.push({
+            sender: 'ai',
+            text: "Désolé, une erreur technique est survenue lors de la transcription. Vous pouvez saisir votre demande au clavier.",
+            timestamp: new Date()
+          });
+          this.shouldScrollBottom = true;
+        }
+      });
+    } else {
+      // Démarrage de l'enregistrement
+      const success = await this.voiceService.startRecording();
+      if (success) {
+        this.isRecording = true;
+      } else {
+        this.messages.push({
+          sender: 'ai',
+          text: "L'accès au microphone n'a pas pu être activé. Veuillez vérifier les autorisations de votre navigateur.",
+          timestamp: new Date()
+        });
+        this.shouldScrollBottom = true;
+      }
+    }
+  }
+
+  sendMessage(): void {
+    const query = this.userInput.trim();
+    if (!query || this.isLoading) return;
+
+    // Add User Message
+    this.messages.push({
+      sender: 'user',
+      text: query,
+      timestamp: new Date()
+    });
+
+    this.userInput = '';
+    this.isLoading = true;
+    this.shouldScrollBottom = true;
+
+    // Build history payload for contextual memory
+    const historyPayload = this.messages
+      .filter(m => m.id !== 'welcome')
+      .map(m => ({ sender: m.sender, text: m.text }));
+
+    // Call Backend AI Service
+    this.aiChatService.sendMessage(query, historyPayload).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.messages.push({
+          sender: 'ai',
+          text: res.reply,
+          cards: res.cards || [],
+          timestamp: new Date()
+        });
+        this.shouldScrollBottom = true;
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.messages.push({
+          sender: 'ai',
+          text: 'Désolé, une erreur est survenue lors de la recherche. Veuillez réessayer.',
+          timestamp: new Date()
+        });
+        this.shouldScrollBottom = true;
+      }
+    });
+  }
+
+  viewEstablishmentMenu(card: RecommendationCard): void {
+    this.isOpen = false;
+    if (card.etablissement_id) {
+      this.router.navigate(['/restaurant', card.etablissement_id]);
+    }
+  }
+
+  orderProduct(card: RecommendationCard): void {
+    const isAuth = this.authService.requireAuth({
+      title: 'Connectez-vous pour commander',
+      message: `Connectez-vous ou créez un compte pour commander le plat "${card.nom}".`,
+      actionType: 'cart',
+      actionPayload: { productId: card.produit_id }
+    });
+
+    if (isAuth) {
+      this.isOpen = false;
+      this.router.navigate(['/product', card.produit_id]);
+    }
+  }
+
+  private scrollToBottom(): void {
+    try {
+      if (this.messagesContainer) {
+        this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
+      }
+    } catch (err) {}
   }
 
   // --- MOUSE DRAG ---
@@ -99,7 +266,6 @@ export class ChatbotFloatingComponent implements OnInit {
     let newX = this.initialPosX + deltaX;
     let newY = this.initialPosY + deltaY;
 
-    // Viewport Boundary Constraints
     const btnSize = 54;
     const maxX = (typeof window !== 'undefined' ? window.innerWidth : 440) - btnSize - 10;
     const maxY = (typeof window !== 'undefined' ? window.innerHeight : 800) - btnSize - 10;

@@ -1,80 +1,19 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
+import { map, catchError, tap } from 'rxjs/operators';
 import { ProVideoUpload } from '../models/pro';
+import { ProfessionalService } from './professional.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProStudioService {
-  private initialVideos: ProVideoUpload[] = [
-    {
-      id: 'v1_thieb',
-      videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-cooking-fresh-vegetables-in-a-pan-41584-large.mp4',
-      thumbnailUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
-      dishId: 'd1',
-      dishName: 'Thiébouddienne Royale',
-      title: 'Thiébouddienne Royale',
-      description: 'Recette traditionnelle du Thiéboudienne rouge au mérou frais.',
-      category: 'Plats Nationaux',
-      dishTag: 'Cuisine',
-      viewsCount: 4300,
-      likesCount: 342,
-      durationSeconds: 150,
-      publishedAt: 'Il y a 2 jours',
-      isVisiblePublic: true
-    },
-    {
-      id: 'v2_poisson',
-      videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-chef-cooking-a-dish-in-a-pan-41583-large.mp4',
-      thumbnailUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80',
-      dishId: 'd2',
-      dishName: 'Poissons & Braisés',
-      title: 'Poissons & Braisés',
-      description: 'Poissons frais grillés au feu de bois avec sauces épicées.',
-      category: 'Plats Nationaux',
-      dishTag: 'Grillades',
-      viewsCount: 5800,
-      likesCount: 512,
-      durationSeconds: 120,
-      publishedAt: 'Il y a 3 jours',
-      isVisiblePublic: true
-    },
-    {
-      id: 'v3_yassa',
-      videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-chef-preparing-a-plate-of-food-41582-large.mp4',
-      thumbnailUrl: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=600&q=80',
-      dishId: 'd3',
-      dishName: 'Yassa Poulet Gourmet',
-      title: 'Yassa Poulet Gourmet',
-      description: 'Poulet mariné au citron vert et oignons caramélisés.',
-      category: 'Plats Nationaux',
-      dishTag: 'Plat phare',
-      viewsCount: 3100,
-      likesCount: 290,
-      durationSeconds: 180,
-      publishedAt: 'Il y a 5 jours',
-      isVisiblePublic: true
-    },
-    {
-      id: 'v4_pastels',
-      videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-cooking-fresh-vegetables-in-a-pan-41584-large.mp4',
-      thumbnailUrl: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=600&q=80',
-      dishId: 'd4',
-      dishName: 'Pastels Croustillants',
-      title: 'Pastels Croustillants',
-      description: 'Pastels farcis au poisson avec sauce tomate pimentée.',
-      category: 'Entrées',
-      dishTag: 'Entrée',
-      viewsCount: 2900,
-      likesCount: 210,
-      durationSeconds: 90,
-      publishedAt: 'Il y a 1 semaine',
-      isVisiblePublic: true
-    }
-  ];
+  private professionalService = inject(ProfessionalService);
 
-  private videosSubject = new BehaviorSubject<ProVideoUpload[]>(this.initialVideos);
+  private videosSubject = new BehaviorSubject<ProVideoUpload[]>([]);
   videos$: Observable<ProVideoUpload[]> = this.videosSubject.asObservable();
+
+  constructor() {}
 
   get videos(): ProVideoUpload[] {
     return this.videosSubject.value;
@@ -82,6 +21,57 @@ export class ProStudioService {
 
   getVideos(): ProVideoUpload[] {
     return this.videosSubject.value;
+  }
+
+  loadFeedPublications(etabId?: number): Observable<ProVideoUpload[]> {
+    return this.professionalService.getFeedPublications(etabId).pipe(
+      map(pubs => (pubs || []).map(p => this.mapBackendToProVideo(p))),
+      tap(vids => {
+        this.videosSubject.next(vids);
+      }),
+      catchError(() => {
+        this.videosSubject.next([]);
+        return of([]);
+      })
+    );
+  }
+
+  mapBackendToProVideo(pub: any): ProVideoUpload {
+    const pNom = pub.produit ? (typeof pub.produit === 'object' ? pub.produit.nom : pub.produit_nom || 'Plat AYYOU') : (pub.produit_nom || 'Plat AYYOU');
+    const etabNom = pub.etablissement ? (typeof pub.etablissement === 'object' ? pub.etablissement.nom : pub.etablissement_nom || '') : '';
+    
+    // Génération de la miniature réelle Cloudinary depuis l'URL de la vidéo
+    let thumb = pub.produit && typeof pub.produit === 'object' ? pub.produit.image_url : pub.produit_detail?.image_url;
+    if (pub.media_url && typeof pub.media_url === 'string' && pub.media_url.includes('cloudinary.com')) {
+      thumb = pub.media_url.replace(/\.(mp4|mov|webm|avi|mkv)$/i, '.jpg');
+    }
+    if (!thumb) {
+      thumb = pub.media_url || '';
+    }
+
+    const titleStr = etabNom ? (pNom !== 'Plat AYYOU' ? `${pNom} — ${etabNom}` : etabNom) : pNom;
+
+    return {
+      id: pub.id ? pub.id.toString() : 'v_' + Date.now(),
+      videoUrl: pub.media_url || '',
+      thumbnailUrl: thumb,
+      dishId: pub.produit ? (typeof pub.produit === 'object' ? pub.produit.id.toString() : pub.produit.toString()) : '',
+      dishName: pNom,
+      title: titleStr,
+      description: pub.description || '',
+      category: (pub.produit && typeof pub.produit === 'object' && pub.produit.categorie) ? (pub.produit.categorie.nom || 'Spécialités') : 'Spécialités',
+      dishTag: 'Vidéo Food',
+      viewsCount: pub.nombre_vues || 0,
+      likesCount: pub.nombre_likes || 0,
+      durationSeconds: pub.max_duree_secondes || 180,
+      publishedAt: pub.date_publication ? new Date(pub.date_publication).toLocaleDateString('fr-FR') : 'Récemment',
+      isVisiblePublic: true
+    };
+  }
+
+  prependVideo(video: ProVideoUpload): void {
+    const current = [video, ...this.videosSubject.value.filter(v => v.id !== video.id)];
+    this.videosSubject.next(current);
   }
 
   toggleVideoVisibility(videoId: string): void {
@@ -94,35 +84,19 @@ export class ProStudioService {
     this.videosSubject.next(updated);
   }
 
-  addVideo(video: Partial<ProVideoUpload>): ProVideoUpload {
-    const newVid: ProVideoUpload = {
-      id: 'v_' + Date.now(),
-      videoUrl: video.videoUrl || 'https://assets.mixkit.co/videos/preview/mixkit-cooking-fresh-vegetables-in-a-pan-41584-large.mp4',
-      thumbnailUrl: video.thumbnailUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
-      dishId: video.dishId || 'd1',
-      dishName: video.dishName || 'Thiéboudienne Penda Mbaye',
-      dishTag: video.dishTag || 'Cuisine',
-      priceFcfa: video.priceFcfa || 4500,
-      category: video.category || 'Plats Nationaux',
-      title: video.title || 'Nouvelle vidéo culinaire',
-      description: video.description || '#AYYOU #DakarFood',
-      durationSeconds: 120,
-      publishedAt: 'À l’instant',
-      viewsCount: 100,
-      likesCount: 12,
-      isVisiblePublic: true
-    };
-    const current = [newVid, ...this.videosSubject.value];
-    this.videosSubject.next(current);
-    return newVid;
-  }
-
-  publishVideo(video: Partial<ProVideoUpload>): Observable<ProVideoUpload> {
-    const added = this.addVideo(video);
-    return of(added);
-  }
-
-  getLatestPublishedVideo(): Observable<ProVideoUpload> {
-    return of(this.videosSubject.value[0]);
+  deleteVideo(videoId: string): Observable<void> {
+    const numId = parseInt(videoId, 10);
+    if (!isNaN(numId)) {
+      return this.professionalService.deleteFeedPublication(numId).pipe(
+        tap(() => {
+          const current = this.videosSubject.value.filter(v => v.id !== videoId);
+          this.videosSubject.next(current);
+        })
+      );
+    } else {
+      const current = this.videosSubject.value.filter(v => v.id !== videoId);
+      this.videosSubject.next(current);
+      return of(undefined);
+    }
   }
 }

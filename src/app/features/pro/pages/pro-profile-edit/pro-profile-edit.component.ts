@@ -1,10 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { forkJoin, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { ProHeaderComponent } from '../../components/pro-header/pro-header.component';
 import { ProBottomNavComponent } from '../../components/pro-bottom-nav/pro-bottom-nav.component';
 import { ProAuthService } from '../../../../core/services/pro-auth.service';
+import { ProfessionalService, BackendEtablissement } from '../../../../core/services/professional.service';
 import { ProfessionalProfile } from '../../../../core/models/pro';
 
 @Component({
@@ -18,6 +21,8 @@ export class ProProfileEditComponent implements OnInit {
   profile!: ProfessionalProfile;
   isSaving: boolean = false;
   cuisineTypesString: string = '';
+  selectedLogoFile: File | null = null;
+  selectedCoverFile: File | null = null;
 
   openingHoursList = [
     { label: 'Lundi - Jeudi', value: '11:30 - 23:00' },
@@ -25,10 +30,9 @@ export class ProProfileEditComponent implements OnInit {
     { label: 'Dimanche', value: '12:00 - 22:30' }
   ];
 
-  constructor(
-    private proAuthService: ProAuthService,
-    private router: Router
-  ) {}
+  private proAuthService = inject(ProAuthService);
+  private professionalService = inject(ProfessionalService);
+  private router = inject(Router);
 
   ngOnInit(): void {
     this.profile = { ...this.proAuthService.getProfile() };
@@ -43,6 +47,11 @@ export class ProProfileEditComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
+      if (type === 'cover') {
+        this.selectedCoverFile = file;
+      } else {
+        this.selectedLogoFile = file;
+      }
       const reader = new FileReader();
       reader.onload = (e: any) => {
         if (type === 'cover') {
@@ -64,11 +73,60 @@ export class ProProfileEditComponent implements OnInit {
         .map(s => s.trim())
         .filter(s => s.length > 0);
     }
-    setTimeout(() => {
-      this.proAuthService.updateProfile(this.profile);
-      this.isSaving = false;
-      this.router.navigate(['/pro/profile']);
-    }, 400);
+
+    const uploadLogo$ = this.selectedLogoFile
+      ? this.professionalService.uploadProductImage(this.selectedLogoFile).pipe(
+          map(res => res.image_url),
+          catchError(() => of(undefined))
+        )
+      : of(undefined);
+
+    const uploadCover$ = this.selectedCoverFile
+      ? this.professionalService.uploadProductImage(this.selectedCoverFile).pipe(
+          map(res => res.image_url),
+          catchError(() => of(undefined))
+        )
+      : of(undefined);
+
+    forkJoin({ logoUrl: uploadLogo$, coverUrl: uploadCover$ }).subscribe({
+      next: ({ logoUrl, coverUrl }) => {
+        const etabIdNum = parseInt(this.profile.id, 10);
+        const backendData: Partial<BackendEtablissement> = {
+          nom: this.profile.name,
+          slogan: this.profile.tagline || '',
+          description: this.profile.description || '',
+          adresse: this.profile.address || this.profile.location || '',
+          telephone: this.profile.phone || '',
+          specialite: this.profile.cuisineTypes ? this.profile.cuisineTypes.join(', ') : '',
+          heure_fermeture: this.profile.closingTime || '23h30'
+        };
+
+        if (logoUrl) {
+          backendData.logo_url = logoUrl;
+        }
+        if (coverUrl) {
+          backendData.couverture_url = coverUrl;
+        }
+
+        const targetId = isNaN(etabIdNum) ? 1 : etabIdNum;
+        this.professionalService.updateEstablishment(targetId, backendData).subscribe({
+          next: (res) => {
+            const updatedProfile = this.professionalService.mapEtablissementToProfile(res);
+            this.proAuthService.updateProfile(updatedProfile);
+            this.isSaving = false;
+            this.router.navigate(['/pro/profile']);
+          },
+          error: () => {
+            this.proAuthService.updateProfile(this.profile);
+            this.isSaving = false;
+            this.router.navigate(['/pro/profile']);
+          }
+        });
+      },
+      error: () => {
+        this.isSaving = false;
+      }
+    });
   }
 
   cancel(): void {

@@ -98,3 +98,14 @@
     }
   }
 }
+
+// Media Queries Responsive Adaptation
+@media (min-width: 768px) {
+  .pending-actions-card {
+    .actions-list {
+      display: grid !important;
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 16px;
+    }
+  }
+}

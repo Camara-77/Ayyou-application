@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -6,6 +6,7 @@ import { AppHeaderComponent } from '../../components/app-header/app-header.compo
 import { AppBottomNavComponent } from '../../components/app-bottom-nav/app-bottom-nav.component';
 import { ChatbotFloatingComponent } from '../../components/chatbot-floating/chatbot-floating.component';
 import { ClientDataService } from '../../../../core/services/client-data.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { UserProfile } from '../../../../core/models/client';
 
 @Component({
@@ -23,16 +24,32 @@ import { UserProfile } from '../../../../core/models/client';
   styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent implements OnInit {
-  userProfile?: UserProfile;
+  private clientDataService = inject(ClientDataService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  constructor(
-    private clientDataService: ClientDataService,
-    private router: Router
-  ) {}
+  userProfile?: UserProfile;
+  canSwitchToDriver: boolean = false;
+  isSwitchingMode: boolean = false;
+  switchError: string | null = null;
 
   ngOnInit(): void {
     this.clientDataService.getUserProfile().subscribe(profile => {
       this.userProfile = profile;
+    });
+
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.canSwitchToDriver = user.hasDriverProfile || user.availableModes?.includes('LIVREUR') || false;
+    }
+
+    this.authService.getModes().subscribe({
+      next: (res) => {
+        this.canSwitchToDriver = res.can_switch_to_driver || (res.available_modes && res.available_modes.includes('LIVREUR')) || false;
+      },
+      error: () => {
+        // Fallback to local user model state
+      }
     });
   }
 
@@ -42,7 +59,30 @@ export class ProfileComponent implements OnInit {
     }
   }
 
+  switchToDriverMode(): void {
+    if (!this.canSwitchToDriver) {
+      this.router.navigate(['/pro/register']);
+      return;
+    }
+
+    this.isSwitchingMode = true;
+    this.switchError = null;
+    this.authService.switchMode('LIVREUR').subscribe({
+      next: () => {
+        this.isSwitchingMode = false;
+        this.router.navigate(['/delivery/home']);
+      },
+      error: (err) => {
+        console.error('Erreur basculement mode livreur:', err);
+        this.switchError = 'Impossible de passer en mode Livreur.';
+        this.isSwitchingMode = false;
+      }
+    });
+  }
+
   logout(): void {
-    this.router.navigate(['/login']);
+    this.authService.logout().subscribe(() => {
+      this.router.navigate(['/login']);
+    });
   }
 }

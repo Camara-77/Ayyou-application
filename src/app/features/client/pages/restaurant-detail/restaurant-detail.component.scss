@@ -311,3 +311,122 @@
     }
   }
 }
+
+// Media Queries Responsive Adaptation
+@media (min-width: 768px) {
+  .page-container {
+    max-width: 100%;
+  }
+  .menu-section {
+    .dishes-list {
+      display: grid !important;
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 16px;
+    }
+  }
+  .videos-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .menu-section {
+    .dishes-list {
+      grid-template-columns: repeat(3, 1fr) !important;
+    }
+  }
+  .videos-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+.cart-conflict-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.cart-conflict-card {
+  background: #ffffff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 360px;
+  padding: 24px 20px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  animation: modalPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  .warning-badge-icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+  }
+
+  .modal-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #111827;
+    margin: 0 0 8px 0;
+  }
+
+  .modal-text {
+    font-size: 13px;
+    color: #4b5563;
+    line-height: 1.5;
+    margin: 0 0 20px 0;
+  }
+
+  .modal-actions-row {
+    display: flex;
+    gap: 10px;
+
+    button {
+      flex: 1;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-cancel {
+      background: #f3f4f6;
+      color: #374151;
+
+      &:hover {
+        background: #e5e7eb;
+      }
+    }
+
+    .btn-clear-add {
+      background: #e51a29;
+      color: #ffffff;
+
+      &:hover {
+        background: #cc1523;
+      }
+    }
+  }
+}
+
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

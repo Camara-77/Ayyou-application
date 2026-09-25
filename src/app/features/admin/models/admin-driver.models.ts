@@ -2,15 +2,23 @@ export type DriverStatus = 'EN_LIVRAISON' | 'DISPONIBLE' | 'RECUPERATION' | 'HOR
 
 export interface DriverDocument {
   id: string;
+  typeDocument?: string;
   title: string;
   subtitle: string;
+  statut?: string;
+  commentaire?: string;
+  fichierUrl?: string;
+  dateCreation?: string;
   isValidated: boolean;
+  isPdf?: boolean;
+  isImage?: boolean;
 }
 
 export interface DriverDetail {
   id: string;
   firstName: string;
   lastName: string;
+  fullName?: string;
   initials: string;
   licensePlate: string;
   phone: string;
@@ -31,6 +39,7 @@ export interface DriverDetail {
 }
 
 export interface DriverStatsSummary {
+  totalCount: number;
   connectedCount: number;
   connectedSubtext: string;
   availableCount: number;
@@ -43,4 +52,4 @@ export interface DriverStatsSummary {
   applicationsSubtext: string;
 }
 
-export type DriverFilterTab = 'ALL' | 'DISPONIBLE' | 'EN_LIVRAISON' | 'HORS_LIGNE';
+export type DriverFilterTab = 'ALL' | 'DISPONIBLE' | 'EN_LIVRAISON' | 'HORS_LIGNE' | 'DOSSIER_A_VALIDER';

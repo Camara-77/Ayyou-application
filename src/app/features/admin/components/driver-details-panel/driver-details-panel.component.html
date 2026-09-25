@@ -6,7 +6,7 @@
         {{ driver.isCandidate ? 'DOSSIER CANDIDATURE EN EXAMEN' : 'FICHE COURSIER' }}
       </span>
       <span class="complet-green-tag" *ngIf="driver.isCandidate">
-        • Complet ({{ driver.documentsCount || '4/4' }})
+        • {{ driver.documents ? driver.documents.length : 0 }} document(s)
       </span>
     </div>
     <span class="submitted-meta-date">{{ driver.submittedAt || 'En service actif' }}</span>
@@ -15,19 +15,26 @@
   <!-- Candidate / Driver Identity Box -->
   <div class="identity-card-box">
     <img
-      [src]="driver.photoUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80'"
+      *ngIf="driver.photoUrl; else initialsAvatar"
+      [src]="driver.photoUrl"
       [alt]="driver.firstName"
       class="candidate-photo-thumb"
     />
+    <ng-template #initialsAvatar>
+      <div class="avatar-initials-circle">
+        {{ driver.initials }}
+      </div>
+    </ng-template>
+
     <div class="identity-details">
-      <h3 class="candidate-name">{{ driver.firstName }} {{ driver.lastName }}</h3>
-      <span class="meta-row">
+      <h3 class="candidate-name">{{ driver.fullName || (driver.firstName + ' ' + driver.lastName) }}</h3>
+      <span class="meta-row" *ngIf="driver.phone">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
         </svg>
         {{ driver.phone }}
       </span>
-      <span class="meta-row">
+      <span class="meta-row" *ngIf="driver.email">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
           <polyline points="22,6 12,13 2,6"/>
@@ -54,17 +61,17 @@
   <div class="documents-section">
     <div class="section-title-row">
       <span class="section-title">PIÈCES JUSTIFICATIVES REQUISES</span>
-      <span class="files-count">{{ driver.documentsCount || '4' }} reçues</span>
+      <span class="files-count">{{ driver.documents ? driver.documents.length : 0 }} reçue(s)</span>
     </div>
 
-    <div class="documents-list">
-      <div class="doc-item-row" *ngFor="let doc of (driver.documents && driver.documents.length > 0 ? driver.documents : defaultDocs)">
+    <div class="documents-list" *ngIf="driver.documents && driver.documents.length > 0; else noDriverDocs">
+      <div class="doc-item-row" *ngFor="let doc of driver.documents">
         <div class="doc-info">
           <span class="doc-title">{{ doc.title }}</span>
           <span class="doc-subtitle">{{ doc.subtitle }}</span>
         </div>
 
-        <button type="button" class="btn-eye-icon">
+        <button type="button" class="btn-eye-icon" (click)="viewDocument(doc)" title="Consulter le document">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
             <circle cx="12" cy="12" r="3"/>
@@ -72,6 +79,12 @@
         </button>
       </div>
     </div>
+
+    <ng-template #noDriverDocs>
+      <div class="empty-docs-box">
+        <span>Aucun document fourni</span>
+      </div>
+    </ng-template>
   </div>
 
   <!-- Admin Action Buttons Stack -->
@@ -94,6 +107,25 @@
   </div>
 </div>
 
+<!-- PDF Modal -->
+<div class="modal-backdrop" *ngIf="selectedPdfUrl" (click)="closePdfPreview()">
+  <div class="pdf-container" (click)="$event.stopPropagation()">
+    <div class="pdf-modal-header">
+      <span class="pdf-title">{{ selectedDocTitle || 'Consultation Document PDF' }}</span>
+      <button type="button" class="btn-close-pdf" (click)="closePdfPreview()">Fermer</button>
+    </div>
+    <iframe [src]="selectedPdfUrl" class="pdf-viewer-frame" title="Visionneuse PDF"></iframe>
+  </div>
+</div>
+
+<!-- Image Lightbox Modal -->
+<div class="modal-backdrop" *ngIf="selectedImage" (click)="closeImagePreview()">
+  <div class="lightbox-container" (click)="$event.stopPropagation()">
+    <img [src]="selectedImage" alt="Visualisation photo" class="lightbox-img" />
+    <button type="button" class="btn-close-lightbox" (click)="closeImagePreview()">Fermer</button>
+  </div>
+</div>
+
 <!-- Approval Confirmation Modal -->
 <div class="modal-backdrop" *ngIf="showApproveModal">
   <div class="modal-card">
@@ -113,11 +145,27 @@
   <div class="modal-card">
     <h3 class="modal-title">Rejet de candidature</h3>
     <p class="modal-message">
-      Êtes-vous sûr de vouloir rejeter la candidature de <strong>{{ driver?.firstName }} {{ driver?.lastName }}</strong> ? Cette action est irréversible.
+      Veuillez préciser le <strong>motif du refus</strong> pour <strong>{{ driver?.firstName }} {{ driver?.lastName }}</strong>. Ce motif sera transmis par email au candidat.
     </p>
+    <div class="modal-form-group">
+      <label class="modal-textarea-label">Motif du refus <span class="required-star">*</span></label>
+      <textarea
+        class="modal-textarea"
+        rows="4"
+        [(ngModel)]="rejectReason"
+        placeholder="Précisez la raison exacte du refus (ex: Permis de conduire illisible, casier judiciaire manquant...)"
+      ></textarea>
+    </div>
     <div class="modal-actions-row">
       <button type="button" class="btn-modal-cancel" (click)="closeModals()">Annuler</button>
-      <button type="button" class="btn-modal-confirm btn-red" (click)="confirmReject()">Rejeter la candidature</button>
+      <button
+        type="button"
+        class="btn-modal-confirm btn-red"
+        [disabled]="!rejectReason || !rejectReason.trim()"
+        (click)="confirmReject()"
+      >
+        Confirmer le refus
+      </button>
     </div>
   </div>
 </div>

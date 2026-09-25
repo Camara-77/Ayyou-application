@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { DriverAuthService, DriverAccountStatus } from '../../services/driver-auth.service';
 import { DriverLoginBannerComponent } from '../../components/login/driver-login-banner/driver-login-banner.component';
 import { DriverLoginFormCardComponent } from '../../components/login/driver-login-form-card/driver-login-form-card.component';
@@ -30,7 +30,8 @@ export class DriverLoginComponent implements OnInit {
 
   constructor(
     private driverAuthService: DriverAuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -51,8 +52,9 @@ export class DriverLoginComponent implements OnInit {
         if (res.accountStatus && res.accountStatus !== 'COMPTE_ACTIVE') {
           this.loginErrorMessage = this.getAccountStatusMessage(res.accountStatus);
         } else {
-          // Success redirection to driver dashboard / home
-          this.router.navigate(['/delivery/home']);
+          // Success redirection to returnUrl or driver dashboard / home
+          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/delivery/home';
+          this.router.navigateByUrl(returnUrl);
         }
       },
       error: (err) => {

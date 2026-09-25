@@ -1,209 +1,361 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-
-export interface DeliveryCourse {
-  id: string;
-  orderRef: string;
-  type: 'EXPRESS' | 'STANDARD';
-  netEarningsFcfa: number;
-  restaurant: {
-    name: string;
-    address: string;
-    readyInMinutes: number;
-  };
-  client: {
-    address: string;
-    note: string;
-  };
-  distanceKm: number;
-  estimatedDurationMinutes: number;
-  requiresInsulatedBag?: boolean;
-  status: 'ASSIGNED' | 'AVAILABLE' | 'EXPIRED' | 'ACCEPTED';
-}
+import { DeliveryService } from '../../../../core/services/delivery.service';
+import { Livraison, LivreurProfile } from '../../../../core/models/delivery';
+import { DriverAuthService } from '../../services/driver-auth.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { DeliveryBottomNavComponent } from '../../components/delivery-bottom-nav/delivery-bottom-nav.component';
+import { DeliveryHeaderComponent } from '../../components/delivery-header/delivery-header.component';
 
 @Component({
   selector: 'app-delivery-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DeliveryBottomNavComponent, DeliveryHeaderComponent],
   templateUrl: './delivery-home.component.html',
   styleUrl: './delivery-home.component.scss'
 })
 export class DeliveryHomeComponent implements OnInit, OnDestroy {
+  private deliveryService = inject(DeliveryService);
+  private driverAuthService = inject(DriverAuthService);
+  private authService = inject(AuthService);
+  public router = inject(Router);
 
-  readonly driver = {
-    name: 'Abdoulaye Diop',
-    rating: 4.9,
-    status: 'Prêt',
-    zone: 'Dakar Plateau'
-  };
+  realDriverProfile: LivreurProfile | null = null;
+  availableMissions: Livraison[] = [];
+  assignedDeliveries: Livraison[] = [];
+  backendStats: { courses_terminees: number; gain_total: string; distance_km: string | null; temps_connecte: string | null } | null = null;
 
-  assignedCourse: DeliveryCourse = {
-    id: 'delivery-9482',
-    orderRef: '#AY-9482',
-    type: 'EXPRESS',
-    netEarningsFcfa: 1000,
-    restaurant: {
-      name: 'Chez Loutcha',
-      address: 'Dakar Plateau, Rue de Thiong',
-      readyInMinutes: 3
-    },
-    client: {
-      address: 'Résidence Teranga, Point E',
-      note: 'Thiéboudienne + Yassa Poulet'
-    },
-    distanceKm: 1.8,
-    estimatedDurationMinutes: 8,
-    status: 'ASSIGNED'
-  };
+  isLoading = true;
+  errorMessage = '';
+  successMessage = '';
+  acceptingId: number | null = null;
+  isOnDuty = true;
+  isUpdatingAvailability = false;
 
-  availableCourses: DeliveryCourse[] = [
-    {
-      id: 'delivery-9485',
-      orderRef: '#AY-9485',
-      type: 'STANDARD',
-      netEarningsFcfa: 1200,
-      restaurant: {
-        name: 'Le Terrou-Bi Restaurant',
-        address: 'Corniche Ouest • Prête au comptoir',
-        readyInMinutes: 0
-      },
-      client: {
-        address: 'Fann Résidence',
-        note: ''
-      },
-      distanceKm: 2.4,
-      estimatedDurationMinutes: 12,
-      status: 'AVAILABLE'
-    },
-    {
-      id: 'delivery-9490',
-      orderRef: '#AY-9490',
-      type: 'STANDARD',
-      netEarningsFcfa: 1500,
-      restaurant: {
-        name: 'Épicerie Fine Almadies',
-        address: 'Route des Almadies • Sac isotherme',
-        readyInMinutes: 0
-      },
-      client: {
-        address: 'Ngor Extension',
-        note: ''
-      },
-      distanceKm: 3.1,
-      estimatedDurationMinutes: 15,
-      requiresInsulatedBag: true,
-      status: 'AVAILABLE'
-    },
-    {
-      id: 'delivery-9494',
-      orderRef: '#AY-9494',
-      type: 'STANDARD',
-      netEarningsFcfa: 1000,
-      restaurant: {
-        name: 'Dibiterie Haoussa',
-        address: 'Fann • Prête dans 5 min',
-        readyInMinutes: 5
-      },
-      client: {
-        address: 'Gueule Tapée',
-        note: ''
-      },
-      distanceKm: 1.2,
-      estimatedDurationMinutes: 7,
-      status: 'AVAILABLE'
+  // Sorting mode for available missions ('closest' default)
+  sortMode: 'closest' | 'all' = 'closest';
+
+  // Timer state for assigned course
+  private timerInterval: any = null;
+  remainingTime: string = '02:00';
+  remainingSeconds: number = 120;
+
+  get driverName(): string {
+    if (this.realDriverProfile) {
+      const full = `${this.realDriverProfile.prenom || ''} ${this.realDriverProfile.nom || ''}`.trim();
+      if (full) return full;
     }
-  ];
+    const legacy = this.driverAuthService.getCurrentDriver();
+    if (legacy?.firstName || legacy?.lastName) {
+      return `${legacy.firstName || ''} ${legacy.lastName || ''}`.trim();
+    }
+    const user = this.authService.getCurrentUser();
+    if (user?.firstName || user?.lastName) {
+      return `${user.firstName || ''} ${user.lastName || ''}`.trim();
+    }
+    return 'Livreur AYYOU';
+  }
 
-  remainingSeconds = 120;
-  timerProgress = 100;
-  isExpired = false;
+  get driverPhoto(): string | null {
+    if (this.realDriverProfile?.permis_conduire && this.realDriverProfile.permis_conduire.startsWith('http')) {
+      return this.realDriverProfile.permis_conduire;
+    }
+    return null;
+  }
 
-  private timerId?: ReturnType<typeof setInterval>;
+  get assignedCourse(): Livraison | null {
+    if (this.assignedDeliveries && this.assignedDeliveries.length > 0) {
+      return this.assignedDeliveries[0];
+    }
+    return null;
+  }
 
-  constructor(public readonly router: Router) {}
+  get sortedAvailableMissions(): Livraison[] {
+    const list = [...this.availableMissions];
+    if (this.sortMode === 'closest') {
+      return list;
+    }
+    return list;
+  }
+
+  get isMissionsPage(): boolean {
+    return this.router.url.includes('/missions') || this.router.url.includes('/livraisons');
+  }
+
+  // Polling state for available missions
+  private pollingInterval: any = null;
 
   ngOnInit(): void {
-    this.startAcceptanceTimer();
+    this.loadDashboardData();
+    this.startAvailablePolling();
   }
 
   ngOnDestroy(): void {
-    this.stopAcceptanceTimer();
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+    }
+    this.stopAvailablePolling();
   }
 
-  get formattedTimer(): string {
-    const minutes = Math.floor(this.remainingSeconds / 60);
-    const seconds = this.remainingSeconds % 60;
-
-    return `${minutes.toString().padStart(2, '0')}:${seconds
-      .toString()
-      .padStart(2, '0')}`;
-  }
-
-  private startAcceptanceTimer(): void {
-    this.stopAcceptanceTimer();
-
-    this.timerId = setInterval(() => {
-      if (this.remainingSeconds <= 0) {
-        this.expireAssignedCourse();
-        return;
+  private startAvailablePolling(): void {
+    this.stopAvailablePolling();
+    this.pollingInterval = setInterval(() => {
+      if (this.isOnDuty) {
+        this.fetchAvailableDeliveriesSilently();
       }
+    }, 10000);
+  }
 
-      this.remainingSeconds--;
+  private stopAvailablePolling(): void {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+      this.pollingInterval = null;
+    }
+  }
 
-      this.timerProgress =
-        (this.remainingSeconds / 120) * 100;
+  fetchAvailableDeliveriesSilently(): void {
+    if (!this.isOnDuty) return;
+    this.deliveryService.getAvailableDeliveries().subscribe({
+      next: (missions) => {
+        this.availableMissions = missions;
+      },
+      error: () => {}
+    });
+  }
+
+  loadDashboardData(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    // 1. Load Driver Profile
+    this.deliveryService.getDriverProfile().subscribe({
+      next: (profile) => {
+        this.realDriverProfile = profile;
+        this.isOnDuty = profile.est_disponible;
+        if (this.isOnDuty) {
+          this.fetchAvailableDeliveries();
+        } else {
+          this.availableMissions = [];
+          this.isLoading = false;
+        }
+      },
+      error: () => {
+        this.isLoading = false;
+      }
+    });
+
+    // 2. Load Driver Stats
+    this.deliveryService.getDriverStats().subscribe({
+      next: (stats) => {
+        this.backendStats = stats;
+      },
+      error: () => {}
+    });
+
+    // 3. Load Assigned Deliveries
+    this.deliveryService.getDeliveries().subscribe({
+      next: (deliveries) => {
+        this.assignedDeliveries = deliveries.filter(d => d.statut !== 'LIVREE' && d.statut !== 'ANNULEE');
+        if (this.assignedCourse) {
+          this.startAssignedCourseTimer();
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  fetchAvailableDeliveries(): void {
+    this.deliveryService.getAvailableDeliveries().subscribe({
+      next: (missions) => {
+        this.availableMissions = missions;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.isLoading = false;
+        if (err.status === 401) {
+          this.driverAuthService.logout();
+          this.router.navigate(['/livreur/login']);
+        } else if (err.status === 403) {
+          this.errorMessage = "Votre compte livreur est en attente de vérification par l'administration.";
+        }
+      }
+    });
+  }
+
+  startAssignedCourseTimer(): void {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+    }
+
+    const totalDuration = 120; // 2 minutes window
+    let deadlineMs: number;
+
+    if (this.assignedCourse?.acceptance_deadline) {
+      deadlineMs = new Date(this.assignedCourse.acceptance_deadline).getTime();
+    } else if (this.assignedCourse?.date_attribution) {
+      deadlineMs = new Date(this.assignedCourse.date_attribution).getTime() + (totalDuration * 1000);
+    } else if (this.assignedCourse?.created_at) {
+      deadlineMs = new Date(this.assignedCourse.created_at).getTime() + (totalDuration * 1000);
+    } else {
+      deadlineMs = new Date().getTime() + (totalDuration * 1000);
+    }
+
+    const now = new Date().getTime();
+    this.remainingSeconds = Math.max(0, Math.floor((deadlineMs - now) / 1000));
+
+    this.updateTimerDisplay();
+
+    this.timerInterval = setInterval(() => {
+      if (this.remainingSeconds > 0) {
+        this.remainingSeconds--;
+        this.updateTimerDisplay();
+      } else {
+        clearInterval(this.timerInterval);
+        this.loadDashboardData();
+      }
     }, 1000);
   }
 
-  private stopAcceptanceTimer(): void {
-    if (this.timerId) {
-      clearInterval(this.timerId);
-      this.timerId = undefined;
-    }
+  private updateTimerDisplay(): void {
+    const mins = Math.floor(this.remainingSeconds / 60);
+    const secs = this.remainingSeconds % 60;
+    this.remainingTime = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }
 
-  private expireAssignedCourse(): void {
-    this.remainingSeconds = 0;
-    this.timerProgress = 0;
-    this.isExpired = true;
-    this.assignedCourse.status = 'EXPIRED';
+  toggleAvailability(): void {
+    if (this.isUpdatingAvailability) return;
+    this.isUpdatingAvailability = true;
+    const targetStatus = !this.isOnDuty;
 
-    this.stopAcceptanceTimer();
+    this.deliveryService.updateAvailability(targetStatus).subscribe({
+      next: (updatedProfile) => {
+        this.isUpdatingAvailability = false;
+        this.realDriverProfile = updatedProfile;
+        this.isOnDuty = updatedProfile.est_disponible;
+        if (this.isOnDuty) {
+          this.fetchAvailableDeliveries();
+        } else {
+          this.availableMissions = [];
+        }
+      },
+      error: (err) => {
+        this.isUpdatingAvailability = false;
+        this.errorMessage = err.error?.detail || "Impossible de modifier votre statut de disponibilité.";
+      }
+    });
   }
 
-  acceptAssignedCourse(): void {
-    if (this.isExpired) {
-      return;
-    }
+  acceptMission(mission: Livraison): void {
+    if (this.acceptingId) return;
 
-    this.stopAcceptanceTimer();
+    this.acceptingId = mission.id;
+    this.errorMessage = '';
+    this.successMessage = '';
 
-    this.assignedCourse.status = 'ACCEPTED';
-
-    this.router.navigate([
-      '/delivery/navigation',
-      this.assignedCourse.id
-    ]);
+    this.deliveryService.acceptDelivery(mission.id).subscribe({
+      next: (updated) => {
+        this.acceptingId = null;
+        this.successMessage = `Mission #${updated.commande_reference} acceptée avec succès !`;
+        this.router.navigate(['/livreur/detail', updated.id]);
+      },
+      error: (err) => {
+        this.acceptingId = null;
+        if (err.status === 400 || err.status === 409) {
+          this.errorMessage = "Cette course vient d'être acceptée par un autre livreur ou n'est plus disponible.";
+          this.availableMissions = this.availableMissions.filter(m => m.id !== mission.id);
+        } else {
+          this.errorMessage = err.error?.detail || "Une erreur est survenue lors de l'acceptation de la mission.";
+        }
+        this.loadDashboardData();
+      }
+    });
   }
 
   declineAssignedCourse(): void {
-    this.stopAcceptanceTimer();
+    if (!this.assignedCourse) return;
+    this.errorMessage = '';
+    const courseId = this.assignedCourse.id;
 
-    this.assignedCourse.status = 'EXPIRED';
-    this.isExpired = true;
-
-    this.availableCourses = [
-      ...this.availableCourses
-    ];
+    this.deliveryService.declineDelivery(courseId).subscribe({
+      next: () => {
+        this.successMessage = "Course déclinée avec succès.";
+        this.assignedDeliveries = this.assignedDeliveries.filter(d => d.id !== courseId);
+        setTimeout(() => {
+          this.successMessage = '';
+          this.loadDashboardData();
+        }, 1500);
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.detail || "Impossible de décliner la course.";
+      }
+    });
   }
 
-  acceptAvailableCourse(course: DeliveryCourse): void {
-    course.status = 'ACCEPTED';
+  getEtablissementName(mission: Livraison): string {
+    if (mission.etablissements && mission.etablissements.length > 0) {
+      return mission.etablissements.map(e => e.nom).join(', ');
+    }
+    return 'Établissement non renseigné';
+  }
 
-    this.router.navigate([
-      '/delivery/navigation',
-      course.id
-    ]);
+  getEtablissementAddress(mission: Livraison): string {
+    if (mission.etablissements && mission.etablissements.length > 0) {
+      return mission.etablissements[0].adresse || 'Adresse non renseignée';
+    }
+    return 'Adresse non renseignée';
+  }
+
+  getDestinationName(mission: Livraison): string {
+    if (mission.nom_destinataire) {
+      return mission.nom_destinataire;
+    }
+    return 'Destinataire non renseigné';
+  }
+
+  getDestinationAddress(mission: Livraison): string {
+    if (mission.adresse_livraison) {
+      return mission.adresse_livraison;
+    }
+    return 'Adresse de destination non renseignée';
+  }
+
+  getFormattedPrice(mission: Livraison): string {
+    const raw = mission.frais_livraison ? parseInt(mission.frais_livraison, 10) : 0;
+    const priceNum = isNaN(raw) ? 0 : raw;
+    return priceNum.toLocaleString('fr-FR');
+  }
+
+  getReadinessBadge(mission: Livraison): { text: string; isWarning: boolean } {
+    if (mission.statut === 'EN_PREPARATION') {
+      return { text: 'En préparation', isWarning: true };
+    }
+    if (mission.statut === 'PRETE' || mission.statut === 'ACCEPTEE') {
+      return { text: 'Prête immédiatement', isWarning: false };
+    }
+    return { text: 'En attente', isWarning: true };
+  }
+
+  get todayStats() {
+    const count = this.backendStats ? this.backendStats.courses_terminees : 0;
+    const gain = this.backendStats ? this.backendStats.gain_total : '0';
+
+    return {
+      completedCount: count,
+      netGainsFormatted: gain,
+      distanceKm: this.backendStats?.distance_km || 'Non disponible',
+      connectedTime: this.backendStats?.temps_connecte || 'Non disponible'
+    };
+  }
+
+  get attributionSectors(): string[] {
+    if (this.realDriverProfile?.secteur_intervention) {
+      const sects = this.realDriverProfile.secteur_intervention
+        .split(',')
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+      if (sects.length > 0) return sects;
+    }
+    return ['Non spécifié'];
   }
 }

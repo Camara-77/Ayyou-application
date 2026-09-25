@@ -10,15 +10,15 @@
       <div class="form-section">
         <label class="section-label">CAPTUREZ VOTRE PLAT</label>
         
-        <div class="video-dropzone-box">
+        <div class="video-dropzone-box" [style.backgroundImage]="'url(' + (extractedThumbnailUrl || defaultFoodBgUrl) + ')'">
           <div class="video-overlay-content">
             <div class="btn-play-camera">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="#E51A29" xmlns="http://www.w3.org/2000/svg">
                 <path d="M17 10.5V7C17 6.44772 16.5523 6 16 6H4C3.44772 6 3 6.44772 3 7V17C3 17.5523 3.44772 18 4 18H16C16.5523 18 17 17.5523 17 17V13.5L21 17.5V6.5L17 10.5Z"/>
               </svg>
             </div>
-            <h3 class="zone-title">Filmer ou importer une vidéo</h3>
-            <p class="zone-subtitle">Glissez votre vidéo ici ou touchez pour ouvrir la galerie</p>
+            <h3 class="zone-title">{{ videoFileSelected ? 'Vidéo sélectionnée' : 'Filmer ou importer une vidéo' }}</h3>
+            <p class="zone-subtitle">{{ videoFileSelected ? 'Première frame extraite · Touchez pour modifier' : 'Glissez votre vidéo ici ou touchez pour ouvrir la galerie' }}</p>
           </div>
           <input type="file" accept="video/*" (change)="onFileSelected($event)" class="file-input-hidden"/>
         </div>
@@ -36,28 +36,44 @@
           <span class="sub-info">(Récupère le prix, le menu et le restaurant automatiquement)</span>
         </div>
 
-        <div class="selected-dish-card">
+        <select *ngIf="dishes && dishes.length > 0" [(ngModel)]="selectedDishId" (ngModelChange)="onDishSelect($event)" name="selectedDishId" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #E5E7EB; background-color: #F9FAFB; font-weight: 600; font-size: 14px; margin-top: 8px;">
+          <option *ngFor="let dish of dishes" [value]="dish.id">{{ dish.name }} — {{ dish.price }} FCFA</option>
+        </select>
+
+        <div *ngIf="!dishes || dishes.length === 0" class="selected-dish-card">
           <div class="card-line-top">
-            <span class="dish-title-bold">Thiéboudienne Penda Mbaye</span>
-            <span class="dish-price-bold">4 500 FCFA</span>
-          </div>
-          <div class="card-line-bottom">
-            <span>Chez Loutcha • Dakar Plateau</span>
+            <span class="dish-title-bold">{{ productName }}</span>
+            <span class="dish-price-bold">{{ productPrice }} FCFA</span>
           </div>
         </div>
       </div>
 
-      <!-- Section 3: CATÉGORIE -->
+      <!-- Section 3: CATÉGORIE PRINCIPALE & SOUS-CATÉGORIE -->
       <div class="form-section">
-        <label class="section-label">CATÉGORIE</label>
+        <label class="section-label">CATÉGORIE PRINCIPALE</label>
         <div class="categories-pills-row">
           <button 
             type="button" 
             class="pill-btn" 
-            *ngFor="let cat of categories" 
-            [class.active]="selectedCategory === cat" 
-            (click)="setCategory(cat)">
-            {{ cat }}
+            *ngFor="let mainCat of categoriesHierarchy" 
+            [class.active]="selectedMainCategory.id === mainCat.id" 
+            (click)="selectMainCategory(mainCat)">
+            {{ mainCat.name }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 3b: SOUS-CATÉGORIE -->
+      <div class="form-section subcategory-section" *ngIf="selectedMainCategory && selectedMainCategory.subCategories.length > 0">
+        <label class="section-label">SOUS-CATÉGORIE ({{ selectedMainCategory.name }})</label>
+        <div class="categories-pills-row subcategories-pills-row">
+          <button 
+            type="button" 
+            class="pill-btn sub-pill" 
+            *ngFor="let sub of selectedMainCategory.subCategories" 
+            [class.active]="selectedSubCategory === sub" 
+            (click)="selectSubCategory(sub)">
+            {{ sub }}
           </button>
         </div>
       </div>
