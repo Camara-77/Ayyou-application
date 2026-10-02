@@ -12,10 +12,12 @@ export interface RegistrationSummaryData {
   attachedBadges: string[];
 }
 
+import { AppLogoComponent } from '../../../../shared/components/app-logo/app-logo.component';
+
 @Component({
   selector: 'app-pro-register-confirmation',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, AppLogoComponent],
   templateUrl: './pro-register-confirmation.component.html',
   styleUrls: ['./pro-register-confirmation.component.scss']
 })
@@ -32,13 +34,32 @@ export class ProRegisterConfirmationComponent implements OnInit {
 
   isMobileMenuOpen: boolean = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    this.loadSummaryData();
+  }
 
   ngOnInit(): void {
-    // Read state passed from router navigation if present
-    const navigation = this.router.getCurrentNavigation();
-    if (navigation?.extras?.state && navigation.extras.state['summary']) {
-      this.summaryData = { ...this.summaryData, ...navigation.extras.state['summary'] };
+    this.loadSummaryData();
+  }
+
+  private loadSummaryData(): void {
+    if (typeof window !== 'undefined') {
+      const historySummary = window.history?.state?.summary;
+      if (historySummary) {
+        this.summaryData = { ...this.summaryData, ...historySummary };
+        return;
+      }
+      const savedSummary = sessionStorage.getItem('ayyou_pro_register_summary');
+      if (savedSummary) {
+        try {
+          const parsed = JSON.parse(savedSummary);
+          if (parsed && typeof parsed === 'object') {
+            this.summaryData = { ...this.summaryData, ...parsed };
+          }
+        } catch (e) {
+          // Fallback if parsing fails
+        }
+      }
     }
   }
 

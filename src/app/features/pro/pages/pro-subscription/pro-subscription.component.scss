@@ -1,0 +1,330 @@
+.subscription-page {
+  padding: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+  color: #172B4D;
+
+  .page-header {
+    margin-bottom: 24px;
+
+    .page-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #091E42;
+      margin-bottom: 4px;
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: #6B778C;
+    }
+  }
+
+  .alert {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+
+    .icon {
+      font-size: 20px;
+    }
+
+    &.alert-success {
+      background-color: #E3FCEF;
+      color: #006644;
+      border: 1px solid #ABF5D1;
+    }
+
+    &.alert-danger {
+      background-color: #FFEBE6;
+      color: #BF2600;
+      border: 1px solid #FFBDAD;
+    }
+  }
+
+  .loading-state {
+    text-align: center;
+    padding: 40px;
+    color: #6B778C;
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #DFE1E6;
+      border-top-color: #00875A;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+  }
+
+  .status-card {
+    background: #FFFFFF;
+    border-radius: 12px;
+    border: 1px solid #DFE1E6;
+    box-shadow: 0 2px 8px rgba(9, 30, 66, 0.08);
+    overflow: hidden;
+    margin-bottom: 32px;
+
+    &.active {
+      border-left: 6px solid #00875A;
+    }
+
+    &.expired {
+      border-left: 6px solid #DE350B;
+    }
+
+    .card-header {
+      padding: 20px 24px;
+      background: #F4F5F7;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #DFE1E6;
+
+      .establishment-info {
+        h2 {
+          font-size: 18px;
+          font-weight: 600;
+          margin-bottom: 4px;
+        }
+
+        .type-tag {
+          font-size: 12px;
+          color: #6B778C;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+      }
+
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+
+        &.badge-active {
+          background-color: #E3FCEF;
+          color: #006644;
+        }
+
+        &.badge-expired {
+          background-color: #FFEBE6;
+          color: #BF2600;
+        }
+
+        &.badge-inactive {
+          background-color: #FFF0B3;
+          color: #172B4D;
+        }
+      }
+    }
+
+    .card-body {
+      padding: 24px;
+
+      .pricing-box {
+        margin-bottom: 20px;
+
+        .price-display {
+          display: flex;
+          align-items: baseline;
+          gap: 8px;
+
+          .amount {
+            font-size: 36px;
+            font-weight: 800;
+            color: #00875A;
+          }
+
+          .currency {
+            font-size: 16px;
+            font-weight: 600;
+            color: #5E6C84;
+          }
+        }
+
+        .pricing-note {
+          font-size: 13px;
+          color: #6B778C;
+          margin-top: 4px;
+        }
+      }
+
+      .dates-box {
+        display: flex;
+        gap: 24px;
+        padding: 14px;
+        background: #FAFBFC;
+        border-radius: 8px;
+        margin-bottom: 20px;
+
+        .date-item {
+          .label {
+            font-size: 12px;
+            color: #6B778C;
+            margin-right: 6px;
+          }
+
+          .value {
+            font-size: 14px;
+            font-weight: 600;
+
+            &.text-danger {
+              color: #DE350B;
+            }
+          }
+        }
+      }
+
+      .warning-banner {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px;
+        background: #FFF0B3;
+        border-radius: 8px;
+        color: #172B4D;
+        font-size: 13px;
+        line-height: 1.5;
+
+        i {
+          font-size: 18px;
+          color: #FF9900;
+        }
+      }
+    }
+
+    .card-footer {
+      padding: 18px 24px;
+      background: #FAFBFC;
+      border-top: 1px solid #DFE1E6;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+
+      .pay-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background-color: #00875A;
+        color: #FFFFFF;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover:not(:disabled) {
+          background-color: #006644;
+        }
+
+        &:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+      }
+
+      .secure-text {
+        font-size: 12px;
+        color: #6B778C;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+    }
+  }
+
+  .history-section {
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .empty-history {
+      padding: 24px;
+      text-align: center;
+      background: #FAFBFC;
+      border-radius: 8px;
+      color: #6B778C;
+    }
+
+    .history-table-wrapper {
+      background: #FFFFFF;
+      border: 1px solid #DFE1E6;
+      border-radius: 8px;
+      overflow-x: auto;
+
+      .history-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+
+        th, td {
+          padding: 12px 16px;
+          text-align: left;
+          border-bottom: 1px solid #DFE1E6;
+        }
+
+        th {
+          background: #F4F5F7;
+          font-weight: 600;
+          color: #5E6C84;
+        }
+
+        .status-pill {
+          padding: 4px 10px;
+          border-radius: 12px;
+          font-size: 12px;
+          font-weight: 600;
+
+          &.pill-paye {
+            background-color: #E3FCEF;
+            color: #006644;
+          }
+
+          &.pill-expire {
+            background-color: #FFEBE6;
+            color: #BF2600;
+          }
+        }
+
+        .btn-invoice {
+          background: none;
+          border: 1px solid #00875A;
+          color: #00875A;
+          padding: 6px 12px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+
+          &:hover {
+            background-color: #E3FCEF;
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

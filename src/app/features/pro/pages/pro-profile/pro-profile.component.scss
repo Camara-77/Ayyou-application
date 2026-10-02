@@ -127,7 +127,46 @@
         &:hover {
           background-color: #FAFAFA;
         }
+
+        &.btn-logout-action {
+          border-color: #FEE2E2;
+          background: #FEF2F2;
+          color: #E51A29;
+
+          &:hover {
+            background: #FEE2E2;
+          }
+        }
       }
+    }
+  }
+}
+
+.logout-section-wrap {
+  margin-top: 20px;
+  margin-bottom: 24px;
+  padding: 0 4px;
+
+  .btn-logout-full {
+    width: 100%;
+    border: 1.5px solid #FEE2E2;
+    background: #FEF2F2;
+    color: #E51A29;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 12px 16px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(229, 26, 41, 0.08);
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #FEE2E2;
+      border-color: #FCA5A5;
     }
   }
 }

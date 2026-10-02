@@ -144,6 +144,14 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    overflow: hidden;
+
+    .rest-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
   }
 
   .rest-info {
@@ -447,33 +455,33 @@
   box-sizing: border-box;
   z-index: 100;
 
-  .btn-commander-primary {
+  app-order-button {
     flex: 1;
-    height: 48px;
-    background-color: #E51A29;
-    color: #ffffff;
-    border: none;
-    border-radius: 14px;
-    font-size: 15px;
-    font-weight: 800;
+    min-width: 0;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(229, 26, 41, 0.3);
   }
 
-  .btn-cart-secondary {
+  .btn-quick-cart {
     width: 48px;
     height: 48px;
     border-radius: 14px;
-    background: #EFEFEF;
-    border: none;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     flex-shrink: 0;
+    transition: background 0.2s ease, transform 0.15s ease;
+
+    &:hover {
+      background: #000000;
+    }
+
+    &:active {
+      transform: scale(0.92);
+    }
   }
 }
 

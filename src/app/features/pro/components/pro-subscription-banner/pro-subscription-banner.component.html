@@ -1,0 +1,42 @@
+<div *ngIf="isExpired" class="pro-expired-banner-card">
+  <div class="banner-header">
+    <div class="icon-warning-circle">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h3 class="banner-title">Abonnement PRO Expiré — Compte Suspendu</h3>
+      <span class="banner-badge">10 000 FCFA / mois</span>
+    </div>
+  </div>
+
+  <div class="banner-body">
+    <p class="description">
+      Votre abonnement PRO AYYOU pour cet établissement a expiré. Vos services et fonctionnalités sont actuellement restreints :
+    </p>
+    <ul class="restrictions-list">
+      <li>🚫 <strong>Visibilité client :</strong> Votre établissement, vos plats et vos vidéos reels sont masqués du public.</li>
+      <li>🚫 <strong>Gestion de menu :</strong> Impossible d'ajouter, modifier ou supprimer des plats.</li>
+      <li>🚫 <strong>Vidéos & Reels :</strong> Impossible de publier de nouvelles vidéos dans le Feed.</li>
+      <li>🚫 <strong>Commandes :</strong> Impossible de recevoir de nouvelles commandes.</li>
+    </ul>
+
+    <div *ngIf="errorMessage" class="error-alert">
+      {{ errorMessage }}
+    </div>
+
+    <div class="banner-actions">
+      <button (click)="paySubscription()" [disabled]="submitting" class="btn-reactivate-paytech">
+        <span *ngIf="!submitting">⚡ Réactiver mon abonnement — 10 000 FCFA</span>
+        <span *ngIf="submitting">Redirection PayTech...</span>
+      </button>
+
+      <a routerLink="/pro/subscription" class="link-manage-subscription">
+        Voir le détail de l'abonnement &gt;
+      </a>
+    </div>
+  </div>
+</div>

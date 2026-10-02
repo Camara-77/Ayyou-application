@@ -1,15 +1,28 @@
 <div class="page-container">
-  <app-header></app-header>
-
   <main class="feed-content" #feedContent (scroll)="onFeedScroll()">
-    <app-food-post
-      *ngFor="let item of feedItems"
-      [feedItem]="item"
-      (orderDish)="onOrderDish($event)"
-      (quickCart)="onQuickCart($event)"
-    ></app-food-post>
+    <div class="video-not-found-card" *ngIf="videoNotFound">
+      <div class="empty-icon-circle">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" stroke="#E51A29" stroke-width="2"/>
+          <line x1="15" y1="9" x2="9" y2="15" stroke="#E51A29" stroke-width="2" stroke-linecap="round"/>
+          <line x1="9" y1="9" x2="15" y2="15" stroke="#E51A29" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3 class="not-found-title">Cette vidéo n'est plus disponible.</h3>
+      <p class="not-found-desc">La publication vidéo que vous tentez d'ouvrir n'existe plus ou a été retirée par son auteur.</p>
+      <button class="btn-explore-feed" (click)="resetFeedView()">Explorer le Feed AYYOU</button>
+    </div>
+
+    <ng-container *ngIf="!videoNotFound">
+      <app-food-post
+        *ngFor="let item of feedItems; let i = index"
+        [feedItem]="item"
+        [feedPosition]="i"
+        (orderDish)="onOrderDish($event)"
+        (quickCart)="onQuickCart($event)"
+      ></app-food-post>
+    </ng-container>
   </main>
 
-  <app-chatbot-floating></app-chatbot-floating>
   <app-bottom-nav activeTab="home"></app-bottom-nav>
 </div>

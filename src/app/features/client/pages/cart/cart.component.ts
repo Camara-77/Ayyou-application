@@ -5,11 +5,9 @@ import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { AppBottomNavComponent } from '../../components/app-bottom-nav/app-bottom-nav.component';
-import { ChatbotFloatingComponent } from '../../components/chatbot-floating/chatbot-floating.component';
 import { QuantitySelectorComponent } from '../../components/quantity-selector/quantity-selector.component';
 import { CartService } from '../../../../core/services/cart.service';
-import { ClientDataService } from '../../../../core/services/client-data.service';
-import { CartItem, Dish } from '../../../../core/models/client';
+import { CartItem } from '../../../../core/models/client';
 
 @Component({
   selector: 'app-cart',
@@ -20,7 +18,6 @@ import { CartItem, Dish } from '../../../../core/models/client';
     FormsModule,
     AppHeaderComponent,
     AppBottomNavComponent,
-    ChatbotFloatingComponent,
     QuantitySelectorComponent
   ],
   templateUrl: './cart.component.html',
@@ -28,23 +25,17 @@ import { CartItem, Dish } from '../../../../core/models/client';
 })
 export class CartComponent implements OnInit, OnDestroy {
   cartItems: CartItem[] = [];
-  recommendations: Dish[] = [];
   searchQuery: string = '';
   private sub?: Subscription;
 
   constructor(
     public cartService: CartService,
-    private clientDataService: ClientDataService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.sub = this.cartService.items$.subscribe(items => {
       this.cartItems = items;
-    });
-
-    this.clientDataService.getRecommendations().subscribe(dishes => {
-      this.recommendations = dishes;
     });
   }
 
@@ -54,10 +45,6 @@ export class CartComponent implements OnInit, OnDestroy {
 
   removeItem(dishId: string): void {
     this.cartService.removeFromCart(dishId);
-  }
-
-  addRecommendation(dish: Dish): void {
-    this.cartService.addToCart(dish, 1);
   }
 
   toggleItemSelection(dishId: string): void {
@@ -87,6 +74,18 @@ export class CartComponent implements OnInit, OnDestroy {
 
   formatPrice(price: number): string {
     return price.toLocaleString('fr-FR') + ' FCFA';
+  }
+
+  getShortDescription(desc: string | undefined): string {
+    if (!desc) return '';
+    const sentences = desc.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 0);
+    if (sentences.length === 0) return '';
+    if (sentences.length === 1) return sentences[0];
+    const firstTwo = `${sentences[0]} ${sentences[1]}`;
+    if (firstTwo.length <= 110) {
+      return firstTwo;
+    }
+    return sentences[0];
   }
 
   ngOnDestroy(): void {

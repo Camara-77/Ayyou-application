@@ -14,6 +14,14 @@ export const routes: Routes = [
     loadComponent: () => import('./features/client/pages/home/home.component').then(m => m.HomeComponent)
   },
   {
+    path: 'feed/video/:id',
+    loadComponent: () => import('./features/client/pages/home/home.component').then(m => m.HomeComponent)
+  },
+  {
+    path: 'video/:id',
+    redirectTo: 'feed/video/:id'
+  },
+  {
     path: 'restaurant/:id',
     loadComponent: () => import('./features/client/pages/restaurant-detail/restaurant-detail.component').then(m => m.RestaurantDetailComponent)
   },

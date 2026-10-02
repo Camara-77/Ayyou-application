@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-food-interaction',
@@ -9,17 +10,17 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./food-interaction.component.scss']
 })
 export class FoodInteractionComponent {
-  @Input() likesCount: number = 1200;
+  @Input() videoId: string | number = '';
+  @Input() likesCount: number = 0;
   @Input() isLiked: boolean = false;
-  @Input() sharesCount: number = 48;
+  @Input() sharesCount: number = 0;
   @Input() dishTitle: string = '';
   @Input() restaurantName: string = '';
   @Output() likeToggle = new EventEmitter<boolean>();
   @Output() share = new EventEmitter<void>();
-  @Output() saveClick = new EventEmitter<boolean>();
 
-  isSaved: boolean = false;
-  showSaveModal: boolean = false;
+  showShareModal: boolean = false;
+  toastMessage: string = '';
 
   onLike(event: Event): void {
     event.stopPropagation();
@@ -32,43 +33,112 @@ export class FoodInteractionComponent {
     this.likeToggle.emit(this.isLiked);
   }
 
-  onSave(event: Event): void {
+  onShare(event: Event): void {
+    console.log('[DIAGNOSTIC] CLICK SHARE -> FoodInteractionComponent.onShare');
     event.stopPropagation();
-    this.isSaved = !this.isSaved;
-    this.showSaveModal = true;
-    this.saveClick.emit(this.isSaved);
+    this.share.emit();
   }
 
-  closeSaveModal(event?: Event): void {
+  closeShareModal(event?: Event): void {
     if (event) {
       event.stopPropagation();
     }
-    this.showSaveModal = false;
+    this.showShareModal = false;
   }
 
-  async onShare(event: Event): Promise<void> {
-    event.stopPropagation();
+  get videoShareUrl(): string {
+    const origin = (typeof window !== 'undefined' && window.location?.origin)
+      ? window.location.origin
+      : (environment.appUrl || 'http://localhost:4200');
+    return `${origin}/feed/video/${this.videoId}`;
+  }
+
+  async shareNative(event?: Event): Promise<void> {
+    if (event) event.stopPropagation();
     const shareData = {
-      title: this.dishTitle || 'AYYOU Plat',
-      text: `Découvrez "${this.dishTitle}" proposé par ${this.restaurantName || 'notre restaurant'} sur AYYOU !`,
-      url: window.location.href
+      title: 'Découvrez cette vidéo sur AYYOU',
+      text: 'Découvrez cette vidéo sur AYYOU',
+      url: this.videoShareUrl
     };
 
-    if (navigator.share) {
+    if (typeof navigator !== 'undefined' && navigator.share) {
       try {
         await navigator.share(shareData);
+        this.incrementShareCount();
       } catch (err) {
-        // User cancelled or share failed silently
+        // Cancelled silently
       }
     } else {
-      try {
-        await navigator.clipboard.writeText(shareData.url);
-        alert('Lien de la publication copié dans le presse-papier !');
-      } catch (err) {
-        // Clipboard fallback
-      }
+      this.copyLink();
     }
+    this.closeShareModal();
+  }
+
+  shareWhatsApp(event?: Event): void {
+    if (event) event.stopPropagation();
+    const text = `Découvrez cette vidéo sur AYYOU :\n${this.videoShareUrl}`;
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    if (typeof window !== 'undefined') {
+      window.open(url, '_blank');
+    }
+    this.incrementShareCount();
+    this.closeShareModal();
+  }
+
+  shareEmail(event?: Event): void {
+    if (event) event.stopPropagation();
+    const subject = 'Découvrez cette vidéo sur AYYOU';
+    const body = `Bonjour,\n\nJe voulais te partager cette vidéo découverte sur AYYOU :\n\n${this.videoShareUrl}\n\nÀ bientôt.`;
+    const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    if (typeof window !== 'undefined') {
+      window.location.href = mailtoUrl;
+    }
+    this.incrementShareCount();
+    this.closeShareModal();
+  }
+
+  shareTelegram(event?: Event): void {
+    if (event) event.stopPropagation();
+    const text = 'Découvrez cette vidéo sur AYYOU';
+    const url = `https://t.me/share/url?url=${encodeURIComponent(this.videoShareUrl)}&text=${encodeURIComponent(text)}`;
+    if (typeof window !== 'undefined') {
+      window.open(url, '_blank');
+    }
+    this.incrementShareCount();
+    this.closeShareModal();
+  }
+
+  shareInstagram(event?: Event): void {
+    if (event) event.stopPropagation();
+    this.shareNative();
+  }
+
+  async copyLink(event?: Event): Promise<void> {
+    if (event) event.stopPropagation();
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(this.videoShareUrl);
+        this.showToast('Lien de la vidéo copié !');
+        this.incrementShareCount();
+      } catch (e) {
+        this.showToast('Lien de la vidéo : ' + this.videoShareUrl);
+      }
+    } else {
+      this.showToast('Lien de la vidéo : ' + this.videoShareUrl);
+    }
+    this.closeShareModal();
+  }
+
+  private incrementShareCount(): void {
+    this.sharesCount++;
     this.share.emit();
+  }
+
+  private showToast(msg: string): void {
+    this.toastMessage = msg;
+    setTimeout(() => {
+      this.toastMessage = '';
+    }, 3000);
   }
 
   formatCount(count: number): string {

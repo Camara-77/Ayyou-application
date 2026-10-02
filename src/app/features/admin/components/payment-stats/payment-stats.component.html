@@ -3,12 +3,12 @@
   <div class="stat-card">
     <span class="card-label">VOLUME BRUT TRAITÉ (GMV)</span>
     <div class="value-row">
-      <span class="stat-number">48 650 000</span>
+      <span class="stat-number">{{ (stats.volumeBrutGmv || 0) | number:'1.0-0':'fr-FR' }}</span>
       <span class="currency-tag">FCFA</span>
     </div>
     <div class="badge-row text-green">
-      <span class="trend-badge">+18.4%</span>
-      <span class="sub-text">vs M-1 (Ce mois-ci)</span>
+      <span class="trend-badge" *ngIf="stats.volumeGrowthPercent > 0">+{{ stats.volumeGrowthPercent }}%</span>
+      <span class="sub-text">Flux réels enregistrés</span>
     </div>
   </div>
 
@@ -16,7 +16,7 @@
   <div class="stat-card">
     <span class="card-label">PAYOUTS MARCHANDS & LIVREURS</span>
     <div class="value-row">
-      <span class="stat-number">42 300 000</span>
+      <span class="stat-number">{{ (stats.payoutsMarchandsLivreurs || 0) | number:'1.0-0':'fr-FR' }}</span>
       <span class="currency-tag">FCFA</span>
     </div>
     <div class="badge-row">
@@ -29,11 +29,11 @@
   <div class="stat-card">
     <span class="card-label">REVENUS ABONNEMENTS PRO</span>
     <div class="value-row">
-      <span class="stat-number">6 350 000</span>
+      <span class="stat-number">{{ (stats.revenusAbonnementsPro || 0) | number:'1.0-0':'fr-FR' }}</span>
       <span class="currency-tag">FCFA</span>
     </div>
     <div class="badge-row">
-      <span class="sub-text">127 commerces • 50k FCFA/m</span>
+      <span class="sub-text">{{ stats.activeSubscriptionsCount || 0 }} souscription(s) AYYOU Pro</span>
     </div>
   </div>
 
@@ -41,12 +41,12 @@
   <div class="stat-card">
     <span class="card-label">EN ATTENTE (WAVE / OM)</span>
     <div class="value-row">
-      <span class="stat-number">1 420 000</span>
+      <span class="stat-number">{{ (stats.pendingWaveOmAmount || 0) | number:'1.0-0':'fr-FR' }}</span>
       <span class="currency-tag">FCFA</span>
     </div>
     <div class="badge-row text-orange">
       <span class="dot-indicator orange-dot">●</span>
-      <span class="sub-text">18 transferts en file d'attente</span>
+      <span class="sub-text">{{ stats.pendingTransfersCount || 0 }} transfert(s) en file d'attente</span>
     </div>
   </div>
 
@@ -54,10 +54,10 @@
   <div class="stat-card">
     <span class="card-label">TAUX DE RÉCONCILIATION</span>
     <div class="value-row">
-      <span class="stat-number">99.8%</span>
+      <span class="stat-number">{{ (stats.reconciliationRatePercent || 100) }}%</span>
     </div>
     <div class="badge-row">
-      <span class="sub-text">Écarts audités: 2 dossiers</span>
+      <span class="sub-text">Écarts audités: {{ stats.auditedDisputesCount || 0 }} dossier(s)</span>
     </div>
   </div>
 </div>

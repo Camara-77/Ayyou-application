@@ -12,11 +12,11 @@ import { PaymentFilterTab } from '../../models/admin-payment.models';
 })
 export class PaymentFiltersComponent {
   @Input() selectedTab: PaymentFilterTab = 'ALL';
-  @Input() totalCount: number = 1840;
-  @Input() subscriptionsCount: number = 127;
-  @Input() restaurantsCount: number = 780;
-  @Input() couriersCount: number = 910;
-  @Input() disputesCount: number = 23;
+  @Input() totalCount: number = 0;
+  @Input() subscriptionsCount: number = 0;
+  @Input() restaurantsCount: number = 0;
+  @Input() couriersCount: number = 0;
+  @Input() disputesCount: number = 0;
 
   @Output() tabChange = new EventEmitter<PaymentFilterTab>();
   @Output() searchChange = new EventEmitter<string>();
@@ -26,7 +26,7 @@ export class PaymentFiltersComponent {
 
   searchQuery: string = '';
   selectedMethod: string = 'ALL';
-  selectedPeriod: string = 'MAY_2024';
+  selectedPeriod: string = 'CURRENT_MONTH';
   selectedStatus: string = 'ALL';
 
   onTabSelect(tab: PaymentFilterTab): void {

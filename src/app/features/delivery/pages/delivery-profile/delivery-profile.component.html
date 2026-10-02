@@ -1,7 +1,30 @@
-<app-delivery-header [title]="'PROFIL'"></app-delivery-header>
+<!-- HEADER TOP BAR -->
+<header class="profile-header">
+  <button (click)="goBack()" class="icon-btn back-btn" aria-label="Retour">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15 19L8 12L15 5"/>
+    </svg>
+  </button>
 
-<main class="profile-container" *ngIf="!isLoading; else loadingState">
-  
+  <div class="header-title-container">
+    <h1 class="header-title">Profil Livreur</h1>
+    <div class="header-status-badge">
+      <span class="status-dot" [class.dot-online]="profile?.est_disponible ?? true"></span>
+      <span class="status-text">{{ (profile?.est_disponible ?? true) ? 'En service' : 'Hors service' }}</span>
+    </div>
+  </div>
+
+  <button class="icon-btn notif-btn" aria-label="Notifications">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    </svg>
+    <span class="notif-badge-dot"></span>
+  </button>
+</header>
+
+<main class="profile-container">
+
   <!-- Banner d'erreur si action impossible -->
   <div class="error-banner" *ngIf="errorMessage || toggleError">
     {{ errorMessage || toggleError }}
@@ -21,24 +44,24 @@
 
       <div class="profile-meta">
         <h2 class="driver-name">{{ driverName }}</h2>
-        <p class="driver-subtitle">Livreur AYYOU Pro · {{ sectorIntervention !== 'Non renseigné' ? sectorIntervention.split(',')[0] : 'Dakar' }}</p>
+        <p class="driver-subtitle">Livreur AYYOU Pro · {{ sectorCityName }}</p>
       </div>
     </div>
 
     <!-- Subcard Disponibilité Toggle Switch -->
     <div class="duty-subcard">
       <div class="duty-left">
-        <span class="duty-dot" [class.active]="profile?.est_disponible"></span>
+        <span class="duty-dot" [class.active]="profile?.est_disponible ?? true"></span>
         <div class="duty-text">
-          <span class="duty-title">{{ profile?.est_disponible ? 'En service' : 'Hors service' }}</span>
+          <span class="duty-title">{{ (profile?.est_disponible ?? true) ? 'En service' : 'Hors service' }}</span>
           <span class="duty-desc">
-            {{ profile?.est_disponible ? 'Visible pour de nouvelles courses' : 'Indisponible pour de nouvelles courses' }}
+            {{ (profile?.est_disponible ?? true) ? 'Visible pour de nouvelles courses' : 'Indisponible pour de nouvelles courses' }}
           </span>
         </div>
       </div>
 
       <label class="toggle-switch">
-        <input type="checkbox" [checked]="profile?.est_disponible" (change)="toggleOnDuty()" [disabled]="isUpdatingAvailability" />
+        <input type="checkbox" [checked]="profile?.est_disponible ?? true" (change)="toggleOnDuty()" [disabled]="isUpdatingAvailability" />
         <span class="slider"></span>
       </label>
     </div>
@@ -75,13 +98,7 @@
     <div class="equipments-section">
       <p class="section-sublabel">ÉQUIPEMENTS CERTIFIÉS</p>
       <div class="equipments-tags">
-        <ng-container *ngIf="equipmentList.length > 0; else defaultEquipments">
-          <span class="tag" *ngFor="let eq of equipmentList">{{ eq }}</span>
-        </ng-container>
-        <ng-template #defaultEquipments>
-          <span class="tag">Casque homologué</span>
-          <span class="tag">Sac isotherme AYYOU</span>
-        </ng-template>
+        <span class="tag" *ngFor="let eq of equipmentList">{{ eq }}</span>
       </div>
     </div>
   </div>
@@ -102,10 +119,7 @@
       <div class="gray-block payout-block">
         <div class="payout-left">
           <div class="payout-icon-wrapper wave-blue-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="#00aaff">
-              <rect width="24" height="24" rx="6" fill="#00AAFF"/>
-              <path d="M12 6c-2.5 0-4.5 2-4.5 4.5 0 2 1.3 3.7 3.1 4.3l-1.1 2.2c-.2.4.1.9.6.9h3.8c.5 0 .8-.5.6-.9l-1.1-2.2c1.8-.6 3.1-2.3 3.1-4.3C16.5 8 14.5 6 12 6z" fill="#FFFFFF"/>
-            </svg>
+            <img src="assets/branding/wave.png" alt="Wave Sénégal" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;" />
           </div>
           <div class="payout-text">
             <span class="payout-title">{{ payoutAccountType }}</span>
@@ -114,7 +128,7 @@
         </div>
 
         <div class="payout-check-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
             <polyline points="22 4 12 14.01 9 11.01"/>
           </svg>
@@ -127,89 +141,54 @@
   <div class="card docs-card">
     <div class="docs-header">
       <h3 class="card-section-title">Documents Officiels</h3>
-      <span class="docs-counter">{{ documentsValidesCount > 0 ? documentsValidesCount : 3 }}/{{ totalDocumentsCount > 0 ? totalDocumentsCount : 3 }} validés</span>
+      <span class="docs-counter">{{ documentsValidesCount }}/{{ totalDocumentsCount }} validés</span>
     </div>
 
-    <div class="docs-list" *ngIf="documents.length > 0; else defaultDocsList">
-      <div class="gray-block doc-item" *ngFor="let doc of documents" (click)="viewDocument(doc)" [class.clickable]="!!doc.fichier">
+    <div class="docs-list">
+      <div class="gray-block doc-item" *ngFor="let doc of displayDocuments" (click)="viewDocument(doc)" [class.clickable]="!!doc.fichier">
         <div class="doc-left">
           <div class="doc-icon-wrapper">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
-              <circle cx="9" cy="9" r="2"/>
-              <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+            <!-- Icon 1: CNI (Briefcase / ID card) -->
+            <svg *ngIf="doc.type_document === 'CNI' || doc.type_document_display?.includes('CNI')" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+            </svg>
+            <!-- Icon 2: Permis (Card / Driver License) -->
+            <svg *ngIf="doc.type_document === 'PERMIS' || doc.type_document_display?.includes('Permis')" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="16" rx="2"/>
+              <circle cx="9" cy="10" r="2"/>
+              <path d="M15 8h2"/>
+              <path d="M15 12h2"/>
+              <path d="M7 16h10"/>
+            </svg>
+            <!-- Icon 3: Casier (Gavel / Scales / Official doc) -->
+            <svg *ngIf="doc.type_document === 'CASIER' || doc.type_document_display?.includes('Casier')" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m14 13-7.5 7.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L11 10"/>
+              <path d="m16 16 6-6"/>
+              <path d="m8 8 6-6"/>
+              <path d="m9 7 8 8"/>
+              <path d="m21 11-8-8"/>
+            </svg>
+            <!-- Fallback Icon -->
+            <svg *ngIf="doc.type_document !== 'CNI' && doc.type_document !== 'PERMIS' && doc.type_document !== 'CASIER' && !doc.type_document_display?.includes('CNI') && !doc.type_document_display?.includes('Permis') && !doc.type_document_display?.includes('Casier')" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+              <polyline points="14 2 14 8 20 8"/>
             </svg>
           </div>
           <div class="doc-text">
             <span class="doc-name">{{ doc.type_document_display || doc.type_document }}</span>
-            <span class="doc-sub">{{ doc.commentaire || 'Document officiel' }}</span>
+            <span class="doc-sub">{{ doc.commentaire || 'République du Sénégal' }}</span>
           </div>
         </div>
 
-        <span class="badge" [ngClass]="{
-          'badge-conforme': doc.statut === 'VALIDE',
-          'badge-attente': doc.statut === 'EN_ATTENTE',
-          'badge-refuse': doc.statut === 'REFUSE'
-        }">
-          <ng-container *ngIf="doc.statut === 'VALIDE'">✓ Vérifié</ng-container>
-          <ng-container *ngIf="doc.statut === 'EN_ATTENTE'">En attente</ng-container>
-          <ng-container *ngIf="doc.statut === 'REFUSE'">Refusé</ng-container>
+        <span class="badge-status-green">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>{{ doc.statut === 'VALIDE' ? (doc.type_document === 'CASIER' || doc.type_document_display?.includes('Casier') ? 'Validé' : 'Vérifié') : doc.statut }}</span>
         </span>
       </div>
     </div>
-
-    <ng-template #defaultDocsList>
-      <div class="docs-list">
-        <div class="gray-block doc-item">
-          <div class="doc-left">
-            <div class="doc-icon-wrapper">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
-                <rect width="18" height="18" x="3" y="3" rx="2"/>
-                <circle cx="9" cy="9" r="2"/>
-                <path d="m21 15-3-3a2 2 0 0 0-3 0L6 21"/>
-              </svg>
-            </div>
-            <div class="doc-text">
-              <span class="doc-name">Pièce d'identité (CNI)</span>
-              <span class="doc-sub">République du Sénégal</span>
-            </div>
-          </div>
-          <span class="badge badge-conforme">✓ Vérifié</span>
-        </div>
-
-        <div class="gray-block doc-item">
-          <div class="doc-left">
-            <div class="doc-icon-wrapper">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
-                <rect width="18" height="14" x="3" y="5" rx="2"/>
-                <path d="M7 15h4M15 15h2"/>
-              </svg>
-            </div>
-            <div class="doc-text">
-              <span class="doc-name">Permis moto (Catégorie A)</span>
-              <span class="doc-sub">Ministère des Transports</span>
-            </div>
-          </div>
-          <span class="badge badge-conforme">✓ Vérifié</span>
-        </div>
-
-        <div class="gray-block doc-item">
-          <div class="doc-left">
-            <div class="doc-icon-wrapper">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-              </svg>
-            </div>
-            <div class="doc-text">
-              <span class="doc-name">Casier judiciaire (Extrait n°3)</span>
-              <span class="doc-sub">Délivré &lt; 3 mois</span>
-            </div>
-          </div>
-          <span class="badge badge-conforme">✓ Validé</span>
-        </div>
-      </div>
-    </ng-template>
   </div>
 
   <!-- CARTE 5: ACTION MODIFIER MES INFORMATIONS -->
@@ -231,12 +210,5 @@
   </button>
 
 </main>
-
-<ng-template #loadingState>
-  <div class="loading-container">
-    <div class="spinner"></div>
-    <p>Chargement du profil livreur...</p>
-  </div>
-</ng-template>
 
 <app-delivery-bottom-nav activeTab="profile"></app-delivery-bottom-nav>

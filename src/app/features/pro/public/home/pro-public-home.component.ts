@@ -11,10 +11,12 @@ interface PartnerCard {
   imageUrl: string;
 }
 
+import { AppLogoComponent } from '../../../../shared/components/app-logo/app-logo.component';
+
 @Component({
   selector: 'app-pro-public-home',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, AppLogoComponent],
   templateUrl: './pro-public-home.component.html',
   styleUrls: ['./pro-public-home.component.scss']
 })

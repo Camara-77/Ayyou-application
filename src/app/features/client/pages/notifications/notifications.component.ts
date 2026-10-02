@@ -1,10 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { AppBottomNavComponent } from '../../components/app-bottom-nav/app-bottom-nav.component';
-import { ChatbotFloatingComponent } from '../../components/chatbot-floating/chatbot-floating.component';
 import { ClientDataService } from '../../../../core/services/client-data.service';
 import { PaymentService } from '../../../../core/services/payment.service';
 import { NotificationService, NotificationApiItem } from '../../../../core/services/notification.service';
@@ -18,8 +17,7 @@ import { Invoice } from '../../../../core/models/payment';
     RouterModule,
     FormsModule,
     AppHeaderComponent,
-    AppBottomNavComponent,
-    ChatbotFloatingComponent
+    AppBottomNavComponent
   ],
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.scss']
@@ -29,6 +27,7 @@ export class NotificationsComponent implements OnInit {
   private paymentService = inject(PaymentService);
   private notificationService = inject(NotificationService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   apiNotifications: NotificationApiItem[] = [];
   isLoading = true;
@@ -78,7 +77,7 @@ export class NotificationsComponent implements OnInit {
     }
     if (item.reference_type === 'Commande' || item.type_notification === 'ORDER') {
       if (item.reference_id) {
-        this.openInvoice(item.reference_id);
+        this.router.navigate(['/order-tracking', item.reference_id]);
       }
     }
   }
@@ -94,7 +93,7 @@ export class NotificationsComponent implements OnInit {
   }
 
   openInvoice(ref?: string): void {
-    this.activeInvoiceRef = ref || 'AY-9482';
+    this.activeInvoiceRef = ref || '';
     this.showInvoiceModal = true;
     this.downloadSuccessMessage = false;
 
@@ -105,7 +104,9 @@ export class NotificationsComponent implements OnInit {
           const matched = invoices.find(inv =>
             inv.numero_facture === ref ||
             inv.commande_numero === ref ||
-            String(inv.id) === ref
+            String(inv.commande) === String(ref) ||
+            String(inv.commande_id) === String(ref) ||
+            String(inv.id) === String(ref)
           ) || invoices[0];
           this.activeInvoice = matched;
         }
@@ -114,8 +115,27 @@ export class NotificationsComponent implements OnInit {
     });
   }
 
+  openInvoiceFromNotif(ref?: string, event?: Event): void {
+    if (event) event.stopPropagation();
+    this.openInvoice(ref);
+  }
+
   closeInvoice(): void {
     this.showInvoiceModal = false;
+  }
+
+  navigateToTracking(ref?: string, event?: Event): void {
+    if (event) event.stopPropagation();
+    const targetId = ref || this.activeInvoiceRef || '1';
+    this.closeInvoice();
+    this.router.navigate(['/order-tracking', targetId]);
+  }
+
+  navigateToValidation(ref?: string, event?: Event): void {
+    if (event) event.stopPropagation();
+    const targetId = ref || this.activeInvoiceRef || '1';
+    this.closeInvoice();
+    this.router.navigate(['/order-validation', targetId]);
   }
 
   downloadInvoicePdf(): void {

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, of, throwError, forkJoin } from 'rxjs';
 import { catchError, map, tap, switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { CartItem, Dish } from '../models/client';
@@ -12,9 +12,10 @@ import { BackendCart, BackendCartItem } from '../models/orders';
 export class CartService {
   private readonly baseUrl = `${environment.apiUrl}/api/orders/cart`;
   private readonly DEFAULT_DELIVERY_FEE = 1000; // FCFA
+  private readonly STORAGE_KEY = 'ayyou_cart_items';
 
-  private itemsSubject = new BehaviorSubject<CartItem[]>([]);
-  items$: Observable<CartItem[]> = this.itemsSubject.asObservable();
+  private itemsSubject: BehaviorSubject<CartItem[]>;
+  items$: Observable<CartItem[]>;
 
   private serverSubtotalSubject = new BehaviorSubject<number>(0);
   serverSubtotal$: Observable<number> = this.serverSubtotalSubject.asObservable();
@@ -23,11 +24,40 @@ export class CartService {
   serverDeliveryFee$: Observable<number> = this.serverDeliveryFeeSubject.asObservable();
 
   constructor(private http: HttpClient) {
+    this.itemsSubject = new BehaviorSubject<CartItem[]>(this.loadLocalCart());
+    this.items$ = this.itemsSubject.asObservable();
     this.loadCart().subscribe();
   }
 
   get items(): CartItem[] {
     return this.itemsSubject.value;
+  }
+
+  private loadLocalCart(): CartItem[] {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const saved = localStorage.getItem(this.STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            return parsed;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Erreur chargement panier local', e);
+    }
+    return [];
+  }
+
+  private saveLocalCart(): void {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.itemsSubject.value));
+      }
+    } catch (e) {
+      console.warn('Erreur sauvegarde panier local', e);
+    }
   }
 
   /**
@@ -36,15 +66,66 @@ export class CartService {
   loadCart(): Observable<BackendCart | null> {
     return this.http.get<BackendCart>(`${this.baseUrl}/`).pipe(
       tap((cart: BackendCart) => {
-        if (cart && Array.isArray(cart.items)) {
+        if (cart && Array.isArray(cart.items) && cart.items.length > 0) {
           const mappedItems = cart.items.map(item => this.mapBackendItemToCartItem(item));
           this.itemsSubject.next(mappedItems);
           const subtotal = parseFloat(cart.total_panier || '0');
           this.serverSubtotalSubject.next(subtotal);
+          this.saveLocalCart();
+        } else if (this.itemsSubject.value.length > 0) {
+          // Si le serveur renvoie 0 article mais qu'on a des articles locaux, on conserve le panier local
+          this.saveLocalCart();
+        } else {
+          this.itemsSubject.next([]);
+          this.serverSubtotalSubject.next(0);
+          this.saveLocalCart();
         }
       }),
       catchError(() => {
         return of(null);
+      })
+    );
+  }
+
+  /**
+   * Garantit que le panier en base de données Django contient les articles affichés à l'écran.
+   * Si le panier serveur est vide mais que des articles locaux existent, les synchronise vers la BDD.
+   */
+  ensureServerCartSynced(): Observable<any> {
+    return this.loadCart().pipe(
+      switchMap(cart => {
+        const serverItems = cart?.items || [];
+        const localItems = this.getSelectedItems();
+
+        if (serverItems.length > 0) {
+          return of(cart);
+        }
+
+        if (localItems.length > 0) {
+          const addRequests = localItems.map(item => {
+            const rawId = item.dish.id;
+            const cleanId = String(rawId).replace(/^[a-zA-Z_]+/, '');
+            const numericId = parseInt(cleanId, 10);
+            const validId = !isNaN(numericId) && numericId > 0 ? numericId : rawId;
+
+            const payload: any = {
+              produit: validId,
+              quantite: item.quantity
+            };
+            if (item.varianteId) payload.variante = item.varianteId;
+            if (item.optionIds && item.optionIds.length > 0) payload.options = item.optionIds;
+
+            return this.http.post<any>(`${this.baseUrl}/items/`, payload).pipe(
+              catchError(() => of(null))
+            );
+          });
+
+          return forkJoin(addRequests).pipe(
+            switchMap(() => this.loadCart())
+          );
+        }
+
+        return of(cart);
       })
     );
   }
@@ -80,8 +161,13 @@ export class CartService {
     varianteId?: string | number,
     optionIds?: (string | number)[]
   ): Observable<any> {
+    const rawId = dish.id;
+    const cleanId = String(rawId).replace(/^[a-zA-Z_]+/, '');
+    const numericId = parseInt(cleanId, 10);
+    const validId = !isNaN(numericId) && numericId > 0 ? numericId : rawId;
+
     const payload: any = {
-      produit: dish.id,
+      produit: validId,
       quantite: quantity
     };
     if (varianteId) {
@@ -95,10 +181,21 @@ export class CartService {
       switchMap(() => this.loadCart()),
       catchError(err => {
         const errorData = err.error || err;
-        if (err.status === 400 && (errorData?.code === 'CART_DIFFERENT_ESTABLISHMENT' || (errorData?.detail && String(errorData.detail).includes('autre établissement')))) {
-          return throwError(() => errorData);
+        if (err.status === 400) {
+          const detailStr = JSON.stringify(errorData).toLowerCase();
+          if (
+            errorData?.code === 'CART_DIFFERENT_ESTABLISHMENT' ||
+            detailStr.includes('établissement') ||
+            detailStr.includes('variante') ||
+            detailStr.includes('disponible') ||
+            detailStr.includes('fermé') ||
+            detailStr.includes('abonnement')
+          ) {
+            return throwError(() => errorData);
+          }
         }
-        return throwError(() => errorData);
+        this.localAddToCart(dish, quantity);
+        return of({ localFallback: true });
       })
     );
   }
@@ -153,10 +250,12 @@ export class CartService {
       tap(() => {
         this.itemsSubject.next([]);
         this.serverSubtotalSubject.next(0);
+        this.saveLocalCart();
       }),
       catchError(() => {
         this.itemsSubject.next([]);
         this.serverSubtotalSubject.next(0);
+        this.saveLocalCart();
         return of(null);
       })
     );
@@ -173,6 +272,7 @@ export class CartService {
         selected: isSelected
       };
       this.itemsSubject.next(current);
+      this.saveLocalCart();
     }
   }
 
@@ -182,6 +282,7 @@ export class CartService {
       selected
     }));
     this.itemsSubject.next(current);
+    this.saveLocalCart();
   }
 
   hasExplicitSelection(): boolean {
@@ -261,7 +362,7 @@ export class CartService {
       varianteId: item.variante?.id,
       varianteName: item.variante?.titre,
       optionIds: (item.options || []).map(o => o.id),
-      selected: false
+      selected: true
     };
   }
 
@@ -271,12 +372,14 @@ export class CartService {
     if (index > -1) {
       current[index] = {
         ...current[index],
-        quantity: current[index].quantity + quantity
+        quantity: current[index].quantity + quantity,
+        selected: true
       };
     } else {
-      current.push({ dish, quantity });
+      current.push({ dish, quantity, selected: true });
     }
     this.itemsSubject.next(current);
+    this.saveLocalCart();
   }
 
   private localUpdateQuantity(itemIdOrDishId: string | number, quantity: number): void {
@@ -288,6 +391,7 @@ export class CartService {
         quantity
       };
       this.itemsSubject.next(current);
+      this.saveLocalCart();
     }
   }
 
@@ -296,5 +400,6 @@ export class CartService {
       i => i.id !== itemIdOrDishId && i.dish.id !== itemIdOrDishId
     );
     this.itemsSubject.next(current);
+    this.saveLocalCart();
   }
 }

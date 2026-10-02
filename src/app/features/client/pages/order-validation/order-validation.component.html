@@ -11,7 +11,7 @@
         </svg>
       </a>
       <div class="header-center-title">
-        <h1 class="page-title">CLICK & COLLECT</h1>
+        <h1 class="page-title">Récupération<br>de votre commande</h1>
         <span class="order-ref-sub">N° {{ validationData.orderRef }}</span>
       </div>
       <span class="badge-priority">
@@ -25,41 +25,15 @@
       <span class="client-code-label">CODE CLIENT PRIORITAIRE</span>
       <h2 class="client-code-val">{{ validationData.clientCode }} 🛡️</h2>
 
-      <!-- Large QR Box -->
+      <!-- Dynamic SVG QR Box -->
       <div class="qr-box-wrapper">
         <div class="qr-corner top-left"></div>
         <div class="qr-corner top-right"></div>
         <div class="qr-corner bottom-left"></div>
         <div class="qr-corner bottom-right"></div>
 
-        <!-- Simulated Visual QR Pattern -->
-        <svg class="qr-svg-mock" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Outer Position Detection Patterns -->
-          <rect x="10" y="10" width="40" height="40" rx="6" stroke="#1A1A1A" stroke-width="4"/>
-          <rect x="20" y="20" width="20" height="20" fill="#1A1A1A"/>
-
-          <rect x="110" y="10" width="40" height="40" rx="6" stroke="#1A1A1A" stroke-width="4"/>
-          <rect x="120" y="20" width="20" height="20" fill="#1A1A1A"/>
-
-          <rect x="10" y="110" width="40" height="40" rx="6" stroke="#1A1A1A" stroke-width="4"/>
-          <rect x="20" y="120" width="20" height="20" fill="#1A1A1A"/>
-
-          <!-- Accent Red Center Element -->
-          <rect x="70" y="70" width="20" height="20" fill="#E51A29" rx="4"/>
-          <circle cx="80" cy="80" r="4" fill="#FFFFFF"/>
-
-          <!-- Data Grid Pattern Dots -->
-          <rect x="60" y="20" width="10" height="10" fill="#1A1A1A"/>
-          <rect x="80" y="30" width="10" height="10" fill="#E51A29"/>
-          <rect x="90" y="15" width="10" height="10" fill="#1A1A1A"/>
-          <rect x="20" y="60" width="10" height="10" fill="#1A1A1A"/>
-          <rect x="40" y="80" width="10" height="10" fill="#1A1A1A"/>
-          <rect x="110" y="70" width="10" height="10" fill="#1A1A1A"/>
-          <rect x="130" y="90" width="10" height="10" fill="#1A1A1A"/>
-          <rect x="60" y="120" width="10" height="10" fill="#1A1A1A"/>
-          <rect x="90" y="130" width="10" height="10" fill="#1A1A1A"/>
-          <rect x="120" y="120" width="10" height="10" fill="#E51A29"/>
-        </svg>
+        <!-- Rendered Real QR SVG -->
+        <div class="qr-svg-container" [innerHTML]="qrCodeSvgContent"></div>
 
         <span class="scan-tag">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -131,9 +105,9 @@
           </div>
           <span class="rest-address">📍 {{ validationData.restaurant.address }}</span>
         </div>
-        <button class="btn-call-outline">
+        <a [href]="'tel:' + (validationData.restaurant.phone || '+221770000000')" class="btn-call-outline">
           📞 Appeler
-        </button>
+        </a>
       </div>
     </div>
 
@@ -170,16 +144,15 @@
 
     <!-- Bottom Action Buttons -->
     <div class="actions-group">
-      <button class="btn-primary-gps">
+      <button class="btn-primary-gps" (click)="openGpsRoute()">
         📍 Ouvrir l'itinéraire GPS
       </button>
-      <button class="btn-secondary-call">
+      <a [href]="'tel:' + (validationData.restaurant.phone || '+221770000000')" class="btn-secondary-call">
         📞 Appeler le restaurant
-      </button>
+      </a>
     </div>
 
   </main>
 
-  <app-chatbot-floating></app-chatbot-floating>
   <app-bottom-nav activeTab="profile"></app-bottom-nav>
 </div>

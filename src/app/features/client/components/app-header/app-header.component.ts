@@ -2,11 +2,12 @@ import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NotificationService } from '../../../../core/services/notification.service';
+import { AppLogoComponent } from '../../../../shared/components/app-logo/app-logo.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, AppLogoComponent],
   templateUrl: './app-header.component.html',
   styleUrls: ['./app-header.component.scss']
 })

@@ -52,7 +52,7 @@ import { AuthService } from '../../../../core/services/auth.service';
         </div>
 
         <div class="help-text">
-          <p>Si vous pensez qu'il s'agit d'une erreur ou pour fournir des documents complémentaires, contactez notre équipe au <strong>+221 33 800 00 00</strong>.</p>
+          <p>Si vous pensez qu'il s'agit d'une erreur ou pour fournir des documents complémentaires, contactez notre équipe au <strong>+221 77 385 26 51</strong>.</p>
         </div>
       </div>
     </div>

@@ -216,6 +216,9 @@ export class AdminSettingsService {
           mapped = this.collaboratorsSubject.value;
         } else {
           this.collaboratorsSubject.next(mapped);
+          const cards = [...this.summaryCardsSubject.value];
+          cards[0].mainValue = `${mapped.length} compte(s)`;
+          this.summaryCardsSubject.next(cards);
         }
 
         if (searchQuery && searchQuery.trim() !== '') {

@@ -28,6 +28,11 @@ export class ChatbotFloatingComponent implements OnInit, AfterViewChecked {
   isTranscribing: boolean = false;
   userInput: string = '';
 
+  quotaUsed: number = 0;
+  quotaMax: number = 7;
+  isQuotaExceeded: boolean = false;
+  timeRemainingFormatted: string = '';
+
   messages: ChatMessage[] = [];
   private shouldScrollBottom: boolean = false;
 
@@ -43,7 +48,31 @@ export class ChatbotFloatingComponent implements OnInit, AfterViewChecked {
   posX: number = 16;
   posY: number = 140;
 
+  get isClientInterface(): boolean {
+    const url = this.router.url.toLowerCase();
+    const isNonClientRoute =
+      url.startsWith('/pro') ||
+      url.startsWith('/vendeur') ||
+      url.startsWith('/delivery') ||
+      url.startsWith('/livreur') ||
+      url.startsWith('/admin') ||
+      url.startsWith('/login') ||
+      url.startsWith('/register') ||
+      url.startsWith('/onboarding') ||
+      url.startsWith('/verify-otp') ||
+      url.startsWith('/reset-password');
+
+    const isVideoFeed =
+      url === '/' ||
+      url === '/home' ||
+      url.startsWith('/feed') ||
+      url.startsWith('/video');
+
+    return !isNonClientRoute && !isVideoFeed;
+  }
+
   ngOnInit(): void {
+
     const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 440;
     const containerWidth = 440;
     const initialLeft = Math.max(16, (screenWidth - containerWidth) / 2 + 16);
@@ -159,6 +188,19 @@ export class ChatbotFloatingComponent implements OnInit, AfterViewChecked {
     this.aiChatService.sendMessage(query, historyPayload).subscribe({
       next: (res) => {
         this.isLoading = false;
+        if (res.quota_used !== undefined) {
+          this.quotaUsed = res.quota_used;
+        }
+        if (res.quota_max !== undefined) {
+          this.quotaMax = res.quota_max;
+        }
+        if (res.is_quota_exceeded !== undefined) {
+          this.isQuotaExceeded = res.is_quota_exceeded;
+        }
+        if (res.formatted_time_remaining) {
+          this.timeRemainingFormatted = res.formatted_time_remaining;
+        }
+
         this.messages.push({
           sender: 'ai',
           text: res.reply,

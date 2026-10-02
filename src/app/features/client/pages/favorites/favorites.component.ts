@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { AppBottomNavComponent } from '../../components/app-bottom-nav/app-bottom-nav.component';
-import { ChatbotFloatingComponent } from '../../components/chatbot-floating/chatbot-floating.component';
 import { FoodPostComponent } from '../../components/food-post/food-post.component';
 import { CartService } from '../../../../core/services/cart.service';
 import { ClientDataService } from '../../../../core/services/client-data.service';
@@ -16,7 +15,6 @@ import { FeedItem, Dish } from '../../../../core/models/client';
     CommonModule,
     RouterModule,
     AppBottomNavComponent,
-    ChatbotFloatingComponent,
     FoodPostComponent
   ],
   templateUrl: './favorites.component.html',
@@ -38,12 +36,30 @@ export class FavoritesComponent implements OnInit {
   }
 
   onOrderDish(dish: Dish): void {
-    this.cartService.addToCart(dish, 1);
-    this.router.navigate(['/checkout']);
+    this.cartService.addToCart(dish, 1).subscribe({
+      next: () => this.router.navigate(['/checkout']),
+      error: (err) => {
+        const msg = JSON.stringify(err || '').toLowerCase();
+        if (msg.includes('variante') || msg.includes('option')) {
+          this.router.navigate(['/product', dish.id]);
+        } else {
+          this.router.navigate(['/checkout']);
+        }
+      }
+    });
   }
 
   onQuickCart(dish: Dish): void {
-    this.cartService.addToCart(dish, 1);
-    this.router.navigate(['/cart']);
+    this.cartService.addToCart(dish, 1).subscribe({
+      next: () => this.router.navigate(['/cart']),
+      error: (err) => {
+        const msg = JSON.stringify(err || '').toLowerCase();
+        if (msg.includes('variante') || msg.includes('option')) {
+          this.router.navigate(['/product', dish.id]);
+        } else {
+          this.router.navigate(['/cart']);
+        }
+      }
+    });
   }
 }

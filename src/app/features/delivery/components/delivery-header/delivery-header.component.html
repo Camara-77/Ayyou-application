@@ -13,7 +13,7 @@
     </button>
 
     <!-- Infos Livreur (Photo + Nom + Badge En Service) -->
-    <div class="header-user">
+    <div class="header-user" *ngIf="title !== 'PROFIL'">
       <div class="avatar-container">
         <img *ngIf="driverPhoto" [src]="driverPhoto" [alt]="driverName" class="avatar-img">
         <div *ngIf="!driverPhoto" class="avatar-placeholder">
@@ -32,12 +32,16 @@
         </span>
       </div>
     </div>
+
+    <!-- Si PROFIL: Logo AYYOU PRO à la place du profil et du nom -->
+    <div class="header-logo-pro" *ngIf="title === 'PROFIL'">
+      <app-logo [height]="28" badgeText="PRO" badgeClass="badge-pro"></app-logo>
+    </div>
   </div>
 
   <!-- Centre: Titre ou Logo AYYOU -->
   <div class="header-logo">
-    <span class="logo-title">AYYOU</span>
-    <span class="logo-sub">{{ title || 'LIVREUR' }}</span>
+    <app-logo *ngIf="title !== 'PROFIL'" [height]="24" [badgeText]="title || 'LIVREUR'" badgeClass="badge-driver"></app-logo>
   </div>
 
   <!-- Droite: Bouton Cloche de Notification -->

@@ -4,16 +4,18 @@ import { Observable, catchError, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface TranscriptionResponse {
+  success?: boolean;
   status: string;
   text?: string;
   message?: string;
+  error?: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class VoiceTranscriptionService {
-  private apiUrl = `${environment.apiUrl}/api/ai/transcribe/`;
+  private apiUrl = `${environment.apiUrl}/api/search/voice/`;
 
   private mediaRecorder: MediaRecorder | null = null;
   private audioChunks: Blob[] = [];

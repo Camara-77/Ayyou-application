@@ -2,45 +2,48 @@
   <app-header [showBack]="true" backUrl="/home" [title]="restaurant.name"></app-header>
 
   <main class="restaurant-content">
-    <!-- Hero Cover & Profile -->
-    <div class="hero-section">
-      <img [src]="restaurant.coverUrl" [alt]="restaurant.name" class="cover-img" />
-      <div class="profile-overlay">
-        <img [src]="restaurant.logoUrl" [alt]="restaurant.name" class="profile-logo" />
-        <div class="profile-details">
-          <h2 class="restaurant-name-badge">{{ restaurant.name }}</h2>
-          <p class="tagline" *ngIf="restaurant.tagline">{{ restaurant.tagline }}</p>
+    <!-- Hero Cover & Profile Header -->
+    <div class="hero-card-header">
+      <div class="cover-image-container">
+        <img [src]="restaurant.coverUrl" [alt]="restaurant.name" class="cover-img" />
+      </div>
+
+      <div class="profile-info-row">
+        <div class="logo-circle-wrap">
+          <img [src]="restaurant.logoUrl" [alt]="restaurant.name" class="profile-logo-img" />
+        </div>
+        <div class="profile-text-meta">
+          <h2 class="restaurant-title">{{ restaurant.name }}</h2>
+          <p class="restaurant-location" *ngIf="restaurant.location">{{ restaurant.location }}</p>
+          <p class="restaurant-tagline" *ngIf="restaurant.tagline">{{ restaurant.tagline }}</p>
         </div>
       </div>
     </div>
 
-    <!-- Quick Status & Action Buttons -->
-    <div class="info-bar">
-      <div class="status-location-row">
-        <div class="status-indicator">
-          <span class="status-dot"></span>
-          <span class="status-text">Ouvert • Ferme à {{ restaurant.closingTime || '23h30' }}</span>
-        </div>
-
-        <div class="location-indicator" *ngIf="restaurant.location">
-          <span class="location-text">{{ restaurant.location }}</span>
-        </div>
-      </div>
-
-      <div class="action-buttons">
-        <a [href]="'tel:' + restaurant.phoneNumber" class="btn-action btn-call">
-          📞 Appeler
-        </a>
-        <button class="btn-action btn-message">
-          💬 Message
-        </button>
-      </div>
+    <!-- About Us Card -->
+    <div class="about-us-card" *ngIf="restaurant.description">
+      <h3 class="about-title">À propos de nous</h3>
+      <p class="about-desc">{{ restaurant.description }}</p>
     </div>
 
-    <!-- About Section Card -->
-    <div class="about-card">
-      <h3 class="card-title">À propos de nous</h3>
-      <p class="about-text">{{ restaurant.description }}</p>
+    <!-- Status Row & Call Button -->
+    <div class="status-action-block">
+      <div class="opening-status-row">
+        <svg class="clock-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51B2A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <span class="status-bold-text">Ouvert</span>
+        <span class="status-separator">•</span>
+        <span class="status-subtext">Ferme à {{ restaurant.closingTime || '23h30' }}</span>
+      </div>
+
+      <a [href]="'tel:' + restaurant.phoneNumber" class="btn-call-red">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFFFFF">
+          <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.27c1.21.49 2.53.76 3.88.76a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.35.27 2.67.76 3.88a1 1 0 01-.27 1.11l-2.2 2.2z"/>
+        </svg>
+        <span>Appeler</span>
+      </a>
     </div>
 
     <!-- Main Navigation Tabs: Menu / Vidéos -->
@@ -49,7 +52,7 @@
         Menu
       </button>
       <button class="tab-btn" [class.active]="activeTab === 'videos'" (click)="activeTab = 'videos'">
-        Vidéos ({{ restaurant.videosCount || 14 }})
+        Vidéos {{ restaurantVideos.length > 0 ? '(' + restaurantVideos.length + ')' : '' }}
       </button>
     </div>
 
@@ -86,17 +89,19 @@
 
     <!-- Tab 2: Vidéos Content -->
     <div *ngIf="activeTab === 'videos'" class="videos-grid">
-      <div class="video-card" *ngFor="let item of [1,2,3,4]">
+      <div class="video-card" *ngFor="let item of restaurantVideos" (click)="openVideo(item)" style="cursor: pointer;">
         <div class="video-thumb">
-          <img [src]="restaurant.coverUrl" class="thumb-img" alt="Video thumbnail" />
+          <video [src]="item.mediaUrl" class="thumb-img" muted loop playsinline></video>
           <div class="play-icon">▶</div>
         </div>
-        <span class="video-title">Préparation de notre Thiéboudienne #{{ item }}</span>
+        <span class="video-title">{{ item.dish?.name || restaurant.name }}</span>
+      </div>
+      <div class="empty-videos" *ngIf="restaurantVideos.length === 0" style="padding: 24px; text-align: center; color: #757575;">
+        <p>Aucune publication vidéo pour cet établissement.</p>
       </div>
     </div>
   </main>
 
-  <app-chatbot-floating></app-chatbot-floating>
   <app-bottom-nav></app-bottom-nav>
 
   <!-- MODAL CONFLIT PANIER MONO-ÉTABLISSEMENT -->

@@ -29,10 +29,12 @@ import {
   RegisterProResponse
 } from '../../services/pro-register.service';
 
+import { AppLogoComponent } from '../../../../shared/components/app-logo/app-logo.component';
+
 @Component({
   selector: 'app-pro-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, AppLogoComponent],
   templateUrl: './pro-register.component.html',
   styleUrls: ['./pro-register.component.scss']
 })
@@ -72,15 +74,15 @@ export class ProRegisterComponent implements OnInit {
 
   // Photo Categories for Restaurant (4) and Vendeur (3)
   photoCategoriesRestaurant: PhotoCategory[] = [
-    { key: 'facade', title: 'Façade extérieure', subtitle: 'Vue de la devanture', file: null, previewUrl: 'mock_facade' },
-    { key: 'interior', title: 'Intérieur', subtitle: 'Comptoir / Accueil', file: null, previewUrl: 'mock_interior' },
+    { key: 'facade', title: 'Façade extérieure', subtitle: 'Vue de la devanture', file: null, previewUrl: null },
+    { key: 'interior', title: 'Intérieur', subtitle: 'Comptoir / Accueil', file: null, previewUrl: null },
     { key: 'dining', title: 'Restauration', subtitle: 'Salle clients', file: null, previewUrl: null },
     { key: 'kitchen', title: 'Cuisine', subtitle: 'Poste de cuisson', file: null, previewUrl: null }
   ];
 
   photoCategoriesVendeur: PhotoCategory[] = [
-    { key: 'facade', title: 'Façade boutique / Étalage', subtitle: 'Vue extérieure ou comptoir', file: null, previewUrl: 'mock_facade' },
-    { key: 'stock', title: 'Rayons ou Préparation', subtitle: 'Organisation des stocks', file: null, previewUrl: 'mock_stock' },
+    { key: 'facade', title: 'Façade boutique / Étalage', subtitle: 'Vue extérieure ou comptoir', file: null, previewUrl: null },
+    { key: 'stock', title: 'Rayons ou Préparation', subtitle: 'Organisation des stocks', file: null, previewUrl: null },
     { key: 'products', title: 'Produits phares', subtitle: 'Articles emballés ou étiquetés', file: null, previewUrl: null }
   ];
 
@@ -277,18 +279,32 @@ export class ProRegisterComponent implements OnInit {
         next: (res: RegisterProResponse) => {
           this.isSubmitting = false;
           this.submitSuccess = true;
+
+          const badges: string[] = [];
+          if (this.nineaDoc.file) badges.push('Registre NINEA');
+          if (this.hygieneDoc.file) badges.push('Certificat d\'Hygiène');
+          if (facade) badges.push('Photo Façade');
+          if (interior) badges.push('Photo Intérieur');
+          if (dining) badges.push('Photo Salle');
+          if (kitchen) badges.push('Photo Cuisine');
+          if (badges.length === 0) badges.push('Dossier Soumis');
+
+          const summary = {
+            reference: `#AYY-REST-${res.etablissement_id || res.user_id || 'PRO'}`,
+            accountType: 'Restaurant' as const,
+            structureName: `${nomEtablissement} (${val.firstName} ${val.lastName})`,
+            contactEmail: email,
+            contactPhone: phone,
+            documentsCountText: `${badges.length} document(s) & photo(s)`,
+            attachedBadges: badges
+          };
+
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem('ayyou_pro_register_summary', JSON.stringify(summary));
+          }
+
           this.router.navigate(['/pro/register/confirmation'], {
-            state: {
-              summary: {
-                reference: `#AYY-REST-${res.etablissement_id || res.user_id}`,
-                accountType: 'Restaurant',
-                structureName: nomEtablissement,
-                contactEmail: email,
-                contactPhone: phone,
-                documentsCountText: 'Dossier soumis avec succès',
-                attachedBadges: ['En attente de validation Super Admin']
-              }
-            }
+            state: { summary }
           });
         },
         error: (err) => {
@@ -330,18 +346,31 @@ export class ProRegisterComponent implements OnInit {
         next: (res: RegisterProResponse) => {
           this.isSubmitting = false;
           this.submitSuccess = true;
+
+          const badges: string[] = [];
+          if (this.nineaDoc.file) badges.push('Registre NINEA');
+          if (this.hygieneDoc.file) badges.push('Certificat d\'Hygiène');
+          if (facade) badges.push('Photo Façade');
+          if (stock) badges.push('Photo Rayons/Stock');
+          if (products) badges.push('Photo Produits');
+          if (badges.length === 0) badges.push('Dossier Commerce');
+
+          const summary = {
+            reference: `#AYY-VND-${res.etablissement_id || res.user_id || 'PRO'}`,
+            accountType: 'Vendeur / Commerce' as const,
+            structureName: `${nomEtablissement} (${val.firstName} ${val.lastName})`,
+            contactEmail: email,
+            contactPhone: phone,
+            documentsCountText: `${badges.length} document(s) & photo(s)`,
+            attachedBadges: badges
+          };
+
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem('ayyou_pro_register_summary', JSON.stringify(summary));
+          }
+
           this.router.navigate(['/pro/register/confirmation'], {
-            state: {
-              summary: {
-                reference: `#AYY-VND-${res.etablissement_id || res.user_id}`,
-                accountType: 'Vendeur / Commerce',
-                structureName: nomEtablissement,
-                contactEmail: email,
-                contactPhone: phone,
-                documentsCountText: 'Dossier soumis avec succès',
-                attachedBadges: ['En attente de validation Super Admin']
-              }
-            }
+            state: { summary }
           });
         },
         error: (err) => {
@@ -387,18 +416,30 @@ export class ProRegisterComponent implements OnInit {
         next: (res: RegisterProResponse) => {
           this.isSubmitting = false;
           this.submitSuccess = true;
+
+          const badges: string[] = [];
+          if (this.cniDoc.file) badges.push('Pièce d\'Identité (CNI)');
+          if (this.permisDoc.file) badges.push('Permis de conduire');
+          if (this.casierDoc.file) badges.push('Casier judiciaire');
+          if (this.carteGriseDoc.file) badges.push('Carte grise');
+          if (badges.length === 0) badges.push('Pièces justificatives');
+
+          const summary = {
+            reference: `#AYY-LIV-${res.profil_livreur_id || res.user_id || 'PRO'}`,
+            accountType: 'Livreur / Flotte' as const,
+            structureName: `${prenom} ${nom}`,
+            contactEmail: email,
+            contactPhone: phone,
+            documentsCountText: `${badges.length} document(s) téléversé(s)`,
+            attachedBadges: badges
+          };
+
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem('ayyou_pro_register_summary', JSON.stringify(summary));
+          }
+
           this.router.navigate(['/pro/register/confirmation'], {
-            state: {
-              summary: {
-                reference: `#AYY-LIV-${res.profil_livreur_id || res.user_id}`,
-                accountType: 'Livreur / Flotte',
-                structureName: `${prenom} ${nom}`,
-                contactEmail: email,
-                contactPhone: phone,
-                documentsCountText: 'Dossier soumis avec succès',
-                attachedBadges: ['En attente de validation Super Admin']
-              }
-            }
+            state: { summary }
           });
         },
         error: (err) => {

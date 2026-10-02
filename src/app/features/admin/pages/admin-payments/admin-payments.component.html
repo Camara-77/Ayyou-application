@@ -18,14 +18,14 @@
   </div>
 
   <!-- Filter Pills + Search Row -->
-  <div class="mt-24">
+  <div class="mt-24" *ngIf="payments$ | async as payments">
     <app-payment-filters
       [selectedTab]="(activeTab$ | async) || 'ALL'"
-      [totalCount]="1840"
-      [subscriptionsCount]="127"
-      [restaurantsCount]="780"
-      [couriersCount]="910"
-      [disputesCount]="23"
+      [totalCount]="payments.length"
+      [subscriptionsCount]="getSubscriptionsCount(payments)"
+      [restaurantsCount]="getRestaurantsCount(payments)"
+      [couriersCount]="getCouriersCount(payments)"
+      [disputesCount]="getDisputesCount(payments)"
       (tabChange)="onTabChange($event)"
       (searchChange)="onSearchChange($event)"
       (methodChange)="onMethodChange($event)"

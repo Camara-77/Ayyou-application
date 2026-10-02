@@ -27,11 +27,18 @@ export class AdminDashboardComponent implements OnInit {
   activeDeliveries$!: Observable<AdminDelivery[]>;
   pendingActions$!: Observable<PendingAction[]>;
 
-  todayDateText: string = "Aujourd'hui, 24 Octobre 2024";
+  todayDateText: string = '';
 
   constructor(private adminService: AdminService) {}
 
   ngOnInit(): void {
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+    this.todayDateText = `Aujourd'hui, ${formattedDate}`;
     this.refreshData();
   }
 

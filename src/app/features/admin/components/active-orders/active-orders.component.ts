@@ -13,5 +13,5 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
 })
 export class ActiveOrdersComponent {
   @Input({ required: true }) orders: AdminOrder[] = [];
-  @Input() totalActiveCount: number = 58;
+  @Input() totalActiveCount: number = 0;
 }

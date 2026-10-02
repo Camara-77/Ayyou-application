@@ -4,17 +4,25 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { AppBottomNavComponent } from '../../components/app-bottom-nav/app-bottom-nav.component';
-import { ChatbotFloatingComponent } from '../../components/chatbot-floating/chatbot-floating.component';
 import { RestaurantCardComponent } from '../../components/restaurant-card/restaurant-card.component';
 import { DishCardComponent } from '../../components/dish-card/dish-card.component';
 import { ClientDataService } from '../../../../core/services/client-data.service';
 import { CartService } from '../../../../core/services/cart.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { Category, Dish, Restaurant, Vendor, SearchResult } from '../../../../core/models/client';
+import { VoiceTranscriptionService } from '../../../../core/services/voice-transcription.service';
 
 export type ResultTypeFilter = 'all' | 'dishes' | 'restaurants' | 'vendors';
+export type VoiceSearchState = 'IDLE' | 'LISTENING' | 'PROCESSING' | 'SUCCESS' | 'NO_SPEECH' | 'ERROR';
 
-import { AppFooterComponent } from '../../../../shared/components/app-footer/app-footer.component';
+export interface BannerSlide {
+  id: string;
+  title: string;
+  subtitle: string;
+  buttonText: string;
+  imageUrl: string;
+  categoryQuery: string;
+}
 
 @Component({
   selector: 'app-search',
@@ -25,10 +33,8 @@ import { AppFooterComponent } from '../../../../shared/components/app-footer/app
     RouterModule,
     AppHeaderComponent,
     AppBottomNavComponent,
-    ChatbotFloatingComponent,
     RestaurantCardComponent,
-    DishCardComponent,
-    AppFooterComponent
+    DishCardComponent
   ],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
@@ -41,6 +47,46 @@ export class SearchComponent implements OnInit {
   categories: Category[] = [];
   recentSearches: string[] = ['Burger gourmet', 'Thiéboudienne', 'Pâtisserie & Brunch'];
 
+  showAllCategories: boolean = false;
+
+  toggleShowAllCategories(): void {
+    this.showAllCategories = !this.showAllCategories;
+  }
+
+  cleanCategoryName(name: string): string {
+    if (!name) return '';
+    return name.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F1E6}-\u{1F1FF}]/gu, '').trim();
+  }
+
+  activeSlideIndex: number = 0;
+
+  bannerSlides: BannerSlide[] = [
+    {
+      id: 'senegal',
+      title: 'Découvrez la cuisine Sénégalaise',
+      subtitle: 'Des saveurs authentiques près de chez vous',
+      buttonText: 'Explorer',
+      imageUrl: 'assets/banners/banner_senegal.jpg',
+      categoryQuery: 'Sénégalais'
+    },
+    {
+      id: 'fastfood',
+      title: 'Découvrez les meilleurs Fast-Foods',
+      subtitle: 'Burgers, tacos & frites croustillantes',
+      buttonText: 'Découvrir',
+      imageUrl: 'assets/banners/banner_fastfood.jpg',
+      categoryQuery: 'Fast-Food'
+    },
+    {
+      id: 'patisserie',
+      title: 'Pâtisseries & Brunch Gourmands',
+      subtitle: 'Douceurs sucrées et rafraîchissements',
+      buttonText: 'Savourer',
+      imageUrl: 'assets/banners/banner_patisserie.jpg',
+      categoryQuery: 'Pâtisserie'
+    }
+  ];
+
   restaurants: Restaurant[] = [];
   dishes: Dish[] = [];
   vendors: Vendor[] = [];
@@ -48,6 +94,7 @@ export class SearchComponent implements OnInit {
   showBackToTop: boolean = false;
 
   private authService = inject(AuthService);
+  private voiceService = inject(VoiceTranscriptionService);
 
   constructor(
     private clientDataService: ClientDataService,
@@ -82,28 +129,45 @@ export class SearchComponent implements OnInit {
   }
 
   performSearch(): void {
-    this.clientDataService.getSearchResults(this.searchQuery).subscribe((res: SearchResult) => {
-      let filteredRestaurants = res.restaurants;
-      let filteredDishes = res.dishes;
-      let filteredVendors = res.vendors || [];
+    const activeCatObj = this.categories.find(c => c.id === this.activeCategory);
+    const cleanCatName = activeCatObj ? this.cleanCategoryName(activeCatObj.name).toLowerCase() : '';
 
-      // Filter by active category if not 'all'
-      if (this.activeCategory !== 'all') {
-        const catName = this.categories.find(c => c.id === this.activeCategory)?.name.toLowerCase() || '';
-        filteredDishes = filteredDishes.filter(d =>
-          d.categoryId === this.activeCategory ||
-          (d.categoryName && d.categoryName.toLowerCase().includes(catName)) ||
-          d.name.toLowerCase().includes(catName)
-        );
-        filteredRestaurants = filteredRestaurants.filter(r =>
-          (r.tagline && r.tagline.toLowerCase().includes(catName)) ||
-          r.name.toLowerCase().includes(catName)
-        );
-      }
+    this.clientDataService.getDishes({
+      categoryId: this.activeCategory !== 'all' ? this.activeCategory : undefined,
+      search: this.searchQuery
+    }).subscribe((dishes: Dish[]) => {
+      this.clientDataService.getSearchResults(this.searchQuery).subscribe((res: SearchResult) => {
+        let filteredDishes = dishes;
+        let filteredRestaurants = res.restaurants;
+        let filteredVendors = res.vendors || [];
 
-      this.restaurants = filteredRestaurants;
-      this.dishes = filteredDishes;
-      this.vendors = filteredVendors;
+        if (this.activeCategory !== 'all' && cleanCatName) {
+          filteredDishes = filteredDishes.filter(d =>
+            d.categoryId === this.activeCategory ||
+            (d.categoryName && d.categoryName.toLowerCase().includes(cleanCatName)) ||
+            cleanCatName.includes(d.categoryName?.toLowerCase() || '')
+          );
+
+          const matchingEtabIds = new Set(filteredDishes.map(d => d.restaurantId));
+
+          filteredRestaurants = filteredRestaurants.filter(r =>
+            matchingEtabIds.has(r.id) ||
+            (r.tagline && r.tagline.toLowerCase().includes(cleanCatName)) ||
+            (r.description && r.description.toLowerCase().includes(cleanCatName)) ||
+            r.name.toLowerCase().includes(cleanCatName)
+          );
+
+          filteredVendors = filteredVendors.filter(v =>
+            matchingEtabIds.has(v.id) ||
+            (v.specialty && v.specialty.toLowerCase().includes(cleanCatName)) ||
+            v.name.toLowerCase().includes(cleanCatName)
+          );
+        }
+
+        this.dishes = filteredDishes;
+        this.restaurants = filteredRestaurants;
+        this.vendors = filteredVendors;
+      });
     });
   }
 
@@ -135,47 +199,116 @@ export class SearchComponent implements OnInit {
     this.recentSearches.splice(index, 1);
   }
 
-  showMicModal: boolean = false;
-  micTranscript: string = '';
-  isMicListening: boolean = false;
-  private micTimer: any = null;
-
-  triggerMicSearch(): void {
-    this.showMicModal = true;
-    this.isMicListening = true;
-    this.micTranscript = 'Écoute en cours...';
-
-    if (this.micTimer !== null) {
-      clearTimeout(this.micTimer);
-    }
-
-    // Simulate voice speech recognition response after 1.6 seconds
-    this.micTimer = setTimeout(() => {
-      this.isMicListening = false;
-      this.micTranscript = 'Thiéboudienne Penda Mbaye';
-    }, 1600);
+  clearAllRecentSearches(): void {
+    this.recentSearches = [];
   }
 
-  confirmMicSearch(): void {
-    if (this.micTranscript && this.micTranscript !== 'Écoute en cours...') {
-      this.searchQuery = this.micTranscript;
+  onBannerScroll(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (target && target.clientWidth > 0) {
+      this.activeSlideIndex = Math.round(target.scrollLeft / target.clientWidth);
+    }
+  }
+
+  selectSlide(index: number, scrollContainer: HTMLElement): void {
+    this.activeSlideIndex = index;
+    if (scrollContainer) {
+      scrollContainer.scrollTo({
+        left: index * scrollContainer.clientWidth,
+        behavior: 'smooth'
+      });
+    }
+  }
+
+  onExploreSlide(slide: BannerSlide): void {
+    const cat = this.categories.find(c =>
+      c.name.toLowerCase().includes(slide.categoryQuery.toLowerCase()) ||
+      slide.categoryQuery.toLowerCase().includes(c.name.toLowerCase())
+    );
+    if (cat) {
+      this.selectCategory(cat.id);
     } else {
-      this.searchQuery = 'Thiéboudienne';
+      this.searchQuery = slide.categoryQuery;
+      this.performSearch();
     }
-    this.showMicModal = false;
-    this.performSearch();
   }
 
-  closeMicModal(event?: Event): void {
-    if (event) {
-      event.stopPropagation();
+  get inputPlaceholder(): string {
+    if (this.voiceState === 'LISTENING') {
+      return 'Écoute en cours... Parlez';
     }
-    if (this.micTimer !== null) {
-      clearTimeout(this.micTimer);
-      this.micTimer = null;
+    if (this.voiceState === 'PROCESSING') {
+      return 'Analyse IA en cours...';
     }
-    this.showMicModal = false;
-    this.isMicListening = false;
+
+    return 'Plat, restaurant, burger, artisan...';
+  }
+
+  voiceState: VoiceSearchState = 'IDLE';
+  micTranscript: string = '';
+  micErrorMessage: string = '';
+
+  onMicClick(): void {
+    if (this.voiceState === 'LISTENING') {
+      this.stopAndTranscribe();
+    } else if (this.voiceState === 'PROCESSING') {
+      // Intentionally ignore click while processing AI transcription
+    } else {
+      this.triggerMicSearch();
+    }
+  }
+
+  async triggerMicSearch(): Promise<void> {
+    this.micTranscript = '';
+    this.micErrorMessage = '';
+
+    const hasPermission = await this.voiceService.requestMicrophonePermission();
+    if (!hasPermission) {
+      this.voiceState = 'ERROR';
+      this.micErrorMessage = 'Accès au microphone refusé. Veuillez l’autoriser dans votre navigateur.';
+      setTimeout(() => { this.voiceState = 'IDLE'; }, 3000);
+      return;
+    }
+
+    const started = await this.voiceService.startRecording();
+    if (!started) {
+      this.voiceState = 'ERROR';
+      this.micErrorMessage = 'Impossible de démarrer l’enregistrement audio.';
+      setTimeout(() => { this.voiceState = 'IDLE'; }, 3000);
+      return;
+    }
+
+    this.voiceState = 'LISTENING';
+  }
+
+  async stopAndTranscribe(): Promise<void> {
+    if (this.voiceState !== 'LISTENING') return;
+
+    this.voiceState = 'PROCESSING';
+
+    const { blob, durationMs } = await this.voiceService.stopRecording();
+
+    if (!blob || blob.size === 0 || durationMs < 300) {
+      this.voiceState = 'IDLE';
+      return;
+    }
+
+    this.voiceService.transcribeAudio(blob).subscribe({
+      next: (res: any) => {
+        const queryToUse = res.search_query || res.text || res.transcription;
+        if ((res.success || res.status === 'success' || queryToUse) && queryToUse) {
+          this.micTranscript = queryToUse;
+          this.searchQuery = queryToUse;
+          this.performSearch();
+        }
+        this.voiceState = 'IDLE';
+      },
+      error: (err: any) => {
+        this.voiceState = 'ERROR';
+        this.micErrorMessage = 'Le serveur de transcription est indisponible.';
+        setTimeout(() => { this.voiceState = 'IDLE'; }, 3000);
+      }
+    });
   }
 
   onAddDishToCart(dish: Dish): void {
@@ -189,8 +322,17 @@ export class SearchComponent implements OnInit {
     }
 
     this.cartService.addToCart(dish).subscribe({
-      next: () => {},
-      error: () => {}
+      next: () => {
+        this.router.navigate(['/cart']);
+      },
+      error: (err) => {
+        const msg = JSON.stringify(err || '').toLowerCase();
+        if (msg.includes('variante') || msg.includes('option')) {
+          this.router.navigate(['/product', dish.id]);
+        } else {
+          this.router.navigate(['/cart']);
+        }
+      }
     });
   }
 

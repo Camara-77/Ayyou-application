@@ -4,6 +4,7 @@ import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ProHeaderComponent } from '../../components/pro-header/pro-header.component';
 import { ProBottomNavComponent } from '../../components/pro-bottom-nav/pro-bottom-nav.component';
+import { ProSubscriptionBannerComponent } from '../../components/pro-subscription-banner/pro-subscription-banner.component';
 import { ProMenuService } from '../../../../core/services/pro-menu.service';
 import { ProfessionalService } from '../../../../core/services/professional.service';
 import { ProDish, ProDishVariant } from '../../../../core/models/pro';
@@ -12,10 +13,11 @@ import { MainCategory, CATEGORIES_HIERARCHY, getCategoryByName } from '../../../
 @Component({
   selector: 'app-pro-menu-edit',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ProHeaderComponent, ProBottomNavComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ProHeaderComponent, ProBottomNavComponent, ProSubscriptionBannerComponent],
   templateUrl: './pro-menu-edit.component.html',
   styleUrls: ['./pro-menu-edit.component.scss']
 })
+
 export class ProMenuEditComponent implements OnInit {
   private proMenuService = inject(ProMenuService);
   private professionalService = inject(ProfessionalService);

@@ -7,7 +7,6 @@ import * as L from 'leaflet';
 
 import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { AppBottomNavComponent } from '../../components/app-bottom-nav/app-bottom-nav.component';
-import { ChatbotFloatingComponent } from '../../components/chatbot-floating/chatbot-floating.component';
 import { ClientDataService } from '../../../../core/services/client-data.service';
 import { OrderService } from '../../../../core/services/order.service';
 import { DeliveryService } from '../../../../core/services/delivery.service';
@@ -22,8 +21,7 @@ import { Livraison } from '../../../../core/models/delivery';
     CommonModule,
     RouterModule,
     AppHeaderComponent,
-    AppBottomNavComponent,
-    ChatbotFloatingComponent
+    AppBottomNavComponent
   ],
   templateUrl: './order-tracking.component.html',
   styleUrls: ['./order-tracking.component.scss']

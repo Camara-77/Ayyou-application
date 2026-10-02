@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { OrderButtonComponent } from '../../components/order-button/order-button.component';
 import { ClientDataService } from '../../../../core/services/client-data.service';
 import { CartService } from '../../../../core/services/cart.service';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -13,7 +14,8 @@ import { ProductDetail, Dish } from '../../../../core/models/client';
   imports: [
     CommonModule,
     RouterModule,
-    FormsModule
+    FormsModule,
+    OrderButtonComponent
   ],
   templateUrl: './product-detail.component.html',
   styleUrls: ['./product-detail.component.scss']

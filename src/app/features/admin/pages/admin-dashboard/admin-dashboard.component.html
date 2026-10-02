@@ -33,7 +33,7 @@
       <app-active-orders 
         *ngIf="activeOrders$ | async as orders" 
         [orders]="orders"
-        [totalActiveCount]="58"
+        [totalActiveCount]="orders.length"
       ></app-active-orders>
 
       <!-- Section Livraisons en cours -->

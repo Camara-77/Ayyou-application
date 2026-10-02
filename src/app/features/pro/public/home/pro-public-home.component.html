@@ -1,10 +1,9 @@
 <!-- STICKY HEADER -->
 <header class="pro-header-sticky">
   <div class="container header-content">
-    <div class="brand-logo-wrap">
-      <span class="logo-text">AYYOU</span>
-      <span class="badge-pro">PRO</span>
-    </div>
+    <a routerLink="/pro" class="brand-logo-wrap">
+      <app-logo [height]="28" badgeText="PRO" badgeClass="badge-pro"></app-logo>
+    </a>
 
     <nav class="nav-desktop">
       <a href="#accueil" (click)="scrollToSection('accueil', $event)" [class.active]="activeSection === 'accueil'">Accueil</a>
@@ -65,7 +64,7 @@
           <span class="stat-label">livraison moyenne</span>
         </div>
         <div class="stat-box">
-          <span class="stat-value">Wave / OM</span>
+          <span class="stat-value">Paytech</span>
           <span class="stat-label">versements directs</span>
         </div>
       </div>
@@ -73,17 +72,7 @@
 
     <div class="hero-right">
       <div class="hero-image-wrapper">
-        <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80" alt="Cuisine AYYOU Pro" class="hero-img" />
-        
-        <div class="hero-overlay-card">
-          <div class="overlay-icon-badge">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M12 2L15 9H22L16.5 13.5L18.5 20.5L12 16L5.5 20.5L7.5 13.5L2 9H9L12 2Z"/></svg>
-          </div>
-          <div class="overlay-info">
-            <span class="overlay-tag">Nouveau partenaire à Dakar</span>
-            <span class="overlay-title">N'Gaïdé Food • Inscription validée</span>
-          </div>
-        </div>
+        <img src="assets/banners/pro_hero_banner.jpg" alt="Restaurant AYYOU Pro" class="hero-img" />
       </div>
     </div>
   </div>
@@ -136,7 +125,7 @@
           <li><span class="check-icon">✓</span> Gestion simple des stocks et commandes</li>
           <li><span class="check-icon">✓</span> Amplifiez votre visibilité auprès des clients</li>
           <li><span class="check-icon">✓</span> Suivi des livraisons en temps réel</li>
-          <li><span class="check-icon">✓</span> Versement direct sur Wave / Orange Money</li>
+          <li><span class="check-icon">✓</span> Versement direct par Paytech</li>
         </ul>
 
         <a routerLink="/pro/register" class="card-link-red">En savoir plus →</a>
@@ -321,10 +310,9 @@
 <footer class="pro-footer">
   <div class="container footer-grid">
     <div class="footer-brand-col">
-      <div class="brand-logo-wrap">
-        <span class="logo-text">AYYOU</span>
-        <span class="badge-pro">PRO</span>
-      </div>
+      <a routerLink="/pro" class="brand-logo-wrap">
+        <app-logo [height]="32" badgeText="PRO" badgeClass="badge-pro"></app-logo>
+      </a>
       <p class="footer-brand-desc">
         La solution n°1 à Dakar pour booster la visibilité et les ventes des restaurants, traiteurs, boutiques et livreurs indépendants.
       </p>

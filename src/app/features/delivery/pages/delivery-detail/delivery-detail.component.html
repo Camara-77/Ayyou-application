@@ -120,18 +120,6 @@
       <div class="resto-details">
         <h3 class="resto-name">{{ getEtablissementName() }}</h3>
         <p class="resto-address">{{ getEtablissementAddress() }}</p>
-
-        <div class="resto-meta-row">
-          <span class="badge-time">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12 6 12 12 16 14"/>
-            </svg>
-            ~4 min
-          </span>
-          <span class="dot-sep">•</span>
-          <span class="dist-text">850 m de vous</span>
-        </div>
       </div>
 
       <a class="btn-phone" *ngIf="getEtablissementPhone()" [href]="'tel:' + getEtablissementPhone()" aria-label="Appeler l'établissement">
@@ -150,10 +138,7 @@
     <div class="map-card-wrapper">
       <div class="leaflet-map-container" #leafletMap></div>
 
-      <!-- Traffic Overlay -->
-      <div class="traffic-overlay-badge">
-        <span>Trafic fluide sur Av. Peytavin</span>
-      </div>
+
 
       <!-- Direction FAB Button -->
       <button class="map-direction-fab" (click)="openExternalGps()" aria-label="Lancer la navigation GPS">

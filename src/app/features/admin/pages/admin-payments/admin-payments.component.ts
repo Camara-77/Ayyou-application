@@ -34,7 +34,7 @@ export class AdminPaymentsComponent implements OnInit {
   private activeTabSubject = new BehaviorSubject<PaymentFilterTab>('ALL');
   private searchQuerySubject = new BehaviorSubject<string>('');
   private methodSubject = new BehaviorSubject<string>('ALL');
-  private periodSubject = new BehaviorSubject<string>('MAY_2024');
+  private periodSubject = new BehaviorSubject<string>('CURRENT_MONTH');
   private statusSubject = new BehaviorSubject<string>('ALL');
 
   activeTab$ = this.activeTabSubject.asObservable();
@@ -92,5 +92,21 @@ export class AdminPaymentsComponent implements OnInit {
 
   onReminderPartner(payment: PaymentItem): void {
     this.adminPaymentService.reminderPartner(payment.id);
+  }
+
+  getSubscriptionsCount(payments: PaymentItem[]): number {
+    return payments.filter(p => p.operationType === 'ABONNEMENT_FORFAIT').length;
+  }
+
+  getRestaurantsCount(payments: PaymentItem[]): number {
+    return payments.filter(p => p.operationType === 'VERSEMENT_RESTAURANT' || p.operationType === 'VERSEMENT_VENDEUR' || p.beneficiaryType === 'RESTAURANT' || p.beneficiaryType === 'VENDEUR').length;
+  }
+
+  getCouriersCount(payments: PaymentItem[]): number {
+    return payments.filter(p => p.operationType === 'REMUNERATION_LIVREUR' || p.beneficiaryType === 'COURSIER').length;
+  }
+
+  getDisputesCount(payments: PaymentItem[]): number {
+    return payments.filter(p => p.operationType === 'LITIGE_REMBOURSEMENT' || p.status === 'ECHOUER' || p.status === 'A_VERIFIER').length;
   }
 }

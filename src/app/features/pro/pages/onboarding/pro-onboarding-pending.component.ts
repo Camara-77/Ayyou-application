@@ -60,7 +60,7 @@ import { AuthService } from '../../../../core/services/auth.service';
         </div>
 
         <div class="help-text">
-          <p>Un problème ? Contactez l'assistance partenaire AYYOU PRO à <a href="mailto:pro&#64;ayyou.sn">pro&#64;ayyou.sn</a> ou via WhatsApp au <strong>+221 33 800 00 00</strong>.</p>
+          <p>Un problème ? Contactez l'assistance partenaire AYYOU PRO à <a href="mailto:pro&#64;ayyou.sn">pro&#64;ayyou.sn</a> ou via WhatsApp au <strong>+221 77 385 26 51</strong>.</p>
         </div>
       </div>
     </div>

@@ -12,174 +12,155 @@
   gap: 16px;
 }
 
-.hero-section {
+.hero-card-header {
   position: relative;
-  height: 200px;
   width: 100%;
+  background-color: #FFFFFF;
 
-  .cover-img {
+  .cover-image-container {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+    height: 180px;
+    position: relative;
+    overflow: hidden;
 
-  .profile-overlay {
-    position: absolute;
-    bottom: -30px;
-    left: 16px;
-    right: 16px;
-    display: flex;
-    align-items: flex-end;
-    gap: 14px;
-
-    .profile-logo {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      border: 3px solid #ffffff;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    .cover-img {
+      width: 100%;
+      height: 100%;
       object-fit: cover;
-      background: white;
-    }
-
-    .profile-details {
-      flex: 1;
-      padding-bottom: 4px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-
-      .restaurant-name-badge {
-        display: inline-block;
-        background: #ffffff;
-        color: #1A1A1A;
-        font-size: 16px;
-        font-weight: 800;
-        padding: 6px 14px;
-        border-radius: 20px;
-        border: 1px solid #EFEFEF;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        width: fit-content;
-        margin: 0;
-      }
-
-      .tagline {
-        font-size: 12px;
-        color: #555555;
-        margin: 0;
-        font-weight: 500;
-        padding-left: 2px;
-      }
     }
   }
-}
 
-.info-bar {
-  margin-top: 36px;
-  padding: 0 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-
-  .status-location-row {
+  .profile-info-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px;
+    gap: 16px;
+    padding: 0 16px;
+    margin-top: -38px;
+    position: relative;
+    z-index: 5;
 
-    .status-indicator {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #E8F5E9;
-      padding: 8px 14px;
-      border-radius: 20px;
-      width: fit-content;
+    .logo-circle-wrap {
+      flex-shrink: 0;
 
-      .status-dot {
-        width: 8px;
-        height: 8px;
+      .profile-logo-img {
+        width: 78px;
+        height: 78px;
         border-radius: 50%;
-        background-color: #22C55E;
-        box-shadow: 0 0 6px #22C55E;
-      }
-
-      .status-text {
-        font-size: 13px;
-        font-weight: 700;
-        color: #2E7D32;
+        border: 3px solid #FFFFFF;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+        object-fit: cover;
+        background-color: #FFFFFF;
       }
     }
 
-    .location-indicator {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: #ffffff;
-      border: 1px solid #EFEFEF;
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #1A1A1A;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-    }
-  }
-
-  .action-buttons {
-    display: flex;
-    gap: 10px;
-
-    .btn-action {
+    .profile-text-meta {
       flex: 1;
-      padding: 10px 14px;
-      border-radius: 12px;
-      border: 1px solid #E0E0E0;
-      background: #ffffff;
-      font-size: 13px;
-      font-weight: 700;
-      color: #1A1A1A;
-      text-decoration: none;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-      transition: background-color 0.2s ease;
+      flex-direction: column;
+      gap: 2px;
+      padding-top: 38px;
 
-      &:hover {
-        background: #F5F5F5;
+      .restaurant-title {
+        font-size: 21px;
+        font-weight: 800;
+        color: #1A1A1A;
+        margin: 0;
+        line-height: 1.25;
       }
 
-      &.btn-call {
-        border-color: #E51A29;
-        color: #E51A29;
-        background: #FFF5F5;
+      .restaurant-location {
+        font-size: 13px;
+        color: #666666;
+        margin: 0;
+        font-weight: 500;
+      }
+
+      .restaurant-tagline {
+        font-size: 13px;
+        color: #666666;
+        margin: 0;
+        font-weight: 500;
       }
     }
   }
 }
 
-.about-card {
-  margin: 0 16px;
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 14px 16px;
-  border: 1px solid #EFEFEF;
+.about-us-card {
+  margin: 4px 16px 0 16px;
+  background-color: #F4F5F7;
+  border-radius: 18px;
+  padding: 16px 20px;
 
-  .card-title {
+  .about-title {
     font-size: 15px;
     font-weight: 700;
     color: #1A1A1A;
-    margin: 0 0 6px;
+    margin: 0 0 8px 0;
   }
 
-  .about-text {
+  .about-desc {
     font-size: 13px;
-    color: #666;
+    color: #555555;
+    line-height: 1.55;
     margin: 0;
-    line-height: 1.4;
+  }
+}
+
+.status-action-block {
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 4px;
+
+  .opening-status-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+
+    .clock-icon {
+      flex-shrink: 0;
+    }
+
+    .status-bold-text {
+      font-weight: 700;
+      color: #1A1A1A;
+    }
+
+    .status-separator {
+      color: #888888;
+    }
+
+    .status-subtext {
+      color: #666666;
+      font-weight: 500;
+    }
+  }
+
+  .btn-call-red {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 48px;
+    background-color: #E51B2A;
+    color: #FFFFFF;
+    border-radius: 24px;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(229, 27, 42, 0.25);
+    transition: background-color 0.2s ease, transform 0.15s ease;
+
+    &:hover {
+      background-color: #d01423;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
   }
 }
 

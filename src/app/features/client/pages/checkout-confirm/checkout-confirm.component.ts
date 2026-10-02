@@ -74,8 +74,34 @@ export class CheckoutConfirmComponent implements OnInit, OnDestroy {
           this.isPendingVerification = false;
           this.fetchInvoiceData(order.id, order.numero_commande);
         } else {
-          this.isPendingVerification = true;
-          this.startPolling(order.id);
+          const params = this.route.snapshot.queryParams;
+          const token = params['token'] || params['paytech_token'];
+          const ref = params['ref_command'] || params['reference'] || order.numero_commande;
+
+          this.paymentService.confirmPayTechFallback({
+            order_id: order.id,
+            reference: ref,
+            token: token
+          }).subscribe({
+            next: (res) => {
+              if (res && res.statut === 'PAYEE') {
+                this.orderService.getOrderById(orderId).subscribe(updatedOrder => {
+                  this.orderData = updatedOrder;
+                  this.isLoading = false;
+                  this.isSuccess = true;
+                  this.isPendingVerification = false;
+                  this.fetchInvoiceData(updatedOrder.id, updatedOrder.numero_commande);
+                });
+              } else {
+                this.isPendingVerification = true;
+                this.startPolling(order.id);
+              }
+            },
+            error: () => {
+              this.isPendingVerification = true;
+              this.startPolling(order.id);
+            }
+          });
         }
       },
       error: () => {

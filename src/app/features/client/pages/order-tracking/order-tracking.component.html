@@ -161,7 +161,7 @@
       </div>
 
       <!-- Security Code Block -->
-      <div class="security-code-card">
+      <div class="security-code-card" [routerLink]="['/order-validation', trackingData.id]" style="cursor: pointer;">
         <div class="sec-left">
           <div class="qr-thumbnail">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -169,11 +169,11 @@
             </svg>
           </div>
           <div class="sec-text">
-            <h4 class="sec-title">CODE DE REMISE SÉCURISÉ</h4>
-            <span class="sec-sub">Communiquez le code à Amadou pour valider la réception du colis.</span>
+            <h4 class="sec-title">CODE DE REMISE SÉCURISÉ & QR CODE</h4>
+            <span class="sec-sub">Cliquez ici pour voir le QR Code et la fiche de récupération.</span>
           </div>
         </div>
-        <span class="sec-code-num">{{ trackingData.securityCode }}</span>
+        <span class="sec-code-num">{{ trackingData.securityCode }} ↗</span>
       </div>
 
       <!-- Main Action Button -->
@@ -184,6 +184,5 @@
     </div>
   </main>
 
-  <app-chatbot-floating></app-chatbot-floating>
   <app-bottom-nav activeTab="profile"></app-bottom-nav>
 </div>

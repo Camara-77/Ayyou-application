@@ -249,6 +249,8 @@ export interface OrderValidationData {
   orderRef: string;
   priorityText: string;
   clientCode: string;
+  tokenQr?: string;
+  codeValidation?: string;
   qrCodeUrl?: string;
   readySinceTime: string;
   pickupLimitTime: string;

@@ -1,10 +1,11 @@
 <div
+  *ngIf="isClientInterface"
   class="chatbot-wrapper"
   [style.left.px]="posX"
   [style.top.px]="posY"
   [class.dragging]="isDragging"
 >
-  <!-- Floating Trigger Button -->
+  <!-- Floating Trigger Button (Hamburger Icon) -->
   <button
     class="chatbot-btn"
     (mousedown)="onMouseDown($event)"
@@ -14,8 +15,7 @@
   >
     <div class="icon-container">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2C6.477 2 2 6.477 2 12C2 13.82 2.487 15.525 3.337 17L2 22L7 20.663C8.475 21.513 10.18 22 12 22C17.523 22 22 17.523 22 12C22 6.477 17.523 2 12 2Z" fill="#FFFFFF"/>
-        <path d="M8 11H16M8 15H13" stroke="#E51A29" stroke-width="2" stroke-linecap="round"/>
+        <path d="M4 6H20M4 12H20M4 18H20" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
     <span *ngIf="badgeCount > 0" class="badge">{{ badgeCount }}</span>
@@ -37,8 +37,12 @@
           <span>Conseiller AYYOU</span>
           <span class="ia-badge">IA</span>
         </div>
+      <div class="header-right">
+        <span class="quota-pill" *ngIf="quotaMax > 0" [class.quota-exceeded]="isQuotaExceeded" [title]="isQuotaExceeded ? 'Recherche intelligente indisponible (disponible dans ' + timeRemainingFormatted + ')' : 'Recherches intelligentes de plats restantes sur 5h'">
+          {{ isQuotaExceeded ? 'Limité (5h)' : ('Recherches : ' + quotaUsed + '/' + quotaMax) }}
+        </span>
+        <button class="close-btn" (click)="toggleChat($event)" aria-label="Fermer">✕</button>
       </div>
-      <button class="close-btn" (click)="toggleChat($event)" aria-label="Fermer">✕</button>
     </div>
 
     <!-- Body / Messages -->
@@ -120,11 +124,11 @@
         (click)="toggleVoiceRecording()"
         [class.recording]="isRecording"
         [class.transcribing]="isTranscribing"
-        [title]="isRecording ? 'Arrêter l\'enregistrement' : 'Recherche vocale 🎙️'"
+        [title]="isRecording ? 'Arrêter l\'enregistrement' : 'Recherche vocale'"
       >
-        <span *ngIf="isRecording" class="recording-pulse">🔴</span>
-        <span *ngIf="isTranscribing" class="transcribing-spinner">⏳</span>
-        <svg *ngIf="!isRecording && !isTranscribing" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <span *ngIf="isRecording" class="recording-pulse"></span>
+        <span *ngIf="isTranscribing" class="transcribing-spinner"></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
           <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
           <line x1="12" y1="19" x2="12" y2="23"></line>
@@ -135,7 +139,7 @@
         type="text"
         [(ngModel)]="userInput"
         (keyup.enter)="sendMessage()"
-        [placeholder]="isRecording ? '🔴 Parlez... (cliquez pour arrêter)' : isTranscribing ? '⏳ Transcription en cours...' : 'Posez votre question culinaire...'"
+        [placeholder]="isRecording ? 'Parlez... (cliquez pour arrêter)' : isTranscribing ? 'Transcription en cours...' : 'Posez votre question culinaire...'"
         [disabled]="isLoading || isTranscribing"
       />
       <button class="send-btn" (click)="sendMessage()" [disabled]="!userInput.trim() || isLoading || isTranscribing" aria-label="Envoyer">
@@ -147,3 +151,4 @@
     </div>
   </div>
 </div>
+

@@ -26,7 +26,7 @@ export class DishCardComponent {
   onAdd(event: Event): void {
     event.stopPropagation();
     if (this.dish && this.dish.id) {
-      this.router.navigate(['/product', this.dish.id]);
+      this.add.emit(this.dish);
     }
   }
 

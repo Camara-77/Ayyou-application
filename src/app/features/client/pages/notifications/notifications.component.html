@@ -33,10 +33,6 @@
     <!-- Section Header -->
     <div class="section-header-row">
       <span class="section-title">ACTIVITÉ RÉCENTE</span>
-      <span class="live-badge">
-        <span class="live-dot"></span>
-        En direct
-      </span>
     </div>
 
     <!-- Notifications List Cards -->
@@ -54,7 +50,12 @@
 
       <!-- Empty State -->
       <div *ngIf="!isLoading && !errorMessage && filteredNotifications.length === 0" style="padding: 32px 16px; text-align: center; background: #FFFFFF; border-radius: 16px; border: 1px solid #EEEEEE; margin: 12px 0;">
-        <div style="font-size: 32px; margin-bottom: 8px;">🔔</div>
+        <div style="margin-bottom: 12px; display: flex; justify-content: center; align-items: center;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 8A6 6 0 0 0 6 8C6 15 3 17 3 17H21S18 15 18 8Z" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13.73 21A2 2 0 0 1 10.27 21" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
         <h3 style="font-size: 16px; font-weight: 700; color: #1A1A1A; margin-bottom: 4px;">Aucune notification</h3>
         <p style="font-size: 13px; color: #757575;">Vous n'avez aucune notification pour le moment.</p>
       </div>
@@ -91,9 +92,17 @@
 
         <div class="notif-actions" *ngIf="item.reference_id">
           <span class="pickup-limit">Réf : #{{ item.reference_id }}</span>
-          <button class="btn-receipt-link" (click)="$event.stopPropagation(); openInvoice(item.reference_id)">
-            Voir reçu ↗
-          </button>
+          <div class="actions-right">
+            <button class="btn-receipt-link" (click)="openInvoiceFromNotif(item.reference_id, $event)">
+              📄 Voir la facture
+            </button>
+            <button class="btn-track-action" (click)="navigateToTracking(item.reference_id, $event)">
+              🛵 Suivre ma commande
+            </button>
+            <button class="btn-receipt-link" (click)="navigateToValidation(item.reference_id, $event)">
+              📱 Code & QR ↗
+            </button>
+          </div>
         </div>
       </div>
 
@@ -181,6 +190,11 @@
         </div>
       </div>
 
+      <!-- Live Tracking & QR Code CTA -->
+      <button class="btn-track-primary-modal" (click)="navigateToTracking()">
+        🛵 Suivre ma commande & Voir mon QR Code
+      </button>
+
       <!-- Download Action -->
       <div class="invoice-actions">
         <button class="btn-download-pdf" (click)="downloadInvoicePdf()" [disabled]="isDownloadingInvoice">
@@ -198,6 +212,5 @@
     </div>
   </div>
 
-  <app-chatbot-floating></app-chatbot-floating>
   <app-bottom-nav activeTab="profile"></app-bottom-nav>
 </div>

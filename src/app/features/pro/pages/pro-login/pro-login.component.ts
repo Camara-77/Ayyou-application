@@ -5,11 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/services/auth.service';
 import { DriverAuthService } from '../../../delivery/services/driver-auth.service';
 import { VendorAuthService } from '../../services/vendor-auth.service';
+import { AppLogoComponent } from '../../../../shared/components/app-logo/app-logo.component';
 
 @Component({
   selector: 'app-pro-login',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, AppLogoComponent],
   templateUrl: './pro-login.component.html',
   styleUrls: ['./pro-login.component.scss']
 })

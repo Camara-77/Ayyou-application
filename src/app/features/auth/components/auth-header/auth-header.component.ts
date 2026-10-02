@@ -1,11 +1,12 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { AppLogoComponent } from '../../../../shared/components/app-logo/app-logo.component';
 
 @Component({
   selector: 'app-auth-header',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, AppLogoComponent],
   templateUrl: './auth-header.component.html',
   styleUrl: './auth-header.component.scss'
 })

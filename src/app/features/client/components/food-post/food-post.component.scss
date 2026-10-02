@@ -26,7 +26,7 @@
     .post-media-content {
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      object-fit: cover;
       object-position: center;
       display: block;
       background-color: #000000;
@@ -57,6 +57,42 @@
       }
     }
 
+    /* Top-Right Sound Toggle Button */
+    .sound-toggle-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 25;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      outline: none;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+
+      &:hover {
+        transform: scale(1.08);
+        background: rgba(229, 27, 42, 0.85);
+        border-color: #E51A29;
+      }
+
+      &:active {
+        transform: scale(0.92);
+      }
+
+      svg {
+        display: block;
+      }
+    }
+
     /* Top-Center Restaurant Profile Header (Centred Avatar + Name Below) */
     .restaurant-top-overlay {
       position: absolute;
@@ -72,6 +108,9 @@
       max-width: 80%;
       text-align: center;
       text-decoration: none;
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
 
       .restaurant-avatar {
         width: 44px;
@@ -98,7 +137,8 @@
       position: absolute;
       right: 16px;
       bottom: 235px;
-      z-index: 10;
+      z-index: 30;
+      pointer-events: auto;
     }
 
     /* Bottom Gradient Overlay (Generous Width for Action Buttons) */
@@ -112,6 +152,7 @@
       background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.4) 65%, transparent 100%);
       display: flex;
       flex-direction: column;
+      pointer-events: none;
 
       .dish-details {
         display: flex;
@@ -119,6 +160,7 @@
         gap: 4px;
         width: 100%;
         max-width: calc(100% - 64px);
+        pointer-events: auto;
 
         .dish-title {
           font-size: 20px;
@@ -190,4 +232,203 @@
       }
     }
   }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Share Modal Overlay & Toast (Root Level relative to food-post)             */
+/* -------------------------------------------------------------------------- */
+.toast-notification {
+  position: absolute;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  color: #FFFFFF;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 10001;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.share-modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  animation: fadeIn 0.2s ease-out;
+
+  @media (min-width: 480px) {
+    align-items: center;
+    padding: 16px;
+  }
+
+  .share-modal-card {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    background: #FFFFFF;
+    border-radius: 24px 24px 0 0;
+    padding: 20px;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    @media (min-width: 480px) {
+      border-radius: 24px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+
+      .modal-title {
+        font-size: 16px;
+        font-weight: 800;
+        color: #1A1A1A;
+        margin: 0;
+      }
+
+      .btn-close {
+        background: #F5F5F5;
+        border: none;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        color: #757575;
+        font-size: 13px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .share-options-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+
+      .share-option-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+
+        .option-icon {
+          width: 52px;
+          height: 52px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+
+          &.whatsapp {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+          }
+          &.telegram {
+            background: linear-gradient(135deg, #2AABEE 0%, #229ED9 100%);
+            box-shadow: 0 4px 12px rgba(42, 171, 238, 0.3);
+          }
+          &.email {
+            background: linear-gradient(135deg, #FF5252 0%, #E51A29 100%);
+            box-shadow: 0 4px 12px rgba(229, 26, 41, 0.3);
+          }
+          &.instagram {
+            background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+            box-shadow: 0 4px 12px rgba(214, 36, 159, 0.3);
+          }
+        }
+
+        &:hover .option-icon {
+          transform: scale(1.08);
+        }
+
+        &:active .option-icon {
+          transform: scale(0.95);
+        }
+
+        .option-label {
+          font-size: 11px;
+          font-weight: 600;
+          color: #333333;
+        }
+      }
+    }
+
+    .share-divider {
+      height: 1px;
+      background-color: #EFEFEF;
+      margin-bottom: 16px;
+    }
+
+    .secondary-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      .btn-copy-link,
+      .btn-native-share {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        height: 44px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      .btn-copy-link {
+        background: #F8F9FA;
+        color: #1A1A1A;
+        border: 1px solid #E5E7EB;
+
+        &:hover {
+          background: #F0F2F5;
+        }
+      }
+
+      .btn-native-share {
+        background: #E51A29;
+        color: #FFFFFF;
+        border: none;
+
+        &:hover {
+          background: #CC1423;
+        }
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }

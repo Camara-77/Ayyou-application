@@ -8,8 +8,7 @@
         </svg>
       </a>
       <a *ngIf="!showBack || showLogo" routerLink="/home" class="logo-link" [class.with-back]="showBack">
-        <!-- Official AYYOU SVG Brand Logo Asset -->
-        <img src="assets/branding/logo.svg" alt="ÂYYOU" class="ayyou-logo-img" />
+        <app-logo [height]="26"></app-logo>
       </a>
     </div>
 

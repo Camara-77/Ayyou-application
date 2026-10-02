@@ -129,7 +129,7 @@ export class AdminPaymentService {
 
         return {
           volumeBrutGmv,
-          volumeGrowthPercent: 12.5,
+          volumeGrowthPercent: 0,
           payoutsMarchandsLivreurs,
           revenusAbonnementsPro,
           activeSubscriptionsCount,

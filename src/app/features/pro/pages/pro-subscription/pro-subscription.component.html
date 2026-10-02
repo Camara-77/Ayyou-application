@@ -1,0 +1,126 @@
+<div class="subscription-page">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Abonnement PRO AYYOU</h1>
+      <p class="page-subtitle">Gestion de votre abonnement mensuel Partenaire (10 000 FCFA / mois)</p>
+    </div>
+  </div>
+
+  <!-- Messages Flash Success / Error -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    <i class="ri-checkbox-circle-line icon"></i>
+    <span>{{ successMessage }}</span>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    <i class="ri-error-warning-line icon"></i>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Chargement du statut d'abonnement...</p>
+  </div>
+
+  <div *ngIf="!loading && subscriptionStatus" class="subscription-content">
+    
+    <!-- Carte Principale de Statut -->
+    <div class="status-card" [class.active]="subscriptionStatus.est_actif" [class.expired]="subscriptionStatus.statut_abonnement === 'EXPIRE'">
+      <div class="card-header">
+        <div class="establishment-info">
+          <h2>{{ subscriptionStatus.etablissement_nom }}</h2>
+          <span class="type-tag">{{ subscriptionStatus.type_etablissement }}</span>
+        </div>
+        <div class="status-badge" [class.badge-active]="subscriptionStatus.est_actif" [class.badge-expired]="subscriptionStatus.statut_abonnement === 'EXPIRE'" [class.badge-inactive]="subscriptionStatus.statut_abonnement === 'INACTIF'">
+          <i class="ri-shield-check-line" *ngIf="subscriptionStatus.est_actif"></i>
+          <i class="ri-time-line" *ngIf="subscriptionStatus.statut_abonnement === 'EXPIRE'"></i>
+          <i class="ri-close-circle-line" *ngIf="subscriptionStatus.statut_abonnement === 'INACTIF'"></i>
+          {{ subscriptionStatus.est_actif ? 'Abonnement ACTIF' : (subscriptionStatus.statut_abonnement === 'EXPIRE' ? 'Abonnement EXPIRÉ' : 'Abonnement INACTIF') }}
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="pricing-box">
+          <div class="price-display">
+            <span class="amount">10 000</span>
+            <span class="currency">FCFA / mois</span>
+          </div>
+          <p class="pricing-note">Tarif unique fixe. Visibilité intégrale plateforme, produits & feed vidéo.</p>
+        </div>
+
+        <div class="dates-box" *ngIf="subscriptionStatus.date_expiration_abonnement">
+          <div class="date-item">
+            <span class="label">Date d'expiration :</span>
+            <span class="value" [class.text-danger]="!subscriptionStatus.est_actif">
+              {{ subscriptionStatus.date_expiration_abonnement | date:'dd/MM/yyyy à HH:mm' }}
+            </span>
+          </div>
+          <div class="date-item" *ngIf="subscriptionStatus.date_debut_abonnement">
+            <span class="label">Début du cycle :</span>
+            <span class="value">{{ subscriptionStatus.date_debut_abonnement | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+
+        <!-- Alert si expiré ou inactif -->
+        <div class="warning-banner" *ngIf="!subscriptionStatus.est_actif">
+          <i class="ri-alert-line"></i>
+          <div class="banner-text">
+            <strong>Attention :</strong> Votre établissement, vos plats et vos vidéos ne sont plus visibles publiquement.
+            Réglez 10 000 FCFA par PayTech (Wave, Orange Money, Carte) pour réactiver l'accès immédiatement.
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <button class="btn btn-primary pay-btn" (click)="paySubscription()" [disabled]="submitting">
+          <i class="ri-secure-payment-line" *ngIf="!submitting"></i>
+          <span class="spinner-small" *ngIf="submitting"></span>
+          <span>{{ subscriptionStatus.est_actif ? 'Renouveler mon abonnement (10 000 FCFA)' : 'Activer / Payer l\'abonnement (10 000 FCFA)' }}</span>
+        </button>
+        <p class="secure-text"><i class="ri-lock-line"></i> Paiement sécurisé par PayTech (Wave, OM, Free Money, Carte)</p>
+      </div>
+    </div>
+
+    <!-- Historique des Factures & Cycles -->
+    <div class="history-section">
+      <h3 class="section-title"><i class="ri-history-line"></i> Historique des abonnements & Factures PRO</h3>
+
+      <div *ngIf="history.length === 0" class="empty-history">
+        <p>Aucun historique d'abonnement enregistré pour le moment.</p>
+      </div>
+
+      <div *ngIf="history.length > 0" class="history-table-wrapper">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Référence</th>
+              <th>Période</th>
+              <th>Montant</th>
+              <th>Statut</th>
+              <th>Facture PDF</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of history">
+              <td><strong>#SUB-{{ item.id }}</strong></td>
+              <td>Du {{ item.date_debut | date:'dd/MM/yyyy' }} au {{ item.date_expiration | date:'dd/MM/yyyy' }}</td>
+              <td>{{ item.montant }} FCFA</td>
+              <td>
+                <span class="status-pill" [class.pill-paye]="item.statut === 'PAYE'" [class.pill-expire]="item.statut === 'EXPIRE'">
+                  {{ item.statut === 'PAYE' ? 'Payé' : 'Expiré' }}
+                </span>
+              </td>
+              <td>
+                <button *ngIf="item.facture" class="btn-invoice" (click)="downloadInvoice(item.facture.id)">
+                  <i class="ri-file-download-line"></i> Facture PDF
+                </button>
+                <span *ngIf="!item.facture" class="text-muted">-</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>

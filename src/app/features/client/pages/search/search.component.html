@@ -1,11 +1,11 @@
 <div class="page-container">
-  <!-- Global AYYOU Header with Logo -->
+  <!-- Global AYYOU Header with Logo & Notification Bell -->
   <app-header></app-header>
 
   <main class="search-content">
-    <!-- Sticky Search & Categories Header -->
+    <!-- Sticky Search Header -->
     <div class="sticky-search-header">
-      <!-- Search Bar with AYYOU Search & Mic Icons -->
+      <!-- Search Input Bar -->
       <div class="search-bar-container">
         <div class="search-input-wrapper">
           <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -16,7 +16,7 @@
           <input
             type="text"
             class="search-input"
-            placeholder="Rechercher un plat, restaurant, vendeur..."
+            [placeholder]="inputPlaceholder"
             [(ngModel)]="searchQuery"
             (input)="onSearchInput()"
           />
@@ -25,31 +25,81 @@
             ✕
           </button>
 
-          <button class="mic-btn" (click)="triggerMicSearch()" aria-label="Recherche vocale (Visuelle)">
+          <button
+            class="mic-btn"
+            [class.listening]="voiceState === 'LISTENING'"
+            [class.processing]="voiceState === 'PROCESSING'"
+            (click)="onMicClick()"
+            [attr.aria-label]="voiceState === 'LISTENING' ? 'Arrêter l\'enregistrement' : 'Recherche vocale'"
+          >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" [attr.fill]="voiceState === 'LISTENING' ? '#E51A29' : voiceState === 'PROCESSING' ? '#3B82F6' : 'none'" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <line x1="12" y1="19" x2="12" y2="23" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>
         </div>
       </div>
+    </div>
 
-      <!-- Category Cards Horizontal Scroll (Image Top, Name Bottom) -->
-      <div class="categories-section">
-        <div class="categories-scroll">
-          <button
-            *ngFor="let cat of categories"
-            class="cat-item-card"
-            [class.active]="activeCategory === cat.id"
-            (click)="selectCategory(cat.id)"
-          >
-            <div class="cat-img-wrapper">
-              <img [src]="cat.imageUrl" [alt]="cat.name" class="cat-img" />
+    <!-- Discovery Banner Slider (Swipeable 3 slides) -->
+    <div class="discovery-banner-slider-wrapper" *ngIf="!searchQuery">
+      <div
+        class="banner-scroll-container"
+        #bannerScrollContainer
+        (scroll)="onBannerScroll($event)"
+      >
+        <div
+          *ngFor="let slide of bannerSlides; let i = index"
+          class="discovery-banner"
+          [class.slide-senegal]="slide.id === 'senegal'"
+          [class.slide-fastfood]="slide.id === 'fastfood'"
+          [class.slide-patisserie]="slide.id === 'patisserie'"
+        >
+          <div class="banner-content">
+            <h2 class="banner-title">{{ slide.title }}</h2>
+            <p class="banner-subtitle">{{ slide.subtitle }}</p>
+            <div class="banner-actions">
+              <button class="btn-explore" (click)="onExploreSlide(slide)">
+                {{ slide.buttonText }} <span class="arrow">&gt;</span>
+              </button>
+              <div class="banner-dots">
+                <span
+                  *ngFor="let dot of bannerSlides; let dIndex = index"
+                  class="dot"
+                  [class.active]="activeSlideIndex === dIndex"
+                  (click)="selectSlide(dIndex, bannerScrollContainer)"
+                ></span>
+              </div>
             </div>
-            <span class="cat-name">{{ cat.name }}</span>
-          </button>
+          </div>
+          <div class="banner-img-wrapper">
+            <img [src]="slide.imageUrl" [alt]="slide.title" class="banner-img" />
+          </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Categories Section (2 ROWS OF 4 CATEGORIES = 8 CATEGORIES) -->
+    <div class="categories-section">
+      <div class="section-header">
+        <h3 class="section-title">Catégories</h3>
+        <button class="btn-see-all" (click)="toggleShowAllCategories()">
+          {{ showAllCategories ? 'Voir moins' : 'Voir tout' }} <span class="arrow">{{ showAllCategories ? '‹' : '&gt;' }}</span>
+        </button>
+      </div>
+      <div class="categories-grid" [class.show-all]="showAllCategories">
+        <button
+          *ngFor="let cat of (showAllCategories ? categories : categories.slice(0, 8))"
+          class="cat-item-card"
+          [class.active]="activeCategory === cat.id"
+          (click)="selectCategory(cat.id)"
+        >
+          <div class="cat-img-wrapper">
+            <img [src]="cat.imageUrl" [alt]="cat.name" class="cat-img" />
+          </div>
+          <span class="cat-name">{{ cleanCategoryName(cat.name) }}</span>
+        </button>
       </div>
     </div>
 
@@ -57,6 +107,7 @@
     <div class="recent-section" *ngIf="recentSearches.length > 0 && !searchQuery">
       <div class="section-header">
         <h3 class="section-title">Recherches récentes</h3>
+        <button class="btn-clear-all" (click)="clearAllRecentSearches()">Effacer tout</button>
       </div>
       <div class="recent-pills">
         <div
@@ -64,52 +115,58 @@
           class="recent-pill"
           (click)="selectRecentSearch(term)"
         >
+          <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=80&q=80" alt="" class="pill-thumb" />
           <span class="term-text">{{ term }}</span>
           <button class="remove-btn" (click)="removeRecentSearch(i, $event)" aria-label="Supprimer">✕</button>
         </div>
       </div>
     </div>
 
-    <!-- Result Type Filter Tabs (Without Parentheses) -->
+    <!-- Result Type Filter Tabs -->
     <div class="result-type-tabs">
       <button
         class="type-tab"
         [class.active]="activeResultType === 'all'"
         (click)="setResultType('all')"
       >
-        Tous {{ totalResultsCount }}
+        Tous <span class="count-badge">{{ totalResultsCount }}</span>
       </button>
       <button
         class="type-tab"
         [class.active]="activeResultType === 'dishes'"
         (click)="setResultType('dishes')"
       >
-        Plats {{ dishes.length }}
+        Plats <span class="count-badge">{{ dishes.length }}</span>
       </button>
       <button
         class="type-tab"
         [class.active]="activeResultType === 'restaurants'"
         (click)="setResultType('restaurants')"
       >
-        Restaurants {{ restaurants.length }}
+        Restaurants <span class="count-badge">{{ restaurants.length }}</span>
       </button>
       <button
         class="type-tab"
         [class.active]="activeResultType === 'vendors'"
         (click)="setResultType('vendors')"
       >
-        Vendeurs {{ vendors.length }}
+        Vendeurs <span class="count-badge">{{ vendors.length }}</span>
       </button>
     </div>
 
     <!-- Empty State -->
     <div class="empty-state" *ngIf="totalResultsCount === 0">
-      <div class="empty-icon">🔍</div>
-      <p class="empty-title">Aucun résultat trouvé</p>
-      <p class="empty-subtitle">Essayez de modifier votre recherche ou sélectionnez une autre catégorie.</p>
+      <div class="empty-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="11" cy="11" r="7" stroke="#E51A29" stroke-width="2"/>
+          <path d="M20 20L16 16" stroke="#E51A29" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <p class="empty-title">{{ activeCategory !== 'all' ? 'Aucun plat disponible' : 'Aucun résultat trouvé' }}</p>
+      <p class="empty-subtitle">{{ activeCategory !== 'all' ? 'Aucun plat disponible dans cette catégorie pour le moment.' : 'Essayez de modifier votre recherche ou sélectionnez une autre catégorie.' }}</p>
     </div>
 
-    <!-- Results Section: Disher / Plats -->
+    <!-- Results Section: Plats -->
     <div
       class="results-block"
       *ngIf="(activeResultType === 'all' || activeResultType === 'dishes') && dishes.length > 0"
@@ -184,43 +241,5 @@
     </svg>
   </button>
 
-  <!-- AYYOU Voice Search Modal Popup -->
-  <div class="mic-modal-overlay" *ngIf="showMicModal" (click)="closeMicModal($event)">
-    <div class="mic-modal-card" (click)="$event.stopPropagation()">
-      <button class="btn-close-modal" (click)="closeMicModal($event)" aria-label="Fermer">✕</button>
-
-      <div class="mic-animation-wrapper">
-        <div class="mic-pulse-ring" [class.active]="isMicListening"></div>
-        <div class="mic-circle-bg">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <line x1="12" y1="19" x2="12" y2="23" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-      </div>
-
-      <h3 class="modal-title">Recherche Vocale AYYOU</h3>
-      <p class="modal-status" *ngIf="isMicListening">Parlez maintenant... Nous vous écoutons 🎙️</p>
-
-      <div class="transcript-box" *ngIf="!isMicListening">
-        <span class="transcript-label">Résultat détecté :</span>
-        <p class="transcript-text">"{{ micTranscript }}"</p>
-      </div>
-
-      <div class="modal-actions">
-        <button class="modal-btn-confirm" (click)="confirmMicSearch()">
-          Rechercher
-        </button>
-        <button class="modal-btn-cancel" (click)="closeMicModal($event)">
-          Annuler
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Global Chatbot & Bottom Navigation Bar -->
-  <app-chatbot-floating></app-chatbot-floating>
-  <app-footer></app-footer>
   <app-bottom-nav activeTab="search"></app-bottom-nav>
 </div>

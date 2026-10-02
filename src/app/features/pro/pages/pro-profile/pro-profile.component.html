@@ -1,6 +1,6 @@
 <div class="pro-app-layout">
-  <!-- Header: Back button, centered title "Profil", bell icon -->
-  <app-pro-header [title]="'Profil'" [showBackButton]="true"></app-pro-header>
+  <!-- Header: Back button, title "Profil", notification bell, hamburger menu -->
+  <app-pro-header [title]="'Profil'" [showBackButton]="true" [showMenu]="true"></app-pro-header>
 
   <main class="pro-main-content">
 
@@ -28,22 +28,6 @@
           </div>
         </div>
 
-        <!-- Action Buttons Row -->
-        <div class="action-buttons-row">
-          <button class="btn-action-outline">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-            </svg>
-            <span>Appels clients</span>
-          </button>
-          <a routerLink="/pro/profile/edit" class="btn-action-outline">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-            </svg>
-            <span>Modifier infos</span>
-          </a>
-        </div>
       </div>
     </div>
 
@@ -51,13 +35,6 @@
     <section class="about-section-card">
       <div class="about-header">
         <h3>À propos de nous</h3>
-        <a routerLink="/pro/profile/edit" class="link-edit-red">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-          </svg>
-          <span>Éditer</span>
-        </a>
       </div>
       <p class="about-description">
         {{ profile ? profile.description : '' }}

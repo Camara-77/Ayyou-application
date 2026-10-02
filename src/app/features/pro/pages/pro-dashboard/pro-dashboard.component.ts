@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ProHeaderComponent } from '../../components/pro-header/pro-header.component';
 import { ProBottomNavComponent } from '../../components/pro-bottom-nav/pro-bottom-nav.component';
+import { ProSubscriptionBannerComponent } from '../../components/pro-subscription-banner/pro-subscription-banner.component';
 import { ProAuthService } from '../../../../core/services/pro-auth.service';
 import { ProOrderService } from '../../../../core/services/pro-order.service';
 import { ProStatsService } from '../../../../core/services/pro-stats.service';
@@ -13,10 +14,11 @@ import { ProProfile, ProOrder, ProStats } from '../../../../core/models/pro';
 @Component({
   selector: 'app-pro-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, ProHeaderComponent, ProBottomNavComponent],
+  imports: [CommonModule, RouterModule, ProHeaderComponent, ProBottomNavComponent, ProSubscriptionBannerComponent],
   templateUrl: './pro-dashboard.component.html',
   styleUrls: ['./pro-dashboard.component.scss']
 })
+
 export class ProDashboardComponent implements OnInit {
   private proAuthService = inject(ProAuthService);
   private proOrderService = inject(ProOrderService);

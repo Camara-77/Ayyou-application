@@ -100,3 +100,52 @@ export interface PaymentStatusCheckResponse {
   transaction?: Payment;
 }
 
+export interface SubscriptionStatusResponse {
+  etablissement_id?: number;
+  etablissement_nom?: string;
+  type_etablissement?: string;
+  statut_abonnement: 'INACTIF' | 'EN_ATTENTE_PAIEMENT' | 'ACTIF' | 'EXPIRE' | string;
+  date_debut_abonnement?: string | null;
+  date_expiration_abonnement?: string | null;
+  est_actif: boolean;
+  prix_mensuel: number;
+  detail?: string;
+}
+
+export interface FactureAbonnement {
+  id: number;
+  numero_facture: string;
+  nom_etablissement_snapshot: string;
+  type_etablissement_snapshot: string;
+  nom_proprietaire_snapshot: string;
+  email_proprietaire_snapshot: string;
+  montant_ht: string;
+  montant_total: string;
+  date_emission: string;
+}
+
+export interface AbonnementPro {
+  id: number;
+  etablissement: number;
+  etablissement_nom: string;
+  paiement?: number | null;
+  montant: string;
+  date_debut: string;
+  date_expiration: string;
+  statut: 'PAYE' | 'EXPIRE' | 'ANNULE' | string;
+  created_at: string;
+  facture?: FactureAbonnement | null;
+}
+
+export interface InitiateSubscriptionResponse {
+  payment_id: number;
+  reference: string;
+  token: string;
+  redirect_url: string;
+  statut: string;
+  montant: string;
+  etablissement_id: number;
+  etablissement_nom: string;
+}
+
+

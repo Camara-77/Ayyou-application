@@ -70,6 +70,11 @@ export const PRO_ROUTES: Routes = [
     loadComponent: () => import('./pages/pro-notifications/pro-notifications.component').then(m => m.ProNotificationsComponent),
     canActivate: [proGuard]
   },
+  {
+    path: 'restaurant/subscription',
+    loadComponent: () => import('./pages/pro-subscription/pro-subscription.component').then(m => m.ProSubscriptionComponent),
+    canActivate: [proGuard]
+  },
 
   // Espace Vendeur
   {
@@ -107,6 +112,11 @@ export const PRO_ROUTES: Routes = [
     loadComponent: () => import('./pages/pro-notifications/pro-notifications.component').then(m => m.ProNotificationsComponent),
     canActivate: [vendorAuthGuard]
   },
+  {
+    path: 'vendor/subscription',
+    loadComponent: () => import('./pages/pro-subscription/pro-subscription.component').then(m => m.ProSubscriptionComponent),
+    canActivate: [vendorAuthGuard]
+  },
 
   // Espace Livreur under /pro/delivery/
   {
@@ -116,9 +126,14 @@ export const PRO_ROUTES: Routes = [
 
   // Existing legacy PRO shortcuts
   {
+    path: 'subscription',
+    loadComponent: () => import('./pages/pro-subscription/pro-subscription.component').then(m => m.ProSubscriptionComponent)
+  },
+  {
     path: 'dashboard',
     loadComponent: () => import('./pages/pro-dashboard/pro-dashboard.component').then(m => m.ProDashboardComponent)
   },
+
   {
     path: 'orders/history',
     loadComponent: () => import('./pages/pro-order-history/pro-order-history.component').then(m => m.ProOrderHistoryComponent)

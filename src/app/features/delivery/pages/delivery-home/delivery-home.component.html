@@ -128,21 +128,6 @@
 
           <!-- Meta Info Row -->
           <div class="meta-info-row">
-            <span class="meta-item">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-              </svg>
-              1,8 km
-            </span>
-            <span class="dot-sep">•</span>
-            <span class="meta-item">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
-              </svg>
-              ~8 min
-            </span>
-            <span class="dot-sep">•</span>
             <span class="meta-item green-text">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="2" y="5" width="20" height="14" rx="2"/>
@@ -195,7 +180,7 @@
           <div class="compact-card" *ngFor="let mission of sortedAvailableMissions">
             <div class="compact-header">
               <span class="meta-summary">
-                #{{ mission.commande_reference || ('AY-' + mission.commande) }} • 1,2 km • ~7 min
+                #{{ mission.commande_reference || ('AY-' + mission.commande) }}
               </span>
               <span class="compact-price">{{ getFormattedPrice(mission) }} FCFA</span>
             </div>
@@ -278,77 +263,67 @@
             </div>
           </div>
 
-          <div class="estimated-badge">
-            <span>Attente estimée : ~3 à 5 min</span>
-          </div>
+
 
           <h3 class="waiting-title">En attente de courses</h3>
         </div>
 
-        <!-- Message Page Livraisons si aucune livraison en cours -->
-        <div class="no-active-delivery-card" *ngIf="isMissionsPage" style="background: #FFFFFF; border-radius: 16px; padding: 24px; text-align: center; border: 1px dashed #CBD5E1; margin-bottom: 20px;">
-          <div style="width: 48px; height: 48px; border-radius: 50%; background: #F1F5F9; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round">
-              <path d="M5 11.5H8L12 13.5H15.5L18 11.5"/>
-              <circle cx="6" cy="15.5" r="3"/>
-              <circle cx="18" cy="15.5" r="3"/>
-            </svg>
-          </div>
-          <h4 style="font-size: 0.95rem; font-weight: 700; color: #1E293B; margin: 0 0 4px;">Aucune livraison en cours</h4>
-          <p style="font-size: 0.82rem; color: #64748B; margin: 0;">Les livraisons attribuées ou en cours d'acheminement s'afficheront ici.</p>
-        </div>
-
-        <!-- Activité d'aujourd'hui -->
-        <div class="activity-section">
-          <div class="section-header">
-            <h3 class="section-title">Activité d'aujourd'hui</h3>
-            <span class="update-label">MIS À JOUR</span>
-          </div>
-
-          <div class="stats-grid">
-            <div class="stat-card">
-              <span class="stat-label">Courses finies</span>
-              <div class="stat-val-row">
-                <span class="stat-number">{{ todayStats.completedCount }}</span>
-                <span class="stat-unit">livraisons</span>
-              </div>
+        <!-- Activité d'aujourd'hui et Rayon d'attribution (Uniquement sur l'interface Livraisons) -->
+        <ng-container *ngIf="isMissionsPage">
+          <!-- Activité d'aujourd'hui -->
+          <div class="activity-section">
+            <div class="section-header">
+              <h3 class="section-title">Activité d'aujourd'hui</h3>
+              <span class="update-label">MIS À JOUR</span>
             </div>
 
-            <div class="stat-card">
-              <span class="stat-label">Gains nets</span>
-              <div class="stat-val-row">
-                <span class="stat-number primary-red">{{ todayStats.netGainsFormatted }}</span>
-                <span class="stat-unit primary-red bold">FCFA</span>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <span class="stat-label">Courses finies</span>
+                <div class="stat-val-row">
+                  <span class="stat-number">{{ todayStats.completedCount }}</span>
+                  <span class="stat-unit">livraisons</span>
+                </div>
               </div>
-            </div>
 
-            <div class="stat-card">
-              <span class="stat-label">Distance</span>
-              <div class="stat-val-row">
-                <span class="stat-number">{{ todayStats.distanceKm }}</span>
-                <span class="stat-unit">km</span>
+              <div class="stat-card">
+                <span class="stat-label">Gains nets</span>
+                <div class="stat-val-row">
+                  <span class="stat-number primary-red">{{ todayStats.netGainsFormatted }}</span>
+                  <span class="stat-unit primary-red bold">FCFA</span>
+                </div>
               </div>
-            </div>
 
-            <div class="stat-card">
-              <span class="stat-label">Temps connecté</span>
-              <div class="stat-val-row">
-                <span class="stat-number">{{ todayStats.connectedTime }}</span>
-                <span class="stat-unit">min</span>
+              <div class="stat-card">
+                <span class="stat-label">Distance</span>
+                <div class="stat-val-row">
+                  <span class="stat-number">{{ todayStats.distanceKm }}</span>
+                  <span class="stat-unit">km</span>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <span class="stat-label">Temps connecté</span>
+                <div class="stat-val-row">
+                  <span class="stat-number">{{ todayStats.connectedTime }}</span>
+                  <span class="stat-unit">min</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Rayon d'attribution actif -->
-        <div class="attribution-card">
-          <h3 class="attribution-title">Rayon d'attribution actif</h3>
-          <div class="chips-list">
-            <span class="chip-item" *ngFor="let sector of attributionSectors">
-              {{ sector }}
-            </span>
+          <!-- Rayon d'attribution actif -->
+          <div class="attribution-card">
+            <h3 class="attribution-title">Rayon d'attribution actif</h3>
+            <div class="chips-list">
+              <span class="chip-item" *ngFor="let sector of attributionSectors">
+                {{ sector }}
+              </span>
+            </div>
           </div>
-        </div>
+        </ng-container>
+
+
 
       </ng-container>
 

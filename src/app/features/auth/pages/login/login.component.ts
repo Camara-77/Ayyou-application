@@ -8,6 +8,7 @@ import { AuthButtonComponent } from '../../components/auth-button/auth-button.co
 import { SocialLoginButtonComponent } from '../../components/social-login-button/social-login-button.component';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AuthModalService } from '../../../../core/services/auth-modal.service';
+import { AppLogoComponent } from '../../../../shared/components/app-logo/app-logo.component';
 
 @Component({
   selector: 'app-login',
@@ -15,11 +16,7 @@ import { AuthModalService } from '../../../../core/services/auth-modal.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterLink,
-    AuthHeaderComponent,
-    AuthInputComponent,
-    AuthButtonComponent,
-    SocialLoginButtonComponent
+    RouterLink
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
@@ -38,6 +35,11 @@ export class LoginComponent {
 
   loading = false;
   errorMessage: string | null = null;
+  showPassword = false;
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   get isIdentifierInvalid(): boolean {
     const control = this.loginForm.get('identifier');

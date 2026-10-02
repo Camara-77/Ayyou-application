@@ -1,104 +1,175 @@
 <div class="history-page">
-  <!-- En-tête de page unifié -->
+  <!-- Header -->
   <app-delivery-header [title]="'HISTORIQUE'"></app-delivery-header>
 
   <main class="history-main">
-    <!-- Carte de Résumé Statistiques -->
-    <div class="stats-summary-card">
-      <div class="stat-col">
-        <span class="stat-label">Courses effectuées</span>
-        <span class="stat-value">{{ completedCount }}</span>
-      </div>
-      <div class="divider-v"></div>
-      <div class="stat-col">
-        <span class="stat-label">Gains cumulés</span>
-        <span class="stat-value highlight">{{ totalGains | number }} FCFA</span>
-      </div>
+    
+    <!-- 1. TIME FILTERS SEGMENTED CONTROL (Aujourd'hui | Cette semaine | Ce mois) -->
+    <div class="time-filter-segmented">
+      <button 
+        class="segment-btn" 
+        [class.active]="timeFilter === 'TODAY'" 
+        (click)="setTimeFilter('TODAY')"
+      >
+        Aujourd'hui
+      </button>
+      <button 
+        class="segment-btn" 
+        [class.active]="timeFilter === 'WEEK'" 
+        (click)="setTimeFilter('WEEK')"
+      >
+        Cette semaine
+      </button>
+      <button 
+        class="segment-btn" 
+        [class.active]="timeFilter === 'MONTH'" 
+        (click)="setTimeFilter('MONTH')"
+      >
+        Ce mois
+      </button>
     </div>
 
-    <!-- Onglets de filtre -->
-    <div class="filter-tabs">
-      <button class="filter-btn" [class.active]="activeFilter === 'ALL'" (click)="setFilter('ALL')">
-        Toutes ({{ deliveries.length }})
-      </button>
-      <button class="filter-btn" [class.active]="activeFilter === 'LIVREE'" (click)="setFilter('LIVREE')">
-        Livrées ({{ completedCount }})
-      </button>
-      <button class="filter-btn" [class.active]="activeFilter === 'ANNULEE'" (click)="setFilter('ANNULEE')">
-        Annulées
-      </button>
-    </div>
-
-    <!-- Indicateur de chargement -->
+    <!-- LOADING & ERROR STATES -->
     <div class="loading-state" *ngIf="isLoading">
       <div class="spinner"></div>
       <p>Chargement de l'historique...</p>
     </div>
 
-    <!-- Message d'erreur -->
     <div class="alert alert-error" *ngIf="errorMessage && !isLoading">
       <span>{{ errorMessage }}</span>
     </div>
 
-    <!-- Etat vide -->
-    <div class="empty-state-card" *ngIf="!isLoading && filteredDeliveries.length === 0">
+    <!-- EMPTY STATE -->
+    <div class="empty-state-card" *ngIf="!isLoading && deliveries.length === 0">
       <div class="icon-circle">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2">
           <circle cx="12" cy="12" r="10"/>
           <polyline points="12 6 12 12 16 14"/>
         </svg>
       </div>
-      <h3 class="empty-title">Aucune course enregistrée</h3>
-      <p class="empty-sub">Vos courses terminées ou annulées s'afficheront ici au fur et à mesure.</p>
+      <h3 class="empty-title">Aucune course effectuée</h3>
+      <p class="empty-sub">Vos courses terminées s'afficheront ici au fur et à mesure.</p>
     </div>
 
-    <!-- Liste des courses -->
-    <div class="deliveries-list" *ngIf="!isLoading && filteredDeliveries.length > 0">
-      <div class="delivery-card" *ngFor="let delivery of filteredDeliveries">
+    <!-- COURSES CARDS LIST -->
+    <div class="courses-list-container" *ngIf="!isLoading && deliveries.length > 0">
+      
+      <!-- TOP LIST OF CARDS -->
+      <div class="course-mock-card" *ngFor="let item of filteredDeliveries">
         
-        <!-- Header carte -->
-        <div class="card-header">
-          <div class="ref-badge">
-            <span class="ref-num">#{{ delivery.commande_reference || delivery.id }}</span>
-            <span class="date-text">{{ getFormattedDate(delivery.updated_at || delivery.created_at) }}</span>
+        <!-- Header: #AY-XXXX • HH:mm  and Status Badge -->
+        <div class="card-top-row">
+          <div class="ref-time-group">
+            <span class="ref-code">#{{ item.commande_reference || ('AY-' + item.id) }}</span>
+            <span class="dot-sep">•</span>
+            <span class="time-text">{{ getFormattedTime(item.updated_at || item.created_at) }}</span>
           </div>
 
-          <span class="status-badge" [class.status-delivered]="delivery.statut === 'LIVREE'" [class.status-cancelled]="delivery.statut === 'ANNULEE'">
-            {{ delivery.statut === 'LIVREE' ? 'Livrée' : 'Annulée' }}
-          </span>
-        </div>
-
-        <!-- Détails Trajet -->
-        <div class="card-body">
-          <div class="route-item">
-            <div class="dot green-dot"></div>
-            <div class="route-info">
-              <span class="route-label">Départ (Restaurant)</span>
-              <span class="route-value">{{ getEtablissementName(delivery) }}</span>
-            </div>
-          </div>
-
-          <div class="route-line"></div>
-
-          <div class="route-item">
-            <div class="dot red-dot"></div>
-            <div class="route-info">
-              <span class="route-label">Destination (Client)</span>
-              <span class="route-value">{{ delivery.nom_destinataire || 'Client' }} • {{ delivery.adresse_livraison || 'Adresse de livraison' }}</span>
-            </div>
+          <div class="status-pill-badge" [class.cancelled]="item.statut === 'ANNULEE'">
+            <span class="status-dot"></span>
+            <span class="status-name">{{ item.statut === 'LIVREE' ? 'LIVRÉE' : 'ANNULÉE' }}</span>
           </div>
         </div>
 
-        <div class="card-divider"></div>
+        <!-- Body: Store & Destination -->
+        <div class="card-body-group">
+          <!-- Departure Store -->
+          <div class="location-row">
+            <svg class="loc-icon store-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2.2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <span class="loc-name store-name">{{ getEtablissementName(item) }}</span>
+          </div>
 
-        <!-- Footer carte (Gain) -->
-        <div class="card-footer">
-          <span class="gain-label">Gain de la course</span>
-          <span class="gain-amount">{{ getFormattedGain(delivery) }}</span>
+          <!-- Destination Client -->
+          <div class="location-row">
+            <svg class="loc-icon pin-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span class="loc-name client-name">{{ getDestinationInfo(item) }}</span>
+          </div>
+        </div>
+
+        <!-- Footer Divider -->
+        <div class="card-footer-divider"></div>
+
+        <!-- Footer: Payment Method & Gain Net -->
+        <div class="card-footer-row">
+          <div class="payment-type-group">
+            <img src="assets/branding/wave.png" alt="Wave" class="pay-icon-img" />
+            <span class="pay-label">Paiement Wave</span>
+          </div>
+
+          <span class="gain-net-val">{{ getFormattedGain(item) }}</span>
         </div>
 
       </div>
+
+      <!-- 2. STATUS FILTER TABS ROW (Toutes (12) | Terminées (12) | Annulées (0) | Filter Icon) -->
+      <div class="status-filter-row">
+        <button 
+          class="status-tab-btn" 
+          [class.active]="statusFilter === 'ALL'" 
+          (click)="setStatusFilter('ALL')"
+        >
+          Toutes ({{ deliveries.length }})
+        </button>
+
+        <button 
+          class="status-tab-btn" 
+          [class.active]="statusFilter === 'LIVREE'" 
+          (click)="setStatusFilter('LIVREE')"
+        >
+          Terminées ({{ completedCount }})
+        </button>
+
+        <button 
+          class="status-tab-btn" 
+          [class.active]="statusFilter === 'ANNULEE'" 
+          (click)="setStatusFilter('ANNULEE')"
+        >
+          Annulées ({{ cancelledCount }})
+        </button>
+
+        <button class="filter-opt-btn" aria-label="Filtrer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="4" y1="21" x2="4" y2="14"/>
+            <line x1="4" y1="10" x2="4" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12" y2="3"/>
+            <line x1="20" y1="21" x2="20" y2="16"/>
+            <line x1="20" y1="12" x2="20" y2="3"/>
+            <line x1="1" y1="14" x2="7" y2="14"/>
+            <line x1="9" y1="8" x2="15" y2="8"/>
+            <line x1="17" y1="16" x2="23" y2="16"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- 3. ACTION BUTTONS BOTTOM -->
+      <div class="bottom-action-buttons">
+        <button class="btn-close-caisse" (click)="closeDailyRegister()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <rect x="2" y="5" width="20" height="14" rx="2"/>
+            <line x1="2" y1="10" x2="22" y2="10"/>
+          </svg>
+          <span>Clôturer la Caisse Journalière ({{ totalGains | number }} F)</span>
+        </button>
+
+        <button class="btn-download-report" (click)="downloadPdfReport()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span>Télécharger le relevé PDF ({{ getFormattedDateHeader() }})</span>
+        </button>
+      </div>
+
     </div>
+
   </main>
 
   <app-delivery-bottom-nav activeTab="history"></app-delivery-bottom-nav>

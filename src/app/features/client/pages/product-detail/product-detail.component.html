@@ -16,7 +16,6 @@
         <span class="green-dot"></span>
         <span>{{ product.stockInfo }} • {{ product.preparationTime }}</span>
       </div>
-      <div class="img-counter">1/4</div>
     </div>
   </div>
 
@@ -33,7 +32,8 @@
     <!-- Restaurant Card -->
     <div class="restaurant-mini-card">
       <div class="rest-avatar">
-        <span>{{ product.restaurant.initials || 'CL' }}</span>
+        <img *ngIf="product.restaurant.avatarUrl" [src]="product.restaurant.avatarUrl" [alt]="product.restaurant.name" class="rest-avatar-img" />
+        <span *ngIf="!product.restaurant.avatarUrl">{{ product.restaurant.initials || 'CL' }}</span>
       </div>
       <div class="rest-info">
         <h4 class="rest-name">{{ product.restaurant.name }}</h4>
@@ -139,14 +139,19 @@
 
   <!-- Sticky Bottom Bar -->
   <div class="sticky-bottom-bar">
-    <button class="btn-commander-primary" (click)="addToCartAndCheckout()">
-      Commander 🛒
-    </button>
-    <button class="btn-cart-secondary" (click)="addToCartOnly()" aria-label="Ajouter au panier">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M6 2L3 6V20C3 20.5523 3.44772 21 4 21H20C20.5523 21 21 20.5523 21 20V6L18 2H6Z" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M3 6H21" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M16 10C16 12.2091 14.2091 14 12 14C9.79086 14 8 12.2091 8 10" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <app-order-button
+      label="Commander"
+      size="medium"
+      (orderClick)="addToCartAndCheckout()"
+      style="flex: 1; display: flex;"
+    ></app-order-button>
+
+    <button class="btn-quick-cart" (click)="addToCartOnly()" aria-label="Ajout rapide au panier">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 3.5h3.2l2.4 10.4a1 1 0 0 0 1 .8h10.8a1 1 0 0 0 1-.8L22 7H7.5" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M14 7.5v5M11.5 10h5" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
+        <circle cx="9.5" cy="19.5" r="1.8" fill="#FFFFFF"/>
+        <circle cx="17.5" cy="19.5" r="1.8" fill="#FFFFFF"/>
       </svg>
     </button>
   </div>

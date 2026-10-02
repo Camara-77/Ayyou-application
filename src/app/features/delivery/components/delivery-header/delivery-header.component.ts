@@ -5,11 +5,12 @@ import { DeliveryService } from '../../../../core/services/delivery.service';
 import { DriverAuthService } from '../../services/driver-auth.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { LivreurProfile } from '../../../../core/models/delivery';
+import { AppLogoComponent } from '../../../../shared/components/app-logo/app-logo.component';
 
 @Component({
   selector: 'app-delivery-header',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, AppLogoComponent],
   templateUrl: './delivery-header.component.html',
   styleUrl: './delivery-header.component.scss'
 })

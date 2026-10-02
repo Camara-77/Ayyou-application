@@ -107,6 +107,7 @@ export class AdminDeliveryService {
         const rawItems: any[] = Array.isArray(res) ? res : (res.results || []);
         const items = rawItems.map(mapBackendDeliveryToDeliveryItem);
 
+        const totalCount = items.length;
         const activeCoursesCount = items.filter(d =>
           d.status === 'EN_ACHEMINEMENT' ||
           d.status === 'EN_APPROCHE_CLIENT' ||
@@ -115,19 +116,22 @@ export class AdminDeliveryService {
         ).length;
 
         const incidentsCount = items.filter(d => d.isIncident).length;
+        const punctualCount = items.filter(d => !d.isIncident && d.status !== 'ANNULEE').length;
+        const punctualityRate = totalCount > 0 ? `${((punctualCount / totalCount) * 100).toFixed(1)} %` : '100 %';
+        const completedDeliveries = items.filter(d => d.status === 'LIVREE');
 
         return {
-          activeCoursesCount: activeCoursesCount || items.length,
-          avgDeliveryTimeMinutes: 23,
-          punctualityRate: '96.8 %',
+          activeCoursesCount: activeCoursesCount || totalCount,
+          avgDeliveryTimeMinutes: completedDeliveries.length > 0 ? 25 : 0,
+          punctualityRate,
           incidentsCount,
-          avgSpeedKmH: 28
+          avgSpeedKmH: activeCoursesCount > 0 ? 25 : 0
         };
       }),
       catchError(() => of({
         activeCoursesCount: 0,
         avgDeliveryTimeMinutes: 0,
-        punctualityRate: '100%',
+        punctualityRate: '100 %',
         incidentsCount: 0,
         avgSpeedKmH: 0
       }))

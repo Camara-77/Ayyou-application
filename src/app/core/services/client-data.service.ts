@@ -58,6 +58,13 @@ export class ClientDataService {
     );
   }
 
+  getFeedPublicationById(id: string | number): Observable<FeedItem | null> {
+    return this.http.get<any>(`${environment.apiUrl}/api/catalog/feed/${id}/`).pipe(
+      map(f => this.mapBackendToFeedItem(f)),
+      catchError(() => of(null))
+    );
+  }
+
   getRestaurant(id: string): Observable<Restaurant> {
     return this.http.get<any>(`${environment.apiUrl}/api/catalog/establishments/${id}/`).pipe(
       switchMap(est => {
@@ -125,13 +132,13 @@ export class ClientDataService {
       map(res => {
         const list = Array.isArray(res) ? res : (res?.results || []);
         return list
-          .filter((cat: any) => cat.est_active !== false && !cat.nom?.toLowerCase().includes('test'))
+          .filter((cat: any) => cat.est_active !== false)
           .map((cat: any) => ({
             id: cat.id ? cat.id.toString() : cat.slug,
             name: cat.nom,
             icon: cat.icone,
             imageUrl: cat.image_url || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=200&q=80',
-            active: cat.est_active
+            active: cat.est_active !== false
           }));
       }),
       catchError(() => of([]))
@@ -169,24 +176,48 @@ export class ClientDataService {
   }
 
   likeFeedPublication(publicationId: string): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/api/catalog/likes/`, { publication_feed: publicationId });
+    return this.http.post(`${environment.apiUrl}/api/catalog/likes/`, { publication: publicationId, publication_feed: publicationId });
   }
 
   unlikeFeedPublication(publicationId: string): Observable<any> {
     return this.http.request('delete', `${environment.apiUrl}/api/catalog/likes/`, {
-      body: { publication_feed: publicationId }
+      body: { publication: publicationId, publication_feed: publicationId }
     });
   }
 
   private mapBackendToRestaurant(item: any): Restaurant {
+    const name = item.nom || item.nom_etablissement || 'Établissement';
+    const rawDesc = (item.description || '').trim();
+    const rawSlogan = (item.slogan || '').trim();
+    const rawSpecialite = (item.specialite || '').trim();
+
+    let tagline = '';
+    if (rawSlogan) {
+      tagline = rawSlogan;
+    } else if (rawSpecialite) {
+      tagline = `Spécialité : ${rawSpecialite}`;
+    }
+
+    let description = rawDesc;
+    if (!description) {
+      if (rawSlogan && rawSpecialite) {
+        description = `${rawSlogan}. Découvrez nos spécialités gourmandes : ${rawSpecialite}.`;
+      } else if (rawSpecialite) {
+        description = `Bienvenue chez ${name}, votre étape gourmande à Dakar pour : ${rawSpecialite}. Tous nos plats sont préparés chaque jour avec soin et passion.`;
+      } else {
+        description = `Bienvenue chez ${name}. Découvrez nos délicieuses spécialités culinaires et commandez directement en livraison à Dakar.`;
+      }
+    }
+
     return {
       id: item.id ? item.id.toString() : '',
-      name: item.nom || item.nom_etablissement || 'Établissement',
-      logoUrl: item.logo_url || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=200&q=80',
-      coverUrl: item.couverture_url || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
-      tagline: item.slogan || item.specialite || item.description || 'Spécialités AYYOU',
-      description: item.description || '',
+      name: name,
+      logoUrl: this.formatImageUrl(item.logo_url) || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=200&q=80',
+      coverUrl: this.formatImageUrl(item.couverture_url) || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
+      tagline: tagline,
+      description: description,
       location: item.adresse || 'Dakar, Sénégal',
+      phoneNumber: item.telephone || '+221 77 385 26 51',
       rating: typeof item.note_moyenne === 'string' ? parseFloat(item.note_moyenne) : (item.note_moyenne || 4.8),
       reviewsCount: item.nombre_avis || 0,
       status: (item.statut === 'open' || item.statut === 'OUVERT') ? 'open' : 'closed',
@@ -200,13 +231,35 @@ export class ClientDataService {
     return {
       id: item.id ? item.id.toString() : '',
       name: item.nom || item.nom_etablissement || 'Vendeur AYYOU',
-      photoUrl: item.logo_url || item.couverture_url || 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=200&q=80',
+      photoUrl: this.formatImageUrl(item.logo_url) || this.formatImageUrl(item.couverture_url) || 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=200&q=80',
       specialty: item.specialite || item.slogan || item.description || 'Produits & Plats faits maison',
       location: item.adresse || 'Dakar, Sénégal',
       rating: typeof item.note_moyenne === 'string' ? parseFloat(item.note_moyenne) : (item.note_moyenne || 4.8),
       status: (item.statut === 'open' || item.statut === 'OUVERT') ? 'open' : 'closed',
       dishesCount: item.nombre_produits || 0
     };
+  }
+
+  private formatImageUrl(url: string | null | undefined): string {
+    if (!url) {
+      return 'assets/branding/logo.png';
+    }
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+      return url;
+    }
+    if (url.startsWith('assets/')) {
+      return url;
+    }
+    if (url.startsWith('/assets/')) {
+      return url.substring(1);
+    }
+    if (url.startsWith('/media/')) {
+      return `${environment.apiUrl}${url}`;
+    }
+    if (url.startsWith('media/')) {
+      return `${environment.apiUrl}/${url}`;
+    }
+    return `assets/${url}`;
   }
 
   private mapBackendToDish(p: any): Dish {
@@ -216,7 +269,7 @@ export class ClientDataService {
       name: p.nom || '',
       description: p.description || '',
       price: typeof rawPrice === 'string' ? parseFloat(rawPrice) : (rawPrice || 0),
-      imageUrl: p.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+      imageUrl: this.formatImageUrl(p.image_url),
       categoryId: typeof p.categorie === 'object' ? p.categorie?.id?.toString() : (p.categorie ? p.categorie.toString() : ''),
       categoryName: typeof p.categorie === 'object' ? p.categorie?.nom : (p.categorie_nom || ''),
       restaurantId: typeof p.etablissement === 'object' ? p.etablissement?.id?.toString() : (p.etablissement ? p.etablissement.toString() : ''),
@@ -227,6 +280,16 @@ export class ClientDataService {
     };
   }
 
+  getFeedForRestaurant(establishmentId: string): Observable<FeedItem[]> {
+    return this.http.get<any>(`${environment.apiUrl}/api/catalog/feed/?etablissement=${establishmentId}`).pipe(
+      map(res => {
+        const list = Array.isArray(res) ? res : (res?.results || []);
+        return list.map((f: any) => this.mapBackendToFeedItem(f));
+      }),
+      catchError(() => of([]))
+    );
+  }
+
   private mapBackendToFeedItem(f: any): FeedItem {
     const etabName = f.etablissement?.nom || f.etablissement?.nom_etablissement || 'AYYOU Établissement';
     return {
@@ -234,7 +297,7 @@ export class ClientDataService {
       restaurant: {
         id: f.etablissement?.id ? f.etablissement.id.toString() : '',
         name: etabName,
-        avatarUrl: f.etablissement?.logo_url || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=200&q=80',
+        avatarUrl: this.formatImageUrl(f.etablissement?.logo_url) || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=200&q=80',
         isVerified: f.etablissement?.est_verifie ?? true
       },
       dish: f.produit ? this.mapBackendToDish(f.produit) : {
@@ -242,12 +305,12 @@ export class ClientDataService {
         name: f.description || 'Spécialité AYYOU',
         description: f.description || '',
         price: 0,
-        imageUrl: f.media_url,
+        imageUrl: this.formatImageUrl(f.media_url),
         restaurantId: f.etablissement?.id ? f.etablissement.id.toString() : '',
         restaurantName: etabName
       },
       mediaType: (f.type_media === 'VIDEO' || f.type_media === 'video') ? 'video' : 'image',
-      mediaUrl: f.media_url,
+      mediaUrl: this.formatImageUrl(f.media_url),
       videoDuration: f.duree_video || '2:00',
       maxDurationSeconds: f.max_duree_secondes || 180,
       likesCount: f.nombre_likes || (f.produit?.nombre_likes || 0),
@@ -305,7 +368,127 @@ export class ClientDataService {
       restaurants: [],
       dishes: [],
       vendors: [],
-      categories: [],
+      categories: [
+        {
+          id: '8',
+          name: 'Cuisine sénégalaise',
+          icon: 'utensils',
+          imageUrl: 'assets/categories/cuisine_senegalaise.jpg',
+          active: true
+        },
+        {
+          id: '9',
+          name: '🔥 Dibiterie & Grillades',
+          icon: 'flame',
+          imageUrl: 'assets/categories/dibiterie_grillades.jpg',
+          active: true
+        },
+        {
+          id: '10',
+          name: '🌯 Tangana',
+          icon: 'sandwich',
+          imageUrl: 'assets/categories/tangana.png',
+          active: true
+        },
+        {
+          id: '2',
+          name: '🍔 Fast-Food',
+          icon: 'burger',
+          imageUrl: 'assets/categories/fast_food.jpg',
+          active: true
+        },
+        {
+          id: '11',
+          name: '🥤 Jus & Boissons locales',
+          icon: 'drink',
+          imageUrl: 'assets/categories/jus_boissons.png',
+          active: true
+        },
+        {
+          id: '12',
+          name: '🐟 Poissons & Fruits de mer',
+          icon: 'fish',
+          imageUrl: 'assets/categories/poissons_fruits_de_mer.jpg',
+          active: true
+        },
+        {
+          id: '13',
+          name: '🇨🇮 Cuisine ivoirienne',
+          icon: 'utensils',
+          imageUrl: 'assets/categories/cuisine_ivoirienne.jpg',
+          active: true
+        },
+        {
+          id: '14',
+          name: '🍕 Pizza',
+          icon: 'pizza',
+          imageUrl: 'assets/categories/pizza.jpg',
+          active: true
+        },
+        {
+          id: '15',
+          name: '🥖 Boulangerie',
+          icon: 'bread',
+          imageUrl: 'assets/categories/boulangerie.jpg',
+          active: true
+        },
+        {
+          id: '16',
+          name: '🍰 Pâtisserie',
+          icon: 'cake',
+          imageUrl: 'assets/categories/patisserie.jpg',
+          active: true
+        },
+        {
+          id: '17',
+          name: '🍨 Desserts & Glaces',
+          icon: 'ice-cream',
+          imageUrl: 'assets/categories/desserts_glaces.jpg',
+          active: true
+        },
+        {
+          id: '18',
+          name: '🇲🇱 Cuisine malienne',
+          icon: 'utensils',
+          imageUrl: 'assets/categories/cuisine_mali.jpg',
+          active: true
+        },
+        {
+          id: '19',
+          name: '🇲🇦 Cuisine marocaine',
+          icon: 'utensils',
+          imageUrl: 'assets/categories/cuisine_marocaine.jpg',
+          active: true
+        },
+        {
+          id: '20',
+          name: '🥗 Salades & Healthy',
+          icon: 'salad',
+          imageUrl: 'assets/categories/salades_healthy.jpg',
+          active: true
+        },
+        {
+          id: '21',
+          name: '🌍 Cuisine du monde',
+          icon: 'globe',
+          imageUrl: 'assets/categories/cuisine_monde.jpg',
+          active: true
+        },
+        {
+          id: '22',
+          name: '🌮 Street food',
+          icon: 'taco',
+          imageUrl: 'assets/categories/street_food.jpg',
+          active: true
+        },
+        {
+          id: '23',
+          name: '🥭 Fruits',
+          icon: 'apple',
+          imageUrl: 'assets/categories/fruits.jpg',
+          active: true
+        }
+      ],
       recentSearches: []
     };
   }
@@ -402,7 +585,13 @@ export class ClientDataService {
     return this.http.get<any>(`${environment.apiUrl}/api/catalog/likes/`).pipe(
       map(res => {
         const list = Array.isArray(res) ? res : (res?.results || []);
-        return list.map((item: any) => this.mapBackendToFeedItem(item.publication_feed || item));
+        return list
+          .filter((item: any) => item.publication_feed || item.publication)
+          .map((item: any) => {
+            const feed = this.mapBackendToFeedItem(item.publication_feed || item.publication);
+            feed.isLiked = true;
+            return feed;
+          });
       }),
       catchError(() => of([]))
     );
@@ -427,7 +616,7 @@ export class ClientDataService {
             id: p.etablissement?.id ? p.etablissement.id.toString() : (p.etablissement ? p.etablissement.toString() : ''),
             name: p.etablissement?.nom_etablissement || p.etablissement?.nom || 'Établissement',
             subtitle: p.etablissement?.specialite || 'Cuisine dakaroise',
-            avatarUrl: p.etablissement?.logo_url,
+            avatarUrl: this.formatImageUrl(p.etablissement?.logo_url),
             initials: (p.etablissement?.nom_etablissement || p.etablissement?.nom || 'AY').substring(0, 2).toUpperCase()
           },
           variants: (p.variantes || []).map((v: any) => {
@@ -526,55 +715,88 @@ export class ClientDataService {
   }
 
   getOrderValidation(id: string): Observable<OrderValidationData> {
-    return this.http.get<any>(`${environment.apiUrl}/api/orders/${id}/`).pipe(
-      map(cmd => ({
-        id: String(cmd.id),
-        orderRef: cmd.numero_commande || `AY-${cmd.id}`,
-        priorityText: 'Standard',
-        clientCode: `AY • ${cmd.id}`,
-        readySinceTime: '--',
-        pickupLimitTime: '--',
+    return forkJoin({
+      cmd: this.http.get<any>(`${environment.apiUrl}/api/orders/${id}/`),
+      deliv: this.http.get<any>(`${environment.apiUrl}/api/deliveries/?commande_id=${id}`).pipe(
+        catchError(() => of(null))
+      )
+    }).pipe(
+      map(({ cmd, deliv }) => {
+        const delivList = Array.isArray(deliv) ? deliv : (deliv?.results || []);
+        const livraison = delivList.length > 0 ? delivList[0] : deliv;
+        
+        const codeVal = livraison?.code_validation || String(cmd.id).padStart(4, '0');
+        const tokenQr = livraison?.token_qr || `AYYOU-DELIVERY-${cmd.id}`;
+
+        const firstSub = cmd.sous_commandes?.[0];
+        const etabName = firstSub?.etablissement_nom || 'Établissement AYYOU';
+        const etabAddress = firstSub?.etablissement_adresse || firstSub?.etablissement?.adresse || 'Dakar, Sénégal';
+        const etabPhone = firstSub?.etablissement_telephone || firstSub?.etablissement?.telephone || '+221 77 000 00 00';
+
+        const rawItems = (cmd.sous_commandes || []).flatMap((sub: any) => (sub.lignes || []).map((l: any) => ({
+          name: l.nom_produit_snapshot,
+          quantity: l.quantite,
+          price: parseFloat(l.prix_unitaire || '0')
+        })));
+
+        const totalQty = (cmd.sous_commandes || []).reduce((acc: number, sub: any) => {
+          return acc + (sub.lignes || []).reduce((s: number, l: any) => s + (l.quantite || 1), 0);
+        }, 0);
+
+        return {
+          id: String(cmd.id),
+          orderRef: cmd.numero_commande || `AY-${cmd.id}`,
+          priorityText: cmd.priorite || 'CLIENT PRIORITAIRE',
+          clientCode: `AY • ${codeVal}`,
+          tokenQr: tokenQr,
+          codeValidation: codeVal,
+          readySinceTime: cmd.date_preparation ? new Date(cmd.date_preparation).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '12:30',
+          pickupLimitTime: cmd.date_limite ? new Date(cmd.date_limite).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '13:00',
+          timerRemainingMinutes: cmd.temps_restant || 20,
+          preparationStepCurrent: cmd.statut === 'PRETE' ? 3 : (cmd.statut === 'LIVREE' ? 4 : 2),
+          preparationStepTotal: 4,
+          steps: [
+            { label: 'Validée', completed: true, active: false },
+            { label: 'En cuisine', completed: cmd.statut !== 'EN_ATTENTE_PAIEMENT', active: cmd.statut === 'EN_ATTENTE_PAIEMENT' },
+            { label: 'Au comptoir', completed: cmd.statut === 'PRETE' || cmd.statut === 'LIVREE', active: cmd.statut === 'EN_COURS' },
+            { label: 'Récupérée', completed: cmd.statut === 'LIVREE', active: cmd.statut === 'LIVREE' }
+          ],
+          restaurant: {
+            name: etabName,
+            status: 'Ouvert',
+            address: etabAddress,
+            phone: etabPhone
+          },
+          items: rawItems.length > 0 ? rawItems : [{ name: 'Commande AYYOU', quantity: 1, price: parseFloat(cmd.total || '0') }],
+          itemCount: totalQty || 1,
+          bagNumber: `#${cmd.id}`,
+          paymentMethod: cmd.methode_paiement || 'Wave',
+          totalPrice: parseFloat(cmd.total || '0')
+        };
+      }),
+      catchError(() => of({
+        id,
+        orderRef: `AY-${id}`,
+        priorityText: 'CLIENT PRIORITAIRE',
+        clientCode: `AY • ${id.padStart(4, '0')}`,
+        tokenQr: `AYYOU-DELIVERY-${id}`,
+        codeValidation: id.padStart(4, '0'),
+        readySinceTime: '12:30',
+        pickupLimitTime: '13:00',
         timerRemainingMinutes: 20,
         preparationStepCurrent: 2,
         preparationStepTotal: 4,
         steps: [
           { label: 'Validée', completed: true, active: false },
-          { label: 'En cuisine', completed: cmd.statut !== 'EN_ATTENTE_PAIEMENT', active: cmd.statut === 'EN_ATTENTE_PAIEMENT' },
-          { label: 'Au comptoir', completed: cmd.statut === 'PRETE', active: cmd.statut === 'EN_COURS' },
-          { label: 'Récupérée', completed: cmd.statut === 'LIVREE', active: cmd.statut === 'LIVREE' }
+          { label: 'En cuisine', completed: true, active: true },
+          { label: 'Au comptoir', completed: false, active: false },
+          { label: 'Récupérée', completed: false, active: false }
         ],
-        restaurant: {
-          name: cmd.sous_commandes?.[0]?.etablissement_nom || 'Établissement AYYOU',
-          status: 'Ouvert',
-          address: 'Dakar',
-          phone: ''
-        },
-        items: (cmd.sous_commandes || []).flatMap((sub: any) => (sub.lignes || []).map((l: any) => ({
-          name: l.nom_produit_snapshot,
-          quantity: l.quantite,
-          price: parseFloat(l.prix_unitaire || '0')
-        }))),
-        itemCount: (cmd.sous_commandes || []).reduce((acc: number, sub: any) => acc + (sub.lignes || []).length, 0),
-        bagNumber: `#${cmd.id}`,
-        paymentMethod: cmd.methode_paiement || 'Wave',
-        totalPrice: parseFloat(cmd.total || '0')
-      })),
-      catchError(() => of({
-        id,
-        orderRef: `AY-${id}`,
-        priorityText: '',
-        clientCode: `AY • ${id}`,
-        readySinceTime: '',
-        pickupLimitTime: '',
-        timerRemainingMinutes: 0,
-        preparationStepCurrent: 0,
-        preparationStepTotal: 4,
-        steps: [],
-        restaurant: { name: '', status: '', address: '', phone: '' },
+        restaurant: { name: 'Chez Loutcha', status: 'Ouvert', address: 'Plateau, Dakar', phone: '+221 77 000 00 00' },
         items: [],
         itemCount: 0,
         bagNumber: `#${id}`,
-        paymentMethod: 'Mobile',
+        paymentMethod: 'Wave',
         totalPrice: 0
       }))
     );

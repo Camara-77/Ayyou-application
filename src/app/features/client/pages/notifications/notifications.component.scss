@@ -289,19 +289,44 @@
         color: #E51A29;
       }
 
-      .btn-qr-code {
-        background-color: #E51A29;
-        color: #ffffff;
-        border: none;
-        border-radius: 14px;
-        padding: 8px 14px;
-        font-size: 12px;
-        font-weight: 800;
+      .actions-right {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
+
+        .btn-track-action {
+          background-color: #E51A29;
+          color: #FFFFFF;
+          border: none;
+          border-radius: 12px;
+          padding: 6px 12px;
+          font-size: 11px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: background-color 0.2s ease, transform 0.15s ease;
+
+          &:hover {
+            background-color: #CC1423;
+          }
+
+          &:active {
+            transform: scale(0.96);
+          }
+        }
+      }
+
+      .btn-receipt-link {
+        font-size: 11px;
+        color: #0284C7;
+        font-weight: 700;
+        background: transparent;
+        border: none;
         cursor: pointer;
-        box-shadow: 0 4px 12px rgba(229, 26, 41, 0.25);
+        padding: 4px;
+
+        &:hover {
+          text-decoration: underline;
+        }
       }
 
       .badge-delivered {
@@ -557,6 +582,26 @@
           }
         }
       }
+    .btn-track-primary-modal {
+      width: 100%;
+      height: 46px;
+      background-color: #1A1A1A;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      margin: 12px 0 8px;
+      transition: background-color 0.2s ease, transform 0.15s ease;
+
+      &:hover {
+        background-color: #333333;
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
     }
 
     .invoice-actions {
@@ -606,4 +651,5 @@
     opacity: 1;
     transform: scale(1);
   }
+}
 }

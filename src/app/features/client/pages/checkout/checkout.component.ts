@@ -5,7 +5,6 @@ import { Subscription } from 'rxjs';
 import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { FormsModule } from '@angular/forms';
 import { AppBottomNavComponent } from '../../components/app-bottom-nav/app-bottom-nav.component';
-import { ChatbotFloatingComponent } from '../../components/chatbot-floating/chatbot-floating.component';
 import { QuantitySelectorComponent } from '../../components/quantity-selector/quantity-selector.component';
 import { CartService } from '../../../../core/services/cart.service';
 import { ClientDataService } from '../../../../core/services/client-data.service';
@@ -26,7 +25,6 @@ import { GooglePlacesService } from '../../../../core/services/google-places.ser
     RouterModule,
     FormsModule,
     AppHeaderComponent,
-    ChatbotFloatingComponent,
     QuantitySelectorComponent
   ],
   templateUrl: './checkout.component.html',
@@ -233,38 +231,94 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       }
     };
 
-    // Map UI payment method to backend Django choice ('WAVE' | 'ORANGE_MONEY')
     const backendMethode = this.selectedPaymentId === 'orange_money' ? 'ORANGE_MONEY' : 'WAVE';
 
-    // 1. Appeler l'API de création de commande (calcul serveur)
+    console.log('[PAYMENT DEBUG] STEP 01 — Checkout lancé (Bouton Payer)', {
+      itemsCount: this.cartItems.length,
+      methode: backendMethode,
+      montantEstime: this.cartService.getTotal()
+    });
+
+    console.log('[PAYMENT DEBUG] STEP 02 — Synchronisation panier serveur lancée (ensureServerCartSynced)');
+    // 1. Garantir la présence des articles dans le panier en BD Django avant le checkout
+    this.cartService.ensureServerCartSynced().subscribe({
+      next: () => {
+        console.log('[PAYMENT DEBUG] STEP 02 OK — Synchronisation panier terminée');
+        this.executeCheckout(payload, backendMethode);
+      },
+      error: (syncErr) => {
+        console.warn('[PAYMENT DEBUG] STEP 02 WARNING — Erreur synchro panier, tentative suite checkout', syncErr);
+        this.executeCheckout(payload, backendMethode);
+      }
+    });
+  }
+
+  private executeCheckout(payload: CheckoutPayload, backendMethode: 'WAVE' | 'ORANGE_MONEY'): void {
+    console.log('[PAYMENT DEBUG] STEP 03 — Envoi POST /api/orders/checkout/', payload);
+    // 2. Appeler l'API de création de commande (calcul serveur)
     this.orderService.checkout(payload).subscribe({
       next: (order: CommandeOrder) => {
         this.createdOrder = order;
         this.orderRef = order.numero_commande;
 
-        // 2. Initialiser la transaction PayTech auprès du backend Django
+        console.log('[PAYMENT DEBUG] STEP 04 — Commande créée avec succès par Django', {
+          orderId: order.id,
+          numeroCommande: order.numero_commande,
+          total: order.total,
+          statut: order.statut
+        });
+
+        console.log('[PAYMENT DEBUG] STEP 05 — Envoi POST /api/payments/paytech/initiate/', {
+          commande_id: order.id,
+          methode: backendMethode
+        });
+
+        // 3. Initialiser la transaction PayTech auprès du backend Django
         this.paymentService.initiatePayTechPayment({
           commande_id: order.id,
           methode: backendMethode
         }).subscribe({
           next: (res) => {
+            console.log('[PAYMENT DEBUG] STEP 07/08 — Réponse PayTech reçue (PAYTECH ATTEINT)', {
+              payment_id: res.payment_id,
+              reference: res.reference,
+              hasRedirectUrl: !!res.redirect_url,
+              statut: res.statut,
+              montant: res.montant
+            });
+
             if (res.redirect_url && res.redirect_url.startsWith('http')) {
-              // 3. Rediriger le client vers le portail de règlement PayTech (Wave, Orange Money)
+              console.log('[PAYMENT DEBUG] STEP 08 OK — Redirection vers interface PayTech', res.redirect_url);
+              // Rediriger le client vers le portail de règlement PayTech (Wave, Orange Money)
               this.cartService.clearCart().subscribe(() => {
                 window.location.href = res.redirect_url;
               });
             } else {
+              console.warn('[PAYMENT DEBUG] STEP 08 WARNING — Pas de redirect_url directe, bascule fallbackConfirmPayment');
               // Simulation / Fallback interne si redirect_url directe non disponible
               this.fallbackConfirmPayment(order, res.payment_id);
             }
           },
           error: (err) => {
+            console.error('[PAYMENT ERROR] STEP 05/06/07 — Échec initialisation PayTech', {
+              httpStatus: err.status,
+              errorDetail: err.error,
+              PAYTECH: 'PAYTECH NON ATTEINT OU ERREUR API',
+              source: 'PAYTECH_INITIATE_ERROR',
+              orderId: order.id
+            });
             this.handlePaymentError(err, 'Erreur lors de l\'initialisation du paiement PayTech.');
           }
         });
 
       },
       error: (err) => {
+        console.error('[PAYMENT ERROR] STEP 03/04 — Échec création de commande Django', {
+          httpStatus: err.status,
+          errorDetail: err.error,
+          PAYTECH: 'PAYTECH NON ATTEINT',
+          source: 'CHECKOUT_CREATE_ORDER_ERROR'
+        });
         // En cas de secours/démo hors-ligne
         this.isProcessingPayment = false;
         if (err.status === 0 || err.status >= 500) {
@@ -272,8 +326,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
           this.paymentMethodName = this.selectedPaymentId === 'wave' ? 'Wave Sénégal' : 'Orange Money';
           this.paymentSuccess = true;
           this.cartService.removeSelectedItems();
-        } else {
-          this.handlePaymentError(err, 'Erreur lors de la création de la commande.');
         }
       }
     });

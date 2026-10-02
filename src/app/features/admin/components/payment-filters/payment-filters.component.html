@@ -76,9 +76,9 @@
       <div class="select-wrapper">
         <span class="select-label">Période :</span>
         <select [(ngModel)]="selectedPeriod" (change)="onPeriodSelect()">
-          <option value="MAY_2024">Ce mois (Mai 2024)</option>
-          <option value="APRIL_2024">Mois dernier (Avril 2024)</option>
-          <option value="YEAR_2024">Année 2024</option>
+          <option value="CURRENT_MONTH">Ce mois-ci</option>
+          <option value="LAST_MONTH">Mois dernier</option>
+          <option value="CURRENT_YEAR">Toute l'année</option>
         </select>
       </div>
 

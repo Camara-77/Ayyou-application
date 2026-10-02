@@ -1,10 +1,9 @@
 <!-- STICKY HEADER NAVBAR -->
 <header class="pro-header-sticky">
   <div class="container header-content">
-    <div class="brand-logo-wrap">
-      <span class="logo-text">AYYOU</span>
-      <span class="badge-pro">PRO</span>
-    </div>
+    <a routerLink="/pro" class="brand-logo-wrap">
+      <app-logo [height]="28" badgeText="PRO" badgeClass="badge-pro"></app-logo>
+    </a>
 
     <nav class="nav-desktop">
       <a routerLink="/pro">Accueil</a>
@@ -17,13 +16,6 @@
     <div class="header-actions">
       <a routerLink="/pro/login" class="btn-login-outline">Se connecter</a>
       <a routerLink="/pro/register" class="btn-register-red">S'inscrire</a>
-      
-      <div class="user-profile-circle">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
-        </svg>
-      </div>
 
       <button class="mobile-toggle-btn" (click)="toggleMobileMenu()" aria-label="Toggle menu">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -400,7 +392,7 @@
                 <h4 class="cat-title">{{ cat.title }}</h4>
                 <p class="cat-sub">{{ cat.subtitle }}</p>
                 <div class="cat-action-status">
-                  <span *ngIf="cat.file || cat.previewUrl" class="text-green">✓ Validée</span>
+                  <span *ngIf="cat.file || cat.previewUrl" class="text-green">✓ Reçu</span>
                   <span *ngIf="!cat.file && !cat.previewUrl" class="text-red">+ Ajouter</span>
                 </div>
               </div>
@@ -419,20 +411,6 @@
                 Glissez-déposez votre photo d'identité ou <span class="link-red">parcourez vos fichiers</span>
               </p>
               <p class="format-text">Photo de face, bien cadrée, fond uni et sans lunettes de soleil. Formats JPG, WebP ou PNG (Max 5 Mo).</p>
-            </div>
-
-            <!-- Drag & Drop Zone for Restaurant/Vendeur -->
-            <div *ngIf="selectedType !== 'LIVREUR'" class="drag-drop-upload-zone mt-14" (click)="triggerFileInput('photo_facade')">
-              <div class="cloud-icon-circle">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E51B2A" stroke-width="2">
-                  <path d="M16 16l-4-4-4 4M12 12v9"/>
-                  <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
-                </svg>
-              </div>
-              <p class="drag-text">
-                Glissez-déposez vos photos ou <span class="link-red">parcourez vos fichiers</span>
-              </p>
-              <p class="format-text">Formats acceptés : JPG, WebP, PNG haute définition jusqu'à 8 Mo par photo</p>
             </div>
           </div>
 
@@ -461,7 +439,7 @@
       <div class="register-sidebar-column">
         <!-- Banner Card -->
         <div class="sidebar-banner-card">
-          <img [src]="selectedType === 'LIVREUR' ? 'https://images.unsplash.com/photo-1526367790999-0150786686a2?auto=format&fit=crop&w=600&q=80' : (selectedType === 'VENDEUR' ? 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=600&q=80' : 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=600&q=80')" alt="AYYOU Dakar" class="banner-img" />
+          <img src="assets/banners/pro_partner_banner.png" alt="AYYOU Dakar" class="banner-img" />
           <div class="banner-body">
             <span class="banner-tag">
               {{ selectedType === 'LIVREUR' ? 'FLOTTE AYYOU DAKAR • En direct' : (selectedType === 'VENDEUR' ? 'COMMERCES AYYOU DAKAR • Plateau • Almadies • VDN' : 'FLOTTE AYYOU DAKAR • Plateau • Almadies • VDN') }}
@@ -479,7 +457,7 @@
             <h3>Avantages Coursiers AYYOU</h3>
             <div class="advantages-bullet-list mt-10">
               <p>• Tarifs garantis par course effectuée et bonus attractifs lors des heures de pointe à Dakar.</p>
-              <p>• Paiements instantanés et sécurisés via Wave ou Orange Money chaque semaine sans frais cachés.</p>
+              <p>• Paiements instantanés et sécurisés via Paytech chaque semaine sans frais cachés.</p>
               <p>• Assurance accidents de trajet incluse sans franchise pour chaque coursier actif en mission.</p>
               <p>• Équipement certifié fourni : veste coupe-vent étanche, sac isotherme haute capacité, et support smartphone guidon.</p>
             </div>
@@ -507,7 +485,7 @@
                 <span class="support-mini-label">SUPPORT COURSIERS DIRECT</span>
                 <span class="schedule-pill">Lun - Sam : 8h - 20h</span>
               </div>
-              <p class="phone-big-red mt-4">+221 33 800 00 00</p>
+              <p class="phone-big-red mt-4">+221 77 385 26 51</p>
             </div>
           </div>
         </ng-container>
@@ -544,7 +522,7 @@
               Pour les {{ selectedType === 'VENDEUR' ? 'vendeurs et commerces' : 'restaurants et marchands' }} : <strong>0% de commission</strong> sur vos ventes directes via notre formule d'abonnement mensuel transparent et fixe.
             </p>
             <div class="wave-pill-badge mt-10">
-              <span>Gains marchands :</span> <strong class="text-red">Versement instantané Wave / Orange Money</strong>
+              <span>Gains marchands :</span> <strong class="text-red">Versement instantané Paytech</strong>
             </div>
           </div>
 
@@ -557,7 +535,7 @@
                   <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.27c1.21.49 2.53.76 3.88.76a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.35.27 2.67.76 3.88a1 1 0 01-.27 1.11l-2.2 2.2z"/>
                 </svg>
               </div>
-              <span class="phone-number">+221 33 800 00 00</span>
+              <span class="phone-number">+221 77 385 26 51</span>
             </div>
             <p class="schedule-text mt-4">Lundi au Samedi : 8h00 - 20h00 GMT</p>
             <p class="address-text mt-8">Notre bureau support est situé Avenue Cheikh Anta Diop, Dakar.</p>
@@ -574,10 +552,9 @@
 <footer class="pro-footer">
   <div class="container footer-grid">
     <div class="footer-brand-col">
-      <div class="brand-logo-wrap">
-        <span class="logo-text">AYYOU</span>
-        <span class="badge-pro">PRO</span>
-      </div>
+      <a routerLink="/pro" class="brand-logo-wrap">
+        <app-logo [height]="32" badgeText="PRO" badgeClass="badge-pro"></app-logo>
+      </a>
       <p class="footer-brand-desc">
         L'infrastructure B2B moderne dédiée aux restaurateurs, commerces de bouche et coursiers professionnels. Fluidité, précision opérationnelle et rayonnement culinaire.
       </p>

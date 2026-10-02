@@ -30,6 +30,12 @@ export interface AIChatResponse {
   cards?: RecommendationCard[];
   intent?: any;
   user_name?: string;
+  quota_used?: number;
+  quota_max?: number;
+  is_quota_exceeded?: boolean;
+  seconds_remaining?: number;
+  formatted_time_remaining?: string;
+  reset_at?: string;
 }
 
 @Injectable({

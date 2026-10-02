@@ -3,12 +3,10 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { AppBottomNavComponent } from '../../components/app-bottom-nav/app-bottom-nav.component';
-import { ChatbotFloatingComponent } from '../../components/chatbot-floating/chatbot-floating.component';
 import { ClientDataService } from '../../../../core/services/client-data.service';
 import { OrderService } from '../../../../core/services/order.service';
 import { OrderHistoryItem } from '../../../../core/models/client';
 import { CommandeOrder } from '../../../../core/models/orders';
-import { AppFooterComponent } from '../../../../shared/components/app-footer/app-footer.component';
 
 @Component({
   selector: 'app-orders-history',
@@ -17,9 +15,7 @@ import { AppFooterComponent } from '../../../../shared/components/app-footer/app
     CommonModule,
     RouterModule,
     AppHeaderComponent,
-    AppBottomNavComponent,
-    ChatbotFloatingComponent,
-    AppFooterComponent
+    AppBottomNavComponent
   ],
   templateUrl: './orders-history.component.html',
   styleUrls: ['./orders-history.component.scss']

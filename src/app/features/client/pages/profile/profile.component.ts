@@ -4,7 +4,6 @@ import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { AppBottomNavComponent } from '../../components/app-bottom-nav/app-bottom-nav.component';
-import { ChatbotFloatingComponent } from '../../components/chatbot-floating/chatbot-floating.component';
 import { ClientDataService } from '../../../../core/services/client-data.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserProfile } from '../../../../core/models/client';
@@ -17,8 +16,7 @@ import { UserProfile } from '../../../../core/models/client';
     RouterModule,
     FormsModule,
     AppHeaderComponent,
-    AppBottomNavComponent,
-    ChatbotFloatingComponent
+    AppBottomNavComponent
   ],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']

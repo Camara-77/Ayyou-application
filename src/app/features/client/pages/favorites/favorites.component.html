@@ -10,6 +10,13 @@
   </div>
 
   <main class="feed-content">
+    <div class="empty-favorites" *ngIf="favorites.length === 0">
+      <div class="empty-icon">❤️</div>
+      <h3 class="empty-title">Aucun favori pour le moment</h3>
+      <p class="empty-subtitle">Aimez des vidéos dans le Feed pour les retrouver dans vos favoris du profil.</p>
+      <a routerLink="/home" class="btn-discover">Découvrir le Feed</a>
+    </div>
+
     <app-food-post
       *ngFor="let item of favorites"
       [feedItem]="item"
@@ -18,6 +25,5 @@
     ></app-food-post>
   </main>
 
-  <app-chatbot-floating></app-chatbot-floating>
   <app-bottom-nav activeTab="profile"></app-bottom-nav>
 </div>

@@ -8,8 +8,8 @@
     <p class="dish-desc" *ngIf="!compact && dish.description">{{ dish.description }}</p>
     <div class="dish-bottom">
       <span class="dish-price">{{ formatPrice(dish.price) }}</span>
-      <button class="btn-see-more" (click)="onAdd($event)" aria-label="Voir plus">
-        Voir plus <span class="arrow">&gt;</span>
+      <button class="btn-see-more" (click)="onAdd($event)" aria-label="Commander">
+        Commander <span class="arrow">&gt;</span>
       </button>
     </div>
   </div>

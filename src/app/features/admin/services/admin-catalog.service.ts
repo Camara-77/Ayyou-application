@@ -76,7 +76,7 @@ function mapBackendCategoryToCatalogCategory(c: any): CatalogCategory {
     fileName: 'category.jpg',
     isActive: !!c.est_active,
     itemCount: Number(c.nombre_produits || 0),
-    linkedEstCount: 10,
+    linkedEstCount: Number(c.nombre_etablissements || c.nombre_produits || 0),
     displayOrder: Number(c.ordre || 0),
     description: c.nom
   };
