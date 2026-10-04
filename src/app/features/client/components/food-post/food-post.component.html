@@ -63,11 +63,24 @@
       </svg>
     </button>
 
-    <!-- Top-Center Restaurant Profile Header (Centred Avatar + Name Below) -->
-    <a [routerLink]="['/restaurant', feedItem.restaurant.id]" class="restaurant-top-overlay" (click)="$event.stopPropagation()">
-      <img [src]="feedItem.restaurant.avatarUrl" [alt]="feedItem.restaurant.name" class="restaurant-avatar" />
+    <!-- Top-Center Restaurant Profile Header (Centred Avatar + Quick '+' Subscribe Button + Name Below) -->
+    <div class="restaurant-top-overlay" (click)="onRestaurantClick($event)">
+      <div class="avatar-plus-wrapper">
+        <img [src]="feedItem.restaurant.avatarUrl" [alt]="feedItem.restaurant.name" class="restaurant-avatar" />
+        <button 
+          type="button" 
+          class="btn-plus-feed" 
+          *ngIf="canShowPlusButton"
+          (click)="onSubscribeFromFeed($event)"
+          [disabled]="isSubscribingFeed"
+          aria-label="S'abonner"
+        >
+          <span *ngIf="!isSubscribingFeed">+</span>
+          <span *ngIf="isSubscribingFeed" class="plus-loader">•</span>
+        </button>
+      </div>
       <span class="restaurant-name">{{ feedItem.restaurant.name }}</span>
-    </a>
+    </div>
 
     <!-- Right Column Interactions (Heart 1.2k, Share Partager) -->
     <div class="interactions-overlay" (click)="$event.stopPropagation()">
@@ -83,13 +96,42 @@
       ></app-food-interaction>
     </div>
 
-    <!-- Bottom Overlay Content -->
+    <!-- Bottom Overlay Content (Compact TikTok-style) -->
     <div class="bottom-overlay" (click)="$event.stopPropagation()">
-      <div class="dish-details" (click)="onDishClick($event)" style="cursor: pointer;">
-        <p class="dish-description" *ngIf="feedItem.dish.description">{{ feedItem.dish.description }}</p>
-        <span class="dish-price">{{ formatPrice(feedItem.dish.price) }}</span>
+      <div class="dish-details">
+        <!-- 1. NOM DU PLAT -->
+        <h3 class="dish-title" (click)="onDishClick($event)" *ngIf="feedItem.dish?.name">
+          {{ feedItem.dish.name }}
+        </h3>
 
-        <div class="action-row">
+        <!-- 2. DESCRIPTION COURTE (Tronquée à 1 ligne par défaut, développable avec SVG Chevron) -->
+        <div class="description-block" *ngIf="feedItem.dish?.description">
+          <p class="dish-description" [class.expanded]="isDescriptionExpanded" (click)="onDishClick($event)">
+            {{ feedItem.dish.description }}
+          </p>
+          <button
+            type="button"
+            class="btn-expand-description"
+            *ngIf="feedItem.dish.description.length > 45"
+            (click)="toggleDescriptionExpand($event)"
+          >
+            <span>{{ isDescriptionExpanded ? 'Réduire' : 'Afficher plus' }}</span>
+            <svg *ngIf="!isDescriptionExpanded" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+            <svg *ngIf="isDescriptionExpanded" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="18 15 12 9 6 15"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- 3. PRIX DU PRODUIT RÉEL POSTGRESQL -->
+        <span class="dish-price" *ngIf="feedItem.dish?.price && feedItem.dish.price > 0" (click)="onDishClick($event)">
+          {{ formatPrice(feedItem.dish.price) }}
+        </span>
+
+        <!-- 4. BOUTON COMMANDER ET AJOUT RAPIDE AU PANIER -->
+        <div class="action-row" *ngIf="feedItem.dish?.price && feedItem.dish.price > 0">
           <app-order-button
             label="Commander"
             size="medium"

@@ -1,0 +1,1192 @@
+.planning-create-layout {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background-color: #F8F9FA;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.planning-create-content {
+  flex: 1;
+  padding: 16px 16px 160px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+/* -------------------------------------------------------------
+ * 1. STEPPER INDICATEUR DE PROGRESSION
+ * ------------------------------------------------------------- */
+.stepper-bar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FFFFFF;
+  padding: 12px 18px;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  border: 1px solid #EEEEEE;
+
+  .step-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .step-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #E5E7EB;
+      color: #6B7280;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease;
+    }
+
+    .step-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6B7280;
+      white-space: nowrap;
+    }
+
+    &.active {
+      .step-circle {
+        background: #E51A29;
+        color: #FFFFFF;
+        box-shadow: 0 2px 6px rgba(229, 26, 41, 0.3);
+      }
+
+      .step-label {
+        color: #1A1A1A;
+        font-weight: 800;
+      }
+    }
+  }
+
+  .step-connector {
+    flex: 1;
+    height: 2px;
+    background: #E5E7EB;
+    margin: 0 10px;
+    transition: background-color 0.25s ease;
+
+    &.active {
+      background: #E51A29;
+    }
+  }
+}
+
+/* -------------------------------------------------------------
+ * 2. BARRE DE RECHERCHE AVEC MICROPHONE
+ * ------------------------------------------------------------- */
+.search-bar-wrapper {
+  background: #FFFFFF;
+  border-radius: 30px;
+  padding: 6px 6px 6px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+
+  .search-icon {
+    flex-shrink: 0;
+  }
+
+  .search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: #1A1A1A;
+    background: transparent;
+
+    &::placeholder {
+      color: #9CA3AF;
+    }
+  }
+
+  .btn-mic-search {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #E51A29;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(229, 26, 41, 0.3);
+    transition: transform 0.2s ease;
+
+    &:active {
+      transform: scale(0.92);
+    }
+
+    &.recording {
+      animation: micPulse 1s infinite alternate;
+    }
+  }
+}
+
+@keyframes micPulse {
+  from { transform: scale(1); box-shadow: 0 0 0 0 rgba(229, 26, 41, 0.4); }
+  to { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(229, 26, 41, 0); }
+}
+
+/* -------------------------------------------------------------
+ * 3. CARROUSEL DE CATÉGORIES
+ * ------------------------------------------------------------- */
+.categories-scroll-wrapper {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .category-pill-btn {
+    padding: 8px 18px;
+    border-radius: 20px;
+    background: #F3F4F6;
+    border: 1px solid transparent;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4B5563;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    .dot-active {
+      color: #FFFFFF;
+      font-weight: 800;
+    }
+
+    &.active {
+      background: #E51A29;
+      color: #FFFFFF;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(229, 26, 41, 0.3);
+    }
+  }
+}
+
+/* -------------------------------------------------------------
+ * 4. LISTE & GRILLE DES PLATS
+ * ------------------------------------------------------------- */
+.dishes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  .dish-item-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    border: 1px solid #EEEEEE;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    .dish-card-img-wrapper {
+      width: 100%;
+      height: 125px;
+      background: #F3F4F6;
+
+      .dish-card-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .dish-card-info {
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+
+      .dish-card-title {
+        font-size: 13.5px;
+        font-weight: 700;
+        color: #1A1A1A;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .dish-card-price {
+        font-size: 13.5px;
+        font-weight: 800;
+        color: #E51A29;
+      }
+
+      .dish-card-resto {
+        font-size: 11px;
+        color: #757575;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}
+
+.empty-state-box {
+  padding: 32px 16px;
+  text-align: center;
+  color: #757575;
+  font-size: 14px;
+}
+
+/* -------------------------------------------------------------
+ * 5. CARTE PLAT SÉLECTIONNÉ (ÉTAPES 1 VALIDÉE)
+ * ------------------------------------------------------------- */
+.selected-dish-summary-card {
+  background: #FFFFFF;
+  border-radius: 20px;
+  padding: 14px;
+  display: flex;
+  gap: 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  border: 1px solid #EEEEEE;
+
+  .dish-summary-img-wrapper {
+    width: 90px;
+    height: 90px;
+    border-radius: 16px;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    .dish-summary-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .dish-summary-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .summary-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .badge-etape-validee {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #E51A29;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .btn-change-dish {
+      background: transparent;
+      border: none;
+      color: #6B7280;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+
+      &:hover {
+        color: #E51A29;
+      }
+    }
+
+    .summary-dish-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #1A1A1A;
+      margin: 2px 0 0 0;
+    }
+
+    .summary-dish-desc {
+      font-size: 12px;
+      color: #6B7280;
+      margin: 0;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .recipe-origin-badge {
+      margin-top: 6px;
+      background: #FFF5F5;
+      border-radius: 10px;
+      padding: 4px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+
+      .badge-bold {
+        font-size: 11px;
+        font-weight: 700;
+        color: #1A1A1A;
+      }
+
+      .badge-dot {
+        font-size: 11px;
+        color: #9CA3AF;
+      }
+
+      .badge-sub {
+        font-size: 11px;
+        color: #6B7280;
+      }
+    }
+  }
+}
+
+/* -------------------------------------------------------------
+ * 6. SECTION OÙ COMMANDER CE PLAT ? (ÉTABLISSEMENTS)
+ * ------------------------------------------------------------- */
+.section-establishments-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .section-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    .title-sub-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      .section-heading {
+        font-size: 16px;
+        font-weight: 800;
+        color: #1A1A1A;
+        margin: 0;
+      }
+
+      .section-sub-caption {
+        font-size: 11.5px;
+        color: #757575;
+        margin: 0;
+      }
+    }
+
+    .count-pill {
+      background: #F3F4F6;
+      color: #4B5563;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 14px;
+      white-space: nowrap;
+    }
+  }
+
+  .establishments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .resto-card-item {
+      background: #FFFFFF;
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 2px solid transparent;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &.selected {
+        border-color: #E51A29;
+        background: #FFF8F8;
+      }
+
+      .resto-icon-circle {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: #F9FAFB;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        &.selected {
+          background: #FDE8E9;
+        }
+      }
+
+      .resto-info {
+        flex: 1;
+
+        .resto-name {
+          font-size: 14.5px;
+          font-weight: 800;
+          color: #1A1A1A;
+          margin: 0;
+        }
+
+        .resto-address {
+          font-size: 12px;
+          color: #757575;
+          margin: 2px 0 6px 0;
+        }
+
+        .resto-price-bottom {
+          .price-val {
+            font-size: 14px;
+            font-weight: 800;
+            color: #1A1A1A;
+
+            &.highlight-red {
+              color: #E51A29;
+            }
+          }
+        }
+      }
+
+      .resto-select-badge {
+        flex-shrink: 0;
+
+        .check-circle-red {
+          width: 22px;
+          height: 22px;
+          border-radius: 50%;
+          background-color: #E51A29;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .empty-circle-grey {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          border: 2px solid #D1D5DB;
+        }
+      }
+    }
+  }
+}
+
+/* -------------------------------------------------------------
+ * 7. SECTIONS BOX (DATE DE DÉGUSTATION & TYPE DE REPAS)
+ * ------------------------------------------------------------- */
+.section-card-box {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  border: 1px solid #EEEEEE;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .section-box-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .title-with-icon {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .box-heading {
+        font-size: 15px;
+        font-weight: 800;
+        color: #1A1A1A;
+        margin: 0;
+      }
+    }
+
+    .header-action-buttons {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-modify-date, .btn-modify-time {
+      background: transparent;
+      border: none;
+      color: #E51A29;
+      font-size: 12.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 8px;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background: #FFF5F5;
+      }
+    }
+  }
+
+  .date-picker-row {
+    position: relative;
+
+    .custom-date-input, .custom-time-input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+      width: 0;
+      height: 0;
+    }
+
+    .selected-date-display-box {
+      background: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+
+      .date-text-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+
+        .formatted-date-bold {
+          font-size: 14px;
+          font-weight: 700;
+          color: #1A1A1A;
+        }
+      }
+
+      .time-text-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+
+        .formatted-time-bold {
+          font-size: 13.5px;
+          font-weight: 800;
+          color: #E51A29;
+          background: #FFF5F5;
+          padding: 3px 8px;
+          border-radius: 8px;
+          border: 1px solid #FDE8E9;
+        }
+      }
+
+      .creneau-pill-grey {
+        background: #E5E7EB;
+        color: #4B5563;
+        font-size: 11.5px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 10px;
+      }
+    }
+  }
+
+  .meal-types-pills-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    .meal-type-pill {
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: #F3F4F6;
+      border: none;
+      font-size: 12px;
+      font-weight: 700;
+      color: #4B5563;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &.active {
+        background: #E51A29;
+        color: #FFFFFF;
+      }
+    }
+  }
+
+  /* PORTIONS SOUHAITÉES ROW */
+  &.quantity-box-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    .quantity-label-group {
+      display: flex;
+      flex-direction: column;
+
+      .quantity-heading {
+        font-size: 15px;
+        font-weight: 800;
+        color: #1A1A1A;
+        margin: 0;
+      }
+
+      .quantity-sub-text {
+        font-size: 11.5px;
+        color: #757575;
+        margin: 2px 0 0 0;
+      }
+    }
+
+    .quantity-counter-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .btn-qty {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: none;
+        font-size: 16px;
+        font-weight: 800;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &.btn-minus {
+          background: #E5E7EB;
+          color: #4B5563;
+        }
+
+        &.btn-plus {
+          background: #E51A29;
+          color: #FFFFFF;
+          box-shadow: 0 2px 6px rgba(229, 26, 41, 0.3);
+        }
+
+        &:active {
+          transform: scale(0.92);
+        }
+      }
+
+      .qty-number {
+        font-size: 16px;
+        font-weight: 800;
+        color: #1A1A1A;
+        min-width: 18px;
+        text-align: center;
+      }
+    }
+  }
+}
+
+/* -------------------------------------------------------------
+ * 8. STICKY BOTTOM SUMMARY BAR (TOTAL & CONFIRMER)
+ * ------------------------------------------------------------- */
+.sticky-bottom-summary-bar {
+  position: fixed;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: #FFFFFF;
+  border-top: 1px solid #EEEEEE;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+  z-index: 100;
+
+  .total-summary-group {
+    display: flex;
+    flex-direction: column;
+
+    .total-lbl {
+      font-size: 11.5px;
+      color: #757575;
+      font-weight: 600;
+    }
+
+    .total-val-row {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+
+      .total-amount {
+        font-size: 18px;
+        font-weight: 800;
+        color: #1A1A1A;
+      }
+
+      .total-currency {
+        font-size: 13px;
+        font-weight: 800;
+        color: #E51A29;
+      }
+    }
+  }
+
+  .btn-confirm-planning-red {
+    padding: 12px 24px;
+    background: #E51A29;
+    border: none;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #FFFFFF;
+    font-size: 14.5px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(229, 26, 41, 0.35);
+    transition: transform 0.2s ease;
+
+    &:active {
+      transform: scale(0.96);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  }
+}
+
+/* EDIT MODE HEADER & COHERENCE ALERT */
+.edit-mode-header-card {
+  background: #FFF5F5;
+  border: 1px solid #FDE8E9;
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .edit-header-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #E51A29;
+    letter-spacing: 0.5px;
+  }
+
+  .edit-header-sub {
+    font-size: 12px;
+    color: #4B5563;
+    margin: 0;
+  }
+}
+
+.coherence-alert-box {
+  background: #FEF2F2;
+  border: 1px solid #FCA5A5;
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #B91C1C;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* PLANNING FORM CARD & DROPDOWNS */
+.planning-form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .form-group-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+
+    .field-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #1A1A1A;
+    }
+
+    .dropdown-trigger-box {
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      transition: all 0.2s ease;
+
+      &.active, &:hover {
+        border-color: #E51A29;
+      }
+
+      .trigger-selected-info {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        overflow: hidden;
+        white-space: nowrap;
+
+        .selected-val-bold {
+          font-size: 14px;
+          font-weight: 800;
+          color: #1A1A1A;
+        }
+
+        .selected-val-placeholder {
+          font-size: 14px;
+          color: #9CA3AF;
+        }
+
+        .selected-val-sub {
+          font-size: 12px;
+          color: #757575;
+        }
+
+        .selected-val-price {
+          font-size: 13.5px;
+          font-weight: 700;
+          color: #E51A29;
+        }
+      }
+
+      .chevron-icon {
+        transition: transform 0.2s ease;
+
+        &.open {
+          transform: rotate(180deg);
+        }
+      }
+    }
+
+    .dropdown-menu-panel {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      z-index: 200;
+      overflow: hidden;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .dropdown-search-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #F3F4F6;
+        border-radius: 10px;
+        padding: 6px 12px;
+
+        .dropdown-search-input {
+          flex: 1;
+          border: none;
+          background: transparent;
+          font-size: 13px;
+          color: #1A1A1A;
+          outline: none;
+
+          &::placeholder {
+            color: #9CA3AF;
+          }
+        }
+
+        .btn-mic-mini {
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          background: #E51A29;
+          border: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+
+          &.recording {
+            animation: micPulse 1s infinite alternate;
+          }
+        }
+      }
+
+      .dropdown-options-list {
+        max-height: 220px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+
+        .dropdown-option-item {
+          padding: 10px 12px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          cursor: pointer;
+          transition: background-color 0.15s ease;
+
+          &:hover, &.selected {
+            background: #FFF5F5;
+          }
+
+          .option-info-group {
+            display: flex;
+            flex-direction: column;
+
+            .option-name {
+              font-size: 13.5px;
+              font-weight: 700;
+              color: #1A1A1A;
+            }
+
+            .option-sub {
+              font-size: 11.5px;
+              color: #757575;
+            }
+          }
+
+          .option-price {
+            font-size: 13px;
+            font-weight: 800;
+            color: #E51A29;
+          }
+        }
+
+        .dropdown-empty-msg {
+          padding: 16px;
+          text-align: center;
+          font-size: 12.5px;
+          color: #9CA3AF;
+        }
+      }
+    }
+  }
+
+  .multiple-establishments-choice-box {
+    background: #FFFBEB;
+    border: 1px solid #FDE68A;
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .choice-heading {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #92400E;
+      margin: 0;
+    }
+
+    .choice-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      .choice-btn {
+        background: #FFFFFF;
+        border: 1px solid #FCD34D;
+        border-radius: 10px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 700;
+        color: #1A1A1A;
+
+        &.selected, &:hover {
+          background: #E51A29;
+          border-color: #E51A29;
+          color: #FFFFFF;
+
+          .choice-loc {
+            color: #FEE2E2;
+          }
+        }
+
+        .choice-loc {
+          font-size: 11.5px;
+          color: #757575;
+        }
+      }
+    }
+  }
+
+  .selected-summary-banner {
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 16px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+
+    .summary-thumb {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      object-fit: cover;
+    }
+
+    .summary-details {
+      display: flex;
+      flex-direction: column;
+
+      .summary-title {
+        font-size: 14.5px;
+        font-weight: 800;
+        color: #1A1A1A;
+        margin: 0;
+      }
+
+      .summary-resto {
+        font-size: 12px;
+        color: #757575;
+        margin: 2px 0;
+      }
+
+      .summary-price {
+        font-size: 13.5px;
+        font-weight: 800;
+        color: #E51A29;
+      }
+    }
+  }
+}
+
+/* STICKY BOTTOM ACTIONS BAR */
+.sticky-bottom-actions-bar {
+  position: fixed;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: #FFFFFF;
+  border-top: 1px solid #EEEEEE;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+  z-index: 100;
+
+  .total-preview-info {
+    display: flex;
+    flex-direction: column;
+
+    .total-lbl {
+      font-size: 11px;
+      color: #757575;
+      font-weight: 600;
+    }
+
+    .total-val {
+      font-size: 16px;
+      font-weight: 800;
+      color: #1A1A1A;
+    }
+  }
+
+  .action-buttons-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .btn-cancel-action-grey {
+      padding: 10px 18px;
+      background: #F3F4F6;
+      border: 1px solid #E5E7EB;
+      border-radius: 20px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #374151;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background: #E5E7EB;
+      }
+    }
+
+    .btn-save-action-red {
+      padding: 10px 20px;
+      background: #E51A29;
+      border: none;
+      border-radius: 20px;
+      color: #FFFFFF;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(229, 26, 41, 0.3);
+      transition: transform 0.2s ease;
+
+      &:active {
+        transform: scale(0.96);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+    }
+  }
+}
+

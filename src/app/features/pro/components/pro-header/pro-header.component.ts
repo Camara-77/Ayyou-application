@@ -37,6 +37,9 @@ export class ProHeaderComponent implements OnInit {
   dynamicName?: string;
   dynamicIsOpen?: boolean;
   isMenuOpen: boolean = false;
+  showToast: boolean = false;
+  toastMessage: string = '';
+  private toastTimeout?: any;
 
   ngOnInit(): void {
     this.notificationService.unreadCount$.subscribe(count => {
@@ -59,6 +62,52 @@ export class ProHeaderComponent implements OnInit {
 
   closeMenu(): void {
     this.isMenuOpen = false;
+  }
+
+  copyStoreLink(): void {
+    this.closeMenu();
+    const profile = this.proAuthService.currentProfile;
+    const etabId = profile?.id || '69';
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const publicUrl = `${origin}/restaurant/${etabId}`;
+
+    if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(publicUrl).then(() => {
+        this.triggerToast('✓ Lien de la boutique copié');
+      }).catch(() => {
+        this.fallbackCopy(publicUrl);
+      });
+    } else {
+      this.fallbackCopy(publicUrl);
+    }
+  }
+
+  private fallbackCopy(text: string): void {
+    if (typeof document === 'undefined') return;
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.opacity = '0';
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      this.triggerToast('✓ Lien de la boutique copié');
+    } catch (e) {
+      this.triggerToast('Erreur lors de la copie');
+    }
+    document.body.removeChild(textArea);
+  }
+
+  private triggerToast(message: string): void {
+    this.toastMessage = message;
+    this.showToast = true;
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+    }
+    this.toastTimeout = setTimeout(() => {
+      this.showToast = false;
+    }, 2500);
   }
 
   @HostListener('document:click', ['$event'])

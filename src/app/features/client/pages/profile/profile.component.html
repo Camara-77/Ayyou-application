@@ -63,6 +63,21 @@
           <span class="chevron">&gt;</span>
         </div>
       </a>
+
+      <!-- Mes abonnements Row -->
+      <a routerLink="/profile/subscriptions" class="settings-card nav-link">
+        <div class="card-left">
+          <div class="icon-circle icon-bookmark">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="card-label">Mes abonnements</span>
+        </div>
+        <div class="card-right">
+          <span class="chevron">&gt;</span>
+        </div>
+      </a>
     </div>
 
     <!-- Section Mon Compte -->
@@ -87,6 +102,26 @@
             <span class="chevron">&gt;</span>
           </div>
         </a>
+
+        <div class="row-divider"></div>
+
+        <!-- Numéro de téléphone du compte -->
+        <div class="account-row phone-row" (click)="openPhoneModal()">
+          <div class="row-left">
+            <div class="icon-circle icon-phone">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="row-text">
+              <span class="row-title">Numéro de téléphone</span>
+              <span class="row-subtitle">{{ userProfile.phoneNumber || 'Aucun numéro configuré' }}</span>
+            </div>
+          </div>
+          <div class="row-right">
+            <span class="btn-edit-inline">Modifier</span>
+          </div>
+        </div>
 
         <div class="row-divider"></div>
 
@@ -121,6 +156,61 @@
       <span>Déconnexion</span>
     </button>
   </main>
+
+  <!-- Modal Modification Numéro de Téléphone -->
+  <div class="modal-overlay" *ngIf="showPhoneModal" (click)="closePhoneModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Modifier mon numéro</h3>
+        <button type="button" class="btn-close-modal" (click)="closePhoneModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-description">
+          Ce numéro de téléphone est utilisé pour votre compte AYYOU et le suivi de vos commandes.
+        </p>
+
+        <div class="form-group">
+          <label class="input-label">Ancien numéro</label>
+          <input 
+            type="text" 
+            class="form-control readonly" 
+            [value]="userProfile?.phoneNumber || 'Non renseigné'" 
+            readonly 
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="input-label">Nouveau numéro *</label>
+          <input 
+            type="tel" 
+            class="form-control" 
+            placeholder="Ex: +221 77 123 45 67" 
+            [(ngModel)]="newPhoneInput"
+            [disabled]="isSavingPhone"
+          />
+        </div>
+
+        <div class="alert alert-danger" *ngIf="phoneError">
+          {{ phoneError }}
+        </div>
+
+        <div class="alert alert-success" *ngIf="phoneSuccessMsg">
+          {{ phoneSuccessMsg }}
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancel" (click)="closePhoneModal()" [disabled]="isSavingPhone">
+          Annuler
+        </button>
+        <button type="button" class="btn-modal-save" (click)="savePhone()" [disabled]="isSavingPhone">
+          <span *ngIf="!isSavingPhone">Enregistrer</span>
+          <span *ngIf="isSavingPhone">Enregistrement...</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <app-bottom-nav activeTab="profile"></app-bottom-nav>
 </div>

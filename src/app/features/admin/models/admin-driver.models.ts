@@ -14,6 +14,24 @@ export interface DriverDocument {
   isImage?: boolean;
 }
 
+export interface AiDriverAnalysisReport {
+  decision: 'CONFORME' | 'NON_CONFORME' | 'A_VERIFIER';
+  confidence: number;
+  inscription_info?: any;
+  identity_consistency?: { status: string; details: string };
+  identity_analysis?: { status: string; details: string };
+  vehicle_consistency?: { status: string; details: string };
+  vehicle_registration_analysis?: { status: string; details: string };
+  insurance_status?: { status: string; details: string };
+  insurance_analysis?: { status: string; details: string };
+  driver_license_analysis?: { status: string; details: string };
+  documents_analysis?: any[];
+  photo_analysis?: any;
+  inconsistencies: string[];
+  recommendation: string;
+  rejection_reasons: string[];
+}
+
 export interface DriverDetail {
   id: string;
   firstName: string;
@@ -36,6 +54,7 @@ export interface DriverDetail {
   photoUrl?: string;
   documentsCount?: string;
   documents?: DriverDocument[];
+  aiAnalysisReport?: AiDriverAnalysisReport;
 }
 
 export interface DriverStatsSummary {

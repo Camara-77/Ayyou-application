@@ -2,8 +2,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { DriverDetail, DriverDocument } from '../../models/admin-driver.models';
-import { resolveMediaUrl } from '../../services/admin-driver.service';
+import { DriverDetail, DriverDocument, AiDriverAnalysisReport } from '../../models/admin-driver.models';
+import { resolveMediaUrl, AdminDriverService } from '../../services/admin-driver.service';
 
 @Component({
   selector: 'app-driver-details-panel',
@@ -29,7 +29,34 @@ export class DriverDetailsPanelComponent {
   docNotes: string = '';
   rejectReason: string = '';
 
-  constructor(private sanitizer: DomSanitizer) {}
+  isAnalyzing: boolean = false;
+  analysisError: string = '';
+
+  constructor(
+    private sanitizer: DomSanitizer,
+    private driverService: AdminDriverService
+  ) {}
+
+  analyzeWithCopilot(): void {
+    if (!this.driver || !this.driver.id || this.isAnalyzing) return;
+
+    this.isAnalyzing = true;
+    this.analysisError = '';
+
+    this.driverService.analyzeDocumentsWithCopilot(this.driver.id).subscribe({
+      next: (report: AiDriverAnalysisReport) => {
+        this.isAnalyzing = false;
+        if (this.driver) {
+          this.driver.aiAnalysisReport = report;
+        }
+      },
+      error: (err) => {
+        this.isAnalyzing = false;
+        console.error('Erreur lors de l\'analyse Copilot livreur:', err);
+        this.analysisError = 'Impossible de contacter AYYOU Copilot. Veuillez réessayer.';
+      }
+    });
+  }
 
   viewDocument(doc: DriverDocument): void {
     if (!doc || !doc.fichierUrl) return;
@@ -65,7 +92,14 @@ export class DriverDetailsPanelComponent {
   }
 
   promptReject(): void {
-    this.rejectReason = '';
+    const report = this.driver?.aiAnalysisReport;
+    if (report && report.rejection_reasons && report.rejection_reasons.length > 0) {
+      this.rejectReason = report.rejection_reasons.map(r => `• ${r}`).join('\n');
+    } else if (report && report.inconsistencies && report.inconsistencies.length > 0) {
+      this.rejectReason = report.inconsistencies.map(inc => `• ${inc}`).join('\n');
+    } else {
+      this.rejectReason = '';
+    }
     this.showRejectModal = true;
   }
 

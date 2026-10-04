@@ -4,7 +4,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { PaymentService } from '../../../../core/services/payment.service';
 import { OrderService } from '../../../../core/services/order.service';
 import { CartService } from '../../../../core/services/cart.service';
-import { CommandeOrder, SubOrder, OrderLine } from '../../../../core/models/orders';
+import { CommandeOrder, OrderLine } from '../../../../core/models/orders';
 import { Invoice, Payment } from '../../../../core/models/payment';
 import { Subscription, interval } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
@@ -30,6 +30,7 @@ export class CheckoutConfirmComponent implements OnInit, OnDestroy {
 
   isDownloadingPdf = false;
   downloadSuccessMessage = false;
+  showBrandText = false;
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -84,7 +85,7 @@ export class CheckoutConfirmComponent implements OnInit, OnDestroy {
             token: token
           }).subscribe({
             next: (res) => {
-              if (res && res.statut === 'PAYEE') {
+              if (res && (res.statut === 'PAYEE' || res.statut === 'PAYE')) {
                 this.orderService.getOrderById(orderId).subscribe(updatedOrder => {
                   this.orderData = updatedOrder;
                   this.isLoading = false;
@@ -191,17 +192,22 @@ export class CheckoutConfirmComponent implements OnInit, OnDestroy {
     });
   }
 
-  fetchInvoiceData(orderId: number | string, numCommande?: string): void {
+  fetchInvoiceData(orderId: number | string, numCommande?: string, retryCount = 0): void {
     this.paymentService.getInvoices().subscribe({
       next: (invoices: Invoice[]) => {
         if (invoices && invoices.length > 0) {
           const matched = invoices.find(inv =>
             String(inv.commande) === String(orderId) ||
             String(inv.commande_id) === String(orderId) ||
-            inv.commande_numero === numCommande ||
-            String(inv.id) === String(orderId)
-          ) || invoices[0];
-          this.invoiceData = matched;
+            inv.commande_numero === numCommande
+          );
+          if (matched) {
+            this.invoiceData = matched;
+            return;
+          }
+        }
+        if (retryCount < 5) {
+          setTimeout(() => this.fetchInvoiceData(orderId, numCommande, retryCount + 1), 1000);
         }
       }
     });
@@ -234,6 +240,61 @@ export class CheckoutConfirmComponent implements OnInit, OnDestroy {
     });
   }
 
+  getInvoiceDateFormatted(): string {
+    const rawDate = this.invoiceData?.date_emission || this.invoiceData?.date_paiement || this.orderData?.date_creation;
+    if (!rawDate) return '';
+    const dateObj = new Date(rawDate);
+    if (isNaN(dateObj.getTime())) return String(rawDate);
+    return dateObj.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+  }
+
+  getShortOrderRef(): string {
+    const num = this.orderData?.numero_commande || this.invoiceData?.commande_numero || '';
+    if (!num) return '';
+    if (num.length > 4) {
+      return `AY • ${num.slice(-4)}`;
+    }
+    return num;
+  }
+
+  getEtablissementNom(): string {
+    if (this.orderData?.sous_commandes && this.orderData.sous_commandes.length > 0) {
+      const sc = this.orderData.sous_commandes[0];
+      if (sc.etablissement_nom) return sc.etablissement_nom;
+    }
+    if (this.invoiceData?.details_lignes_snapshot && this.invoiceData.details_lignes_snapshot.length > 0) {
+      return this.invoiceData.details_lignes_snapshot[0].etablissement;
+    }
+    return 'Chez Loutcha';
+  }
+
+  getEtablissementSpecialite(): string {
+    if (this.orderData?.sous_commandes && this.orderData.sous_commandes.length > 0) {
+      const sc = this.orderData.sous_commandes[0];
+      if (sc.etablissement_specialite) return sc.etablissement_specialite;
+    }
+    return 'Cuisine sénégalaise & Africaine';
+  }
+
+  getInvoiceArticles(): { quantite: number; nom: string; prix: string }[] {
+    if (this.invoiceData?.details_lignes_snapshot && this.invoiceData.details_lignes_snapshot.length > 0) {
+      return this.invoiceData.details_lignes_snapshot.map(item => ({
+        quantite: item.quantite,
+        nom: item.produit,
+        prix: this.formatPrice(item.total_ligne)
+      }));
+    }
+    return this.getAllOrderLines().map(line => ({
+      quantite: line.quantite,
+      nom: line.nom_produit_snapshot,
+      prix: this.formatPrice(line.total_ligne)
+    }));
+  }
+
   getAllOrderLines(): OrderLine[] {
     if (!this.orderData || !this.orderData.sous_commandes) return [];
     const lines: OrderLine[] = [];
@@ -245,9 +306,40 @@ export class CheckoutConfirmComponent implements OnInit, OnDestroy {
     return lines;
   }
 
+  getSousTotal(): string | number {
+    if (this.invoiceData?.montant_ht) return this.invoiceData.montant_ht;
+    if (this.orderData?.sous_total) return this.orderData.sous_total;
+    return 0;
+  }
+
+  getFraisLivraison(): string | number {
+    if (this.invoiceData?.frais_livraison !== undefined) return this.invoiceData.frais_livraison;
+    if (this.orderData?.frais_livraison !== undefined) return this.orderData.frais_livraison;
+    return 0;
+  }
+
+  getTotalPaid(): string | number {
+    if (this.invoiceData?.montant_total) return this.invoiceData.montant_total;
+    if (this.orderData?.total) return this.orderData.total;
+    return 0;
+  }
+
+  getPaymentMethodName(): string {
+    if (this.paymentData?.methode_nom) return this.paymentData.methode_nom;
+    if (this.orderData?.mode_paiement) {
+      const m = this.orderData.mode_paiement.toUpperCase();
+      if (m.includes('WAVE')) return 'Wave';
+      if (m.includes('ORANGE') || m.includes('OM')) return 'Orange Money';
+      if (m.includes('CARTE')) return 'Carte Bancaire';
+      if (m.includes('CASH') || m.includes('ESPECES')) return 'Espèces à la livraison';
+      return this.orderData.mode_paiement;
+    }
+    return 'Wave / Orange Money';
+  }
+
   formatPrice(val: string | number): string {
     const n = parseFloat(String(val || 0));
-    return n.toLocaleString('fr-FR') + ' FCFA';
+    return n.toLocaleString('fr-FR') + ' F CFA';
   }
 
   navigateToTracking(): void {
@@ -259,7 +351,13 @@ export class CheckoutConfirmComponent implements OnInit, OnDestroy {
     this.router.navigate(['/cart']);
   }
 
+  onLogoError(event: Event): void {
+    this.showBrandText = true;
+    (event.target as HTMLElement).style.display = 'none';
+  }
+
   ngOnDestroy(): void {
     this.pollSubscription?.unsubscribe();
   }
 }
+

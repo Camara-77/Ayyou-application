@@ -38,6 +38,9 @@ export interface Restaurant {
   dishes: Dish[];
   videosCount?: number;
   isFavorite?: boolean;
+  isSubscribed?: boolean;
+  followersCount?: number;
+  typeEtablissement?: 'RESTAURANT' | 'VENDEUR';
 }
 
 export interface FeedItem {
@@ -47,6 +50,7 @@ export interface FeedItem {
     name: string;
     avatarUrl: string;
     isVerified?: boolean;
+    isSubscribed?: boolean;
   };
   dish: Dish;
   mediaType: 'image' | 'video';
@@ -121,6 +125,16 @@ export interface UserProfile {
   location: string;
   avatarUrl: string;
   notificationsEnabled: boolean;
+  phoneNumber?: string;
+  email?: string;
+}
+
+export interface SubscriptionItem {
+  id: string | number;
+  utilisateur: number;
+  etablissement: number;
+  etablissementDetail: Restaurant;
+  dateCreation: string;
 }
 
 export interface NotificationItem {

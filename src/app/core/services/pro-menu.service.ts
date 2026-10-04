@@ -131,13 +131,19 @@ export class ProMenuService {
   saveDish(dish: Partial<ProDish>): Observable<ProDish> {
     const numId = dish.id ? parseInt(dish.id, 10) : undefined;
     const catIdNum = dish.categoryId ? parseInt(dish.categoryId, 10) : undefined;
+
+    let finalImageUrl = dish.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80';
+    if (finalImageUrl.startsWith('data:image/') || (!finalImageUrl.startsWith('http://') && !finalImageUrl.startsWith('https://'))) {
+      finalImageUrl = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80';
+    }
+
     const payload: Partial<BackendProduit> = {
       id: isNaN(numId as number) ? undefined : numId,
       nom: dish.name || 'Nouveau Plat',
       description: dish.description || '',
       prix_base: dish.price || 4000,
       categorie: isNaN(catIdNum as number) ? undefined : catIdNum,
-      image_url: dish.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+      image_url: finalImageUrl,
       est_disponible: dish.isVisiblePublic !== undefined ? dish.isVisiblePublic : true,
       stock_disponible: dish.stockGeneral !== undefined ? dish.stockGeneral : 100,
       stock_ayyou_reserve: dish.stockAyyouAllocated !== undefined ? dish.stockAyyouAllocated : 50,

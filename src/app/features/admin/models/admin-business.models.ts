@@ -16,6 +16,19 @@ export interface EstablishmentDocument {
   iconType: 'eye' | 'download' | 'check';
 }
 
+export interface AiDocumentAnalysisReport {
+  decision: 'CONFORME' | 'NON_CONFORME' | 'A_VERIFIER';
+  confidence: number;
+  inscription_info?: any;
+  identity_consistency?: { status: string; details: string };
+  business_consistency?: { status: string; details: string };
+  documents_analysis?: any[];
+  photo_analysis?: any;
+  inconsistencies: string[];
+  recommendation: string;
+  rejection_reasons: string[];
+}
+
 export interface EstablishmentDetail {
   id: string;
   name: string;
@@ -40,6 +53,7 @@ export interface EstablishmentDetail {
   documentsCount: string; // e.g. '4/4 Fichiers'
   documents: EstablishmentDocument[];
   photos: string[];
+  aiAnalysisReport?: AiDocumentAnalysisReport;
 }
 
 export interface EstablishmentStatsSummary {

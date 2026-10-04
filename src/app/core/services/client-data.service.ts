@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, forkJoin } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { Category, Dish, FeedItem, PaymentMethod, Restaurant, SearchResult, Vendor, UserProfile, NotificationItem, OrderHistoryItem, ProductDetail, OrderTrackingData, OrderValidationData } from '../models/client';
+import { Category, Dish, FeedItem, PaymentMethod, Restaurant, SearchResult, Vendor, UserProfile, NotificationItem, OrderHistoryItem, ProductDetail, OrderTrackingData, OrderValidationData, SubscriptionItem } from '../models/client';
 
 export interface BackendUserProfile {
   id: number;
@@ -223,7 +223,10 @@ export class ClientDataService {
       status: (item.statut === 'open' || item.statut === 'OUVERT') ? 'open' : 'closed',
       closingTime: item.heure_fermeture || '23h30',
       categories: [],
-      dishes: []
+      dishes: [],
+      isSubscribed: !!item.is_subscribed,
+      followersCount: item.followers_count || 0,
+      typeEtablissement: item.type_etablissement || 'RESTAURANT'
     };
   }
 
@@ -298,7 +301,8 @@ export class ClientDataService {
         id: f.etablissement?.id ? f.etablissement.id.toString() : '',
         name: etabName,
         avatarUrl: this.formatImageUrl(f.etablissement?.logo_url) || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=200&q=80',
-        isVerified: f.etablissement?.est_verifie ?? true
+        isVerified: f.etablissement?.est_verifie ?? true,
+        isSubscribed: !!(f.etablissement?.is_subscribed || f.is_subscribed)
       },
       dish: f.produit ? this.mapBackendToDish(f.produit) : {
         id: f.id ? f.id.toString() : '',
@@ -499,13 +503,17 @@ export class ClientDataService {
         name: res.nom_complet || `${res.prenom} ${res.nom}`.trim() || 'Client AYYOU',
         location: res.profil_client?.adresse_principale || 'Dakar, Sénégal',
         avatarUrl: res.profil_client?.photo_avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-        notificationsEnabled: res.profil_client?.notifications_activees ?? true
+        notificationsEnabled: res.profil_client?.notifications_activees ?? true,
+        phoneNumber: res.numero_telephone || '',
+        email: res.email || ''
       })),
       catchError(() => of({
         name: 'Client AYYOU',
         location: 'Dakar, Sénégal',
         avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-        notificationsEnabled: true
+        notificationsEnabled: true,
+        phoneNumber: '',
+        email: ''
       }))
     );
   }
@@ -516,6 +524,38 @@ export class ClientDataService {
 
   updateUserProfile(data: any): Observable<BackendUserProfile> {
     return this.http.patch<BackendUserProfile>(`${environment.apiUrl}/api/users/me/`, data);
+  }
+
+  updatePhone(phoneNumber: string): Observable<any> {
+    return this.http.patch(`${environment.apiUrl}/api/users/me/phone/`, {
+      numero_telephone: phoneNumber
+    });
+  }
+
+  subscribeToEstablishment(etablissementId: string | number): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/api/catalog/subscriptions/`, {
+      etablissement_id: etablissementId
+    });
+  }
+
+  unsubscribeFromEstablishment(etablissementId: string | number): Observable<any> {
+    return this.http.delete(`${environment.apiUrl}/api/catalog/subscriptions/${etablissementId}/`);
+  }
+
+  getMySubscriptions(): Observable<SubscriptionItem[]> {
+    return this.http.get<any>(`${environment.apiUrl}/api/catalog/subscriptions/`).pipe(
+      map(res => {
+        const list = Array.isArray(res) ? res : (res?.results || []);
+        return list.map((item: any) => ({
+          id: item.id,
+          utilisateur: item.utilisateur,
+          etablissement: item.etablissement,
+          etablissementDetail: this.mapBackendToRestaurant(item.etablissement_detail || {}),
+          dateCreation: item.date_creation
+        }));
+      }),
+      catchError(() => of([]))
+    );
   }
 
   updateLocation(latitude: number, longitude: number, adresse_principale?: string): Observable<any> {

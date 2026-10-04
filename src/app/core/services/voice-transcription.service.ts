@@ -7,6 +7,8 @@ export interface TranscriptionResponse {
   success?: boolean;
   status: string;
   text?: string;
+  transcription?: string;
+  search_query?: string;
   message?: string;
   error?: string;
 }

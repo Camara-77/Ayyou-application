@@ -192,6 +192,15 @@ export class OrderTrackingComponent implements OnInit, AfterViewInit, OnDestroy 
     return amount.toLocaleString('fr-FR') + ' F';
   }
 
+  getStepProgressWidth(): string {
+    if (!this.trackingData?.steps) return '0%';
+    const activeIdx = this.trackingData.steps.findIndex(s => s.active);
+    if (activeIdx === 3) return '100%';
+    if (activeIdx === 2) return '66%';
+    if (activeIdx === 1) return '33%';
+    return '0%';
+  }
+
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
     if (this.map) {
@@ -213,30 +222,69 @@ export class OrderTrackingComponent implements OnInit, AfterViewInit, OnDestroy 
       });
     });
 
+    const statusUpper = (cmd.statut || '').toUpperCase();
+    let steps = [
+      { label: 'Validée', completed: true, active: false },
+      { label: 'En cuisine', completed: false, active: false },
+      { label: 'En route', completed: false, active: false },
+      { label: 'Livrée', completed: false, active: false }
+    ];
+
+    if (statusUpper === 'LIVREE') {
+      steps = [
+        { label: 'Validée', completed: true, active: false },
+        { label: 'En cuisine', completed: true, active: false },
+        { label: 'En route', completed: true, active: false },
+        { label: 'Livrée', completed: true, active: true }
+      ];
+    } else if (statusUpper === 'EN_LIVRAISON' || statusUpper === 'EN_ROUTE' || statusUpper === 'PICKUP_EFFECTUE') {
+      steps = [
+        { label: 'Validée', completed: true, active: false },
+        { label: 'En cuisine', completed: true, active: false },
+        { label: 'En route', completed: true, active: true },
+        { label: 'Livrée', completed: false, active: false }
+      ];
+    } else if (statusUpper === 'EN_PREPARATION' || statusUpper === 'PRETE' || statusUpper === 'ACCEPTEE') {
+      steps = [
+        { label: 'Validée', completed: true, active: false },
+        { label: 'En cuisine', completed: true, active: true },
+        { label: 'En route', completed: false, active: false },
+        { label: 'Livrée', completed: false, active: false }
+      ];
+    } else {
+      // STATUT_PAYEE / BROUILLON / EN_ATTENTE_PAIEMENT
+      steps = [
+        { label: 'Validée', completed: true, active: true },
+        { label: 'En cuisine', completed: false, active: false },
+        { label: 'En route', completed: false, active: false },
+        { label: 'Livrée', completed: false, active: false }
+      ];
+    }
+
+    const orderRefShort = cmd.numero_commande
+      ? (cmd.numero_commande.split('-').pop() || String(cmd.id))
+      : String(cmd.id);
+
     return {
       id: String(cmd.id),
       orderRef: cmd.numero_commande,
       restaurant: {
-        name: firstSub ? firstSub.etablissement_nom : 'Chez Loutcha',
-        status: 'Ouvert',
-        subtitle: 'Cuisine sénégalaise & Africaine',
-        address: '101 Rue Carnot, Dakar'
+        name: firstSub?.etablissement_nom || 'Chez Loutcha',
+        avatarUrl: firstSub?.etablissement_logo || '',
+        status: firstSub?.etablissement_statut || 'Ouvert',
+        subtitle: firstSub?.etablissement_specialite || 'Cuisine sénégalaise & Africaine',
+        address: firstSub?.etablissement_adresse || '101 Rue de Sandaga, Plateau Dakar'
       },
       etaTime: '13h45',
       etaRemainingMinutes: 20,
-      steps: [
-        { label: 'Validée', completed: true, active: false },
-        { label: 'En cuisine', completed: cmd.statut !== 'EN_ATTENTE_PAIEMENT', active: cmd.statut === 'EN_ATTENTE_PAIEMENT' },
-        { label: 'En route', completed: cmd.statut === 'LIVREE', active: cmd.statut === 'EN_COURS' },
-        { label: 'Livrée', completed: cmd.statut === 'LIVREE', active: cmd.statut === 'LIVREE' }
-      ],
+      steps: steps,
       metrics: {
         remainingTime: '20 min',
         distance: '1.8 km',
         condition: 'Fluide'
       },
       driver: {
-        name: 'Amadou Sali',
+        name: 'Amadou Sall',
         badge: 'Livreur Pro',
         vehicle: 'Scooter Yamaha NMAX',
         rating: 4.9,
@@ -246,11 +294,11 @@ export class OrderTrackingComponent implements OnInit, AfterViewInit, OnDestroy 
       totalPrice: parseFloat(cmd.total || '0'),
       deliveryAddress: {
         recipientName: cmd.nom_destinataire || 'Client AYYOU',
-        addressText: cmd.adresse_livraison,
-        instructions: cmd.instructions_livraison || '',
+        addressText: cmd.adresse_livraison || 'Villa 14, Allées Seydou Nourou Tall, Point E',
+        instructions: cmd.instructions_livraison ? `Instructions : ${cmd.instructions_livraison}` : 'Sonner au portail noir, 1er étage.',
         tag: 'Sans contact'
       },
-      securityCode: String(cmd.id).padStart(4, '0')
+      securityCode: orderRefShort.slice(-4)
     };
   }
 }

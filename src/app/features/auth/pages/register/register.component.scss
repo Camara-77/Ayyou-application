@@ -369,7 +369,7 @@
   &__divider {
     @include flex-center;
     position: relative;
-    margin: 20px 0;
+    margin: 20px 0 16px 0;
     border-bottom: 1px solid #EAEAEA;
 
     span {
@@ -380,6 +380,39 @@
       font-size: 10.5px;
       font-weight: 700;
       letter-spacing: 0.5px;
+    }
+  }
+
+  &__social-wrapper {
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 48px;
+    border-radius: 12px;
+    border: 1.5px solid #EAEAEA;
+    background-color: #FFFFFF;
+    color: #212121;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #F8F9FA;
+      border-color: #D1D5DB;
+    }
+
+    &:active {
+      transform: scale(0.99);
     }
   }
 

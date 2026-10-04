@@ -101,8 +101,92 @@
     </div>
   </div>
 
+  <!-- AI Copilot Analysis Result Card -->
+  <div class="ai-analysis-report-card" *ngIf="establishment.aiAnalysisReport">
+    <div class="report-header">
+      <div class="header-left">
+        <span class="robot-icon">🤖</span>
+        <span class="report-title">ANALYSE AYYOU COPILOT</span>
+      </div>
+      <div class="decision-badge" [ngClass]="{
+        'badge-conforme': establishment.aiAnalysisReport.decision === 'CONFORME',
+        'badge-non-conforme': establishment.aiAnalysisReport.decision === 'NON_CONFORME',
+        'badge-verifier': establishment.aiAnalysisReport.decision === 'A_VERIFIER'
+      }">
+        <span *ngIf="establishment.aiAnalysisReport.decision === 'CONFORME'">✓ DOSSIER CONFORME</span>
+        <span *ngIf="establishment.aiAnalysisReport.decision === 'NON_CONFORME'">⚠ DOSSIER NON CONFORME</span>
+        <span *ngIf="establishment.aiAnalysisReport.decision === 'A_VERIFIER'">🔍 À VÉRIFIER</span>
+      </div>
+    </div>
+
+    <div class="report-breakdown">
+      <div class="breakdown-item">
+        <span class="item-name">Identité</span>
+        <span class="item-status" [ngClass]="establishment.aiAnalysisReport.identity_consistency?.status === 'COHERENT' ? 'text-green' : 'text-red'">
+          {{ establishment.aiAnalysisReport.identity_consistency?.status === 'COHERENT' ? '✓ Cohérente' : '⚠ Incohérente' }}
+        </span>
+      </div>
+
+      <div class="breakdown-item">
+        <span class="item-name">NINEA</span>
+        <span class="item-status" [ngClass]="establishment.aiAnalysisReport.business_consistency?.status === 'COHERENT' ? 'text-green' : 'text-orange'">
+          {{ establishment.aiAnalysisReport.business_consistency?.status === 'COHERENT' ? '✓ Cohérent' : '⚠ À vérifier' }}
+        </span>
+      </div>
+
+      <div class="breakdown-item">
+        <span class="item-name">Registre de commerce</span>
+        <span class="item-status" [ngClass]="establishment.aiAnalysisReport.business_consistency?.status === 'COHERENT' ? 'text-green' : 'text-orange'">
+          {{ establishment.aiAnalysisReport.business_consistency?.status === 'COHERENT' ? '✓ Cohérent' : '⚠ À vérifier' }}
+        </span>
+      </div>
+
+      <div class="breakdown-item">
+        <span class="item-name">Photos</span>
+        <span class="item-status" [ngClass]="establishment.aiAnalysisReport.photo_analysis?.photos_exploitables ? 'text-green' : 'text-orange'">
+          {{ establishment.aiAnalysisReport.photo_analysis?.photos_exploitables ? '✓ Exploitables' : '⚠ Inexploitables' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Inconsistencies List -->
+    <div class="inconsistencies-block" *ngIf="establishment.aiAnalysisReport.inconsistencies && establishment.aiAnalysisReport.inconsistencies.length > 0">
+      <span class="block-title">Incohérences détectées :</span>
+      <ul class="inconsistencies-list">
+        <li *ngFor="let inc of establishment.aiAnalysisReport.inconsistencies">• {{ inc }}</li>
+      </ul>
+    </div>
+
+    <!-- AI Recommendation -->
+    <div class="recommendation-box">
+      <span class="rec-label">Recommandation :</span>
+      <p class="rec-text">{{ establishment.aiAnalysisReport.recommendation }}</p>
+    </div>
+  </div>
+
+  <div class="analysis-error-alert" *ngIf="analysisError">
+    <span>{{ analysisError }}</span>
+  </div>
+
   <!-- Admin Action Buttons Stack -->
   <div class="admin-actions-stack">
+    <!-- Copilot AI Trigger Button -->
+    <button
+      type="button"
+      class="btn-admin-copilot-ai"
+      [disabled]="isAnalyzing"
+      (click)="analyzeWithCopilot()"
+    >
+      <div class="copilot-btn-content">
+        <div class="title-row">
+          <span class="plus-icon" *ngIf="!isAnalyzing">+</span>
+          <span class="spinner-inline" *ngIf="isAnalyzing">⏳</span>
+          <span class="copilot-main-text">{{ isAnalyzing ? 'AYYOU Copilot analyse le dossier...' : 'Analyser avec AYYOU Copilot' }}</span>
+        </div>
+        <span class="copilot-sub-text">Analyse intelligente des documents</span>
+      </div>
+    </button>
+
     <button type="button" class="btn-admin-primary-red" (click)="promptApprove()">
       + Ajouter l'établissement
     </button>

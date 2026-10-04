@@ -83,6 +83,12 @@ export class AuthService {
       tap(res => {
         if (res.verified) {
           this.clearPendingPhone();
+          if (res.access && res.refresh) {
+            this.setTokens(res.access, res.refresh);
+          }
+          if (res.utilisateur) {
+            this.setCurrentUserFromDjango(res.utilisateur);
+          }
         }
       })
     );

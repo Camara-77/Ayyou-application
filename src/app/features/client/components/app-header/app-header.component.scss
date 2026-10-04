@@ -63,8 +63,9 @@
   .right-section {
     display: flex;
     align-items: center;
+    gap: 6px;
 
-    .bell-btn {
+    .btn-icon {
       position: relative;
       background: transparent;
       border: none;
@@ -75,6 +76,12 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      text-decoration: none;
+
+      &.active svg rect,
+      &.active svg line {
+        stroke: #E51A29;
+      }
 
       .badge {
         position: absolute;

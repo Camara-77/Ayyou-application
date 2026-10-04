@@ -32,6 +32,57 @@ export class FoodPostComponent implements OnDestroy {
 
   showShareModal: boolean = false;
   toastMessage: string = '';
+  isDescriptionExpanded: boolean = false;
+  isSubscribingFeed: boolean = false;
+
+  get canShowPlusButton(): boolean {
+    const etabId = this.feedItem?.restaurant?.id || this.feedItem?.dish?.restaurantId;
+    if (!etabId) return false;
+    return !this.feedItem?.restaurant?.isSubscribed;
+  }
+
+  onRestaurantClick(event: Event): void {
+    event.stopPropagation();
+    const etabId = this.feedItem?.restaurant?.id || this.feedItem?.dish?.restaurantId;
+    if (etabId) {
+      this.router.navigate(['/restaurant', etabId]);
+    }
+  }
+
+  onSubscribeFromFeed(event: Event): void {
+    event.stopPropagation();
+    const etabId = this.feedItem?.restaurant?.id || this.feedItem?.dish?.restaurantId;
+    if (!etabId) return;
+
+    if (!this.authService.requireAuth({
+      title: 'Connectez-vous pour vous abonner',
+      message: 'Vous devez avoir un compte AYYOU pour vous abonner à un établissement.',
+      actionType: 'generic'
+    })) {
+      return;
+    }
+
+    if (this.isSubscribingFeed) return;
+    this.isSubscribingFeed = true;
+
+    this.clientDataService.subscribeToEstablishment(etabId).subscribe({
+      next: () => {
+        if (this.feedItem?.restaurant) {
+          this.feedItem.restaurant.isSubscribed = true;
+        }
+        this.isSubscribingFeed = false;
+        this.showToast('Abonné(e) à ' + (this.feedItem?.restaurant?.name || 'l\'établissement'));
+      },
+      error: () => {
+        this.isSubscribingFeed = false;
+      }
+    });
+  }
+
+  toggleDescriptionExpand(event: Event): void {
+    event.stopPropagation();
+    this.isDescriptionExpanded = !this.isDescriptionExpanded;
+  }
 
   private clientDataService = inject(ClientDataService);
   private authService = inject(AuthService);

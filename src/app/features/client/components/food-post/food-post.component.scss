@@ -112,13 +112,56 @@
       border: none !important;
       padding: 0 !important;
 
-      .restaurant-avatar {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 2px solid #ffffff;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      .avatar-plus-wrapper {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        .restaurant-avatar {
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid #ffffff;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-plus-feed {
+          position: absolute;
+          bottom: -5px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background-color: #E51A29;
+          color: #FFFFFF;
+          border: 1.5px solid #FFFFFF;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 13px;
+          font-weight: 800;
+          line-height: 1;
+          padding: 0;
+          cursor: pointer;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+          transition: transform 0.15s ease, background-color 0.15s ease;
+
+          &:hover {
+            transform: translateX(-50%) scale(1.15);
+            background-color: #C01321;
+          }
+
+          &:active {
+            transform: translateX(-50%) scale(0.9);
+          }
+
+          &:disabled {
+            opacity: 0.7;
+          }
+        }
       }
 
       .restaurant-name {
@@ -129,6 +172,7 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        margin-top: 2px;
       }
     }
 
@@ -163,34 +207,76 @@
         pointer-events: auto;
 
         .dish-title {
-          font-size: 20px;
+          font-size: 18px;
           font-weight: 800;
           color: #ffffff;
-          margin: 0;
-          line-height: 1.2;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+          margin: 0 0 2px 0;
+          line-height: 1.25;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: underline;
+          }
         }
 
-        .dish-description {
-          font-size: 12px;
-          color: #ffffff;
-          opacity: 0.85;
-          margin: 2px 0 4px;
-          line-height: 1.35;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+        .description-block {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 2px;
+
+          .dish-description {
+            font-size: 12px;
+            color: #ffffff;
+            opacity: 0.9;
+            margin: 0;
+            line-height: 1.35;
+            display: -webkit-box;
+            -webkit-line-clamp: 1; /* 1 seule ligne par défaut */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+            cursor: pointer;
+
+            &.expanded {
+              -webkit-line-clamp: unset;
+              overflow: visible;
+            }
+          }
+
+          .btn-expand-description {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 0 4px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            opacity: 0.85;
+
+            &:hover {
+              opacity: 1;
+              text-decoration: underline;
+            }
+
+            svg {
+              color: #ffffff;
+            }
+          }
         }
 
         .dish-price {
           font-size: 16px;
-          font-weight: 700;
+          font-weight: 800;
           color: #ffffff;
           opacity: 0.95;
-          margin-bottom: 8px;
+          margin: 2px 0 6px 0;
           text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+          cursor: pointer;
         }
 
         .action-row {

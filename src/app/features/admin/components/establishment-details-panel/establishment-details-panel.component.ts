@@ -2,7 +2,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { EstablishmentDetail, EstablishmentDocument } from '../../models/admin-business.models';
+import { EstablishmentDetail, EstablishmentDocument, AiDocumentAnalysisReport } from '../../models/admin-business.models';
+import { AdminBusinessService } from '../../services/admin-business.service';
 
 @Component({
   selector: 'app-establishment-details-panel',
@@ -28,7 +29,34 @@ export class EstablishmentDetailsPanelComponent {
   docNotes: string = '';
   rejectReason: string = '';
 
-  constructor(private sanitizer: DomSanitizer) {}
+  isAnalyzing: boolean = false;
+  analysisError: string = '';
+
+  constructor(
+    private sanitizer: DomSanitizer,
+    private businessService: AdminBusinessService
+  ) {}
+
+  analyzeWithCopilot(): void {
+    if (!this.establishment || !this.establishment.id || this.isAnalyzing) return;
+
+    this.isAnalyzing = true;
+    this.analysisError = '';
+
+    this.businessService.analyzeDocumentsWithCopilot(this.establishment.id).subscribe({
+      next: (report: AiDocumentAnalysisReport) => {
+        this.isAnalyzing = false;
+        if (this.establishment) {
+          this.establishment.aiAnalysisReport = report;
+        }
+      },
+      error: (err) => {
+        this.isAnalyzing = false;
+        console.error('Erreur lors de l\'analyse Copilot:', err);
+        this.analysisError = 'Impossible de contacter AYYOU Copilot. Veuillez réessayer.';
+      }
+    });
+  }
 
   viewDocument(doc: EstablishmentDocument): void {
     if (!doc || !doc.fichierUrl) return;
@@ -68,7 +96,14 @@ export class EstablishmentDetailsPanelComponent {
   }
 
   promptReject(): void {
-    this.rejectReason = '';
+    const report = this.establishment?.aiAnalysisReport;
+    if (report && report.rejection_reasons && report.rejection_reasons.length > 0) {
+      this.rejectReason = report.rejection_reasons.map(r => `• ${r}`).join('\n');
+    } else if (report && report.inconsistencies && report.inconsistencies.length > 0) {
+      this.rejectReason = report.inconsistencies.map(inc => `• ${inc}`).join('\n');
+    } else {
+      this.rejectReason = '';
+    }
     this.showRejectModal = true;
   }
 

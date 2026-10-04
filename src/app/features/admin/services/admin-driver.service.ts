@@ -307,4 +307,14 @@ export class AdminDriverService {
       })
     );
   }
+
+  analyzeDocumentsWithCopilot(id: string): Observable<any> {
+    const url = `${environment.apiUrl}/api/admin/drivers/${id}/analyze-documents/`;
+    return this.http.post<any>(url, {});
+  }
+
+  resendEmail(id: string, motif?: string): Observable<any> {
+    const url = `${environment.apiUrl}/api/admin/drivers/${id}/resend-email/`;
+    return this.http.post<any>(url, { motif });
+  }
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ViewChildren, QueryList, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { AppBottomNavComponent } from '../../components/app-bottom-nav/app-bottom-nav.component';
 import { FoodPostComponent } from '../../components/food-post/food-post.component';
 import { ClientDataService } from '../../../../core/services/client-data.service';
@@ -15,6 +16,7 @@ import { Dish, FeedItem } from '../../../../core/models/client';
   imports: [
     CommonModule,
     RouterModule,
+    AppHeaderComponent,
     AppBottomNavComponent,
     FoodPostComponent
   ],

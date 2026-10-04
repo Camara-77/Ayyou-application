@@ -17,6 +17,22 @@
           <p class="restaurant-location" *ngIf="restaurant.location">{{ restaurant.location }}</p>
           <p class="restaurant-tagline" *ngIf="restaurant.tagline">{{ restaurant.tagline }}</p>
         </div>
+        <div class="subscription-action-wrapper">
+          <span class="subscribers-count" *ngIf="restaurant.followersCount !== undefined">
+            {{ restaurant.followersCount }}
+          </span>
+          <button 
+            type="button" 
+            class="btn-sub-toggle" 
+            [class.subscribed]="restaurant.isSubscribed"
+            (click)="toggleSubscription()"
+            [disabled]="isSubscribing"
+          >
+            <span *ngIf="isSubscribing">...</span>
+            <span *ngIf="!isSubscribing && !restaurant.isSubscribed">S'abonner</span>
+            <span *ngIf="!isSubscribing && restaurant.isSubscribed">Abonné</span>
+          </button>
+        </div>
       </div>
     </div>
 

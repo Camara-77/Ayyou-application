@@ -1,239 +1,349 @@
 .confirm-container {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   background-color: #F8F9FA;
-  padding: 24px 16px;
+  padding: 16px;
+  box-sizing: border-box;
+
+  .brand-header {
+    margin-top: 12px;
+    margin-bottom: 20px;
+    text-align: center;
+
+    .brand-logo-text {
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: #E53935;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+  }
 
   .card {
     background: #FFFFFF;
-    border-radius: 20px;
-    padding: 32px 24px;
-    max-width: 480px;
+    border-radius: 24px;
+    padding: 24px 20px;
+    max-width: 440px;
     width: 100%;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    box-sizing: border-box;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    border: 1px solid #F0F0F0;
+    text-align: left;
+
+    &.loading-card, &.pending-card, &.error-card {
+      text-align: center;
+      padding: 40px 24px;
+    }
 
     .spinner {
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       border: 4px solid #EAEAEA;
-      border-top-color: #E50914;
+      border-top-color: #E53935;
       border-radius: 50%;
-      animation: spin 1s infinite linear;
+      animation: spin 0.9s infinite linear;
       margin: 0 auto 20px;
     }
 
     h2 {
-      font-size: 1.35rem;
+      font-size: 1.25rem;
       font-weight: 700;
       color: #1A1A1A;
       margin-bottom: 8px;
     }
 
     .subtitle {
-      color: #666;
-      font-size: 0.95rem;
+      color: #666666;
+      font-size: 0.9rem;
       line-height: 1.5;
       margin-bottom: 16px;
     }
 
     .icon-circle {
-      width: 72px;
-      height: 72px;
-      background: #10B981;
+      width: 64px;
+      height: 64px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto 16px;
-      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
 
       &.error-circle {
         background: #EF4444;
-        box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+        box-shadow: 0 6px 18px rgba(239, 68, 68, 0.25);
       }
 
       &.pending-circle {
         background: #F59E0B;
-        box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+        box-shadow: 0 6px 18px rgba(245, 158, 11, 0.25);
       }
     }
 
     .ref-badge {
       display: inline-block;
       background: #F3F4F6;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 0.85rem;
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-size: 0.8rem;
       font-weight: 600;
-      color: #374151;
-      margin: 12px 0 20px;
+      color: #4B5563;
+      margin: 8px 0 20px;
+    }
+  }
+
+  /* Success Card Layout */
+  .success-banner {
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #F3F4F6;
+
+    .check-icon-circle {
+      width: 56px;
+      height: 56px;
+      background: #2E7D32;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      box-shadow: 0 6px 16px rgba(46, 125, 50, 0.25);
     }
 
-    .order-summary-box {
-      background: #F9FAFB;
-      border: 1px solid #E5E7EB;
-      border-radius: 12px;
-      padding: 16px;
-      margin: 20px 0;
-      text-align: left;
+    .success-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #111827;
+      margin: 0 0 4px 0;
+    }
 
-      .summary-header {
+    .success-subtitle {
+      font-size: 0.88rem;
+      color: #6B7280;
+      margin: 0;
+    }
+  }
+
+  /* Invoice Receipt Container */
+  .invoice-container {
+    padding: 16px 0 8px;
+
+    .invoice-section {
+      padding: 12px 0;
+
+      &.divider-top {
+        border-top: 1px solid #F3F4F6;
+      }
+
+      .section-heading {
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.8px;
+        color: #9CA3AF;
+        text-transform: uppercase;
+        margin: 0 0 10px 0;
+      }
+
+      .info-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding-bottom: 12px;
-        border-bottom: 1px solid #E5E7EB;
-        font-weight: 700;
+        font-size: 0.88rem;
+        margin-bottom: 6px;
 
-        .order-num {
-          color: #111827;
+        &:last-child {
+          margin-bottom: 0;
         }
 
-        .status-payee {
-          background: #D1FAE5;
-          color: #065F46;
-          padding: 4px 10px;
-          border-radius: 12px;
-          font-size: 0.75rem;
-          font-weight: 700;
+        .info-label {
+          color: #6B7280;
+        }
+
+        .info-value {
+          color: #111827;
+          font-weight: 500;
+
+          &.font-mono {
+            font-family: monospace;
+            font-weight: 700;
+            color: #1F2937;
+          }
         }
       }
 
-      .items-list {
-        padding: 12px 0;
+      .establishment-info {
+        .etab-name {
+          font-size: 1rem;
+          font-weight: 700;
+          color: #111827;
+          margin-bottom: 2px;
+        }
 
-        .item-row {
+        .etab-specialty {
+          font-size: 0.82rem;
+          color: #6B7280;
+        }
+      }
+
+      .articles-list {
+        .article-row {
           display: flex;
-          align-items: center;
+          justify-content: space-between;
+          align-items: flex-start;
+          font-size: 0.88rem;
           margin-bottom: 8px;
-          font-size: 0.9rem;
 
           &:last-child {
             margin-bottom: 0;
           }
 
-          .item-qty {
-            font-weight: 700;
-            color: #E50914;
-            margin-right: 8px;
-            width: 24px;
-          }
-
-          .item-name {
+          .article-qty-name {
+            color: #1F2937;
+            font-weight: 500;
             flex: 1;
-            color: #374151;
+            padding-right: 12px;
           }
 
-          .item-price {
-            font-weight: 600;
+          .article-price {
             color: #111827;
+            font-weight: 600;
+            white-space: nowrap;
           }
         }
       }
 
-      .totals-breakdown {
-        border-top: 1px dashed #D1D5DB;
-        padding-top: 12px;
+      .totals-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.88rem;
+        color: #6B7280;
+        margin-bottom: 6px;
 
-        .total-row {
-          display: flex;
-          justify-content: space-between;
-          font-size: 0.85rem;
-          color: #6B7280;
-          margin-bottom: 6px;
+        &.grand-total-row {
+          margin-top: 10px;
+          padding-top: 10px;
+          border-top: 1px dashed #E5E7EB;
 
-          &.grand-total {
+          .grand-total-label {
             font-size: 1rem;
+            font-weight: 800;
+            color: #111827;
+          }
+
+          .grand-total-value {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #E53935;
+          }
+        }
+      }
+
+      .status-grid {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .status-col {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+
+          &.align-right {
+            align-items: flex-end;
+          }
+
+          .font-bold {
             font-weight: 700;
             color: #111827;
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid #E5E7EB;
+            font-size: 0.9rem;
+          }
 
-            .total-amount {
-              color: #E50914;
-              font-weight: 800;
-            }
+          .badge-paye {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #E8F5E9;
+            color: #2E7D32;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
           }
         }
       }
     }
+  }
 
-    .invoice-box {
-      background: #EFF6FF;
-      border: 1px solid #BFDBFE;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 20px;
-      text-align: center;
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
 
-      .invoice-info {
-        margin-bottom: 10px;
-        font-size: 0.9rem;
+    .btn-secondary-action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 12px 16px;
+      background: #FFFFFF;
+      border: 1.5px solid #E53935;
+      color: #E53935;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
 
-        .invoice-label {
-          color: #1E40AF;
-          margin-right: 6px;
-        }
-
-        .invoice-num {
-          font-weight: 700;
-          color: #1E3A8A;
-        }
+      &:hover:not(:disabled) {
+        background: #FFEBEE;
       }
 
-      .btn-invoice-pdf {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: #2563EB;
-        color: #FFFFFF;
-        border: none;
-        padding: 10px 18px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        cursor: pointer;
-        transition: background 0.2s;
-
-        &:hover {
-          background: #1D4ED8;
-        }
-
-        &:disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-        }
-      }
-
-      .download-success {
-        color: #059669;
-        font-size: 0.8rem;
-        font-weight: 600;
-        margin-top: 8px;
-        margin-bottom: 0;
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
       }
     }
 
-    .btn-primary {
+    .btn-primary-action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       width: 100%;
-      padding: 14px 20px;
-      background: #E50914;
-      color: #FFFFFF;
+      padding: 14px 16px;
+      background: #E53935;
       border: none;
-      border-radius: 12px;
-      font-size: 1rem;
-      font-weight: 600;
+      color: #FFFFFF;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
       cursor: pointer;
       transition: background 0.2s ease;
 
       &:hover {
-        background: #C00711;
+        background: #C62828;
+      }
+
+      &:active {
+        transform: scale(0.99);
       }
     }
+  }
+
+  .download-toast {
+    color: #2E7D32;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 8px;
+    margin-bottom: 0;
   }
 }
 

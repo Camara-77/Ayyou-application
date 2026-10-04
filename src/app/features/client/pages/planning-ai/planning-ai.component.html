@@ -1,0 +1,916 @@
+<div class="planning-ai-layout">
+  <!-- Header avec bouton Retour, Titre et Icônes à droite -->
+  <app-header [showBack]="true" backUrl="/planning" title="AYYOU Copilote" [showPlanning]="true"></app-header>
+
+  <!-- BARRE SOUS-HEADER : BOUTON BURGER ☰ À GAUCHE & ANIMATION VOCALE À DROITE -->
+  <div class="sub-header-bar">
+    <div class="burger-menu-container">
+      <button
+        type="button"
+        class="btn-sub-burger"
+        [class.active]="isBurgerMenuOpen"
+        (click)="toggleBurgerMenu($event)"
+        aria-label="Menu principal"
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+
+      <!-- MENU DÉROULANT POPOVER (BURGER) -->
+      <div class="burger-dropdown-menu" *ngIf="isBurgerMenuOpen" (click)="$event.stopPropagation()">
+        <div class="burger-dropdown-item" (click)="openHistoryDrawer()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>Historique</span>
+        </div>
+
+        <div class="burger-dropdown-item" (click)="startNewConversation()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Nouveau Chat</span>
+        </div>
+
+        <div class="burger-dropdown-item" (click)="openPlannedMealsDrawer()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Mes Plannings ({{ plannedMealsList.length }})</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BARRE D'ANIMATION VOCALE EN TEMPS RÉEL (CALÉE À DROITE) -->
+    <div class="voice-status-bar" *ngIf="currentState === 'LISTENING' || currentState === 'TRANSCRIBING'">
+      <div class="sound-wave-icon">
+        <span class="bar bar-1"></span>
+        <span class="bar bar-2"></span>
+        <span class="bar bar-3"></span>
+        <span class="bar bar-4"></span>
+        <span class="bar bar-5"></span>
+      </div>
+      <span class="voice-status-text" *ngIf="currentState === 'LISTENING'">Écoute...</span>
+      <span class="voice-status-text" *ngIf="currentState === 'TRANSCRIBING'">Transcription...</span>
+    </div>
+  </div>
+
+  <main class="planning-ai-content" #chatScrollContainer>
+
+    <!-- ÉTAPE 4 : VUE DÉTAIL PRODUIT INTÉGRÉE DANS LE COPILOT -->
+    <div class="inline-product-detail-view" *ngIf="isViewingProductDetail && selectedProductDetail">
+      <div class="detail-back-bar">
+        <button type="button" class="btn-back-copilot" (click)="closeProductDetailInCopilot()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Retour</span>
+        </button>
+        <span class="detail-header-tag">Détail du produit</span>
+      </div>
+
+      <div class="product-detail-card">
+        <div class="product-detail-hero">
+          <img [src]="selectedProductDetail.image_url || 'assets/images/thieboudienne.jpg'" [alt]="selectedProductDetail.nom" class="product-detail-img" />
+          <span class="product-status-chip" [class.available]="selectedProductDetail.est_disponible !== false">
+            {{ selectedProductDetail.est_disponible !== false ? '✓ En stock' : 'Indisponible' }}
+          </span>
+        </div>
+
+        <div class="product-detail-body">
+          <div class="product-category-tag" *ngIf="selectedProductDetail.categorie_nom">
+            🏷️ {{ selectedProductDetail.categorie_nom }}
+          </div>
+          <h2 class="product-detail-title">{{ selectedProductDetail.nom }}</h2>
+          <div class="product-resto-info" *ngIf="selectedProductDetail.etablissement_nom">
+            <span class="resto-icon">📍</span>
+            <span class="resto-name">{{ selectedProductDetail.etablissement_nom }}</span>
+            <span class="resto-address" *ngIf="selectedProductDetail.etablissement_adresse"> — {{ selectedProductDetail.etablissement_adresse }}</span>
+          </div>
+
+          <div class="product-detail-price">
+            {{ selectedProductDetail.prix_formate || ((selectedProductDetail.prix || 0).toLocaleString('fr-FR') + ' FCFA') }}
+          </div>
+
+          <p class="product-detail-description" *ngIf="selectedProductDetail.description">
+            {{ selectedProductDetail.description }}
+          </p>
+          <p class="product-detail-description empty" *ngIf="!selectedProductDetail.description">
+            Aucune description spécifique disponible pour ce plat.
+          </p>
+
+          <div class="product-detail-actions">
+            <button type="button" class="btn-detail-order" (click)="orderDish(selectedProductDetail)" [disabled]="isOrderingMap[selectedProductDetail.id]">
+              🛍️ Commander ({{ selectedProductDetail.prix_formate || ((selectedProductDetail.prix || 0).toLocaleString('fr-FR') + ' FCFA') }})
+            </button>
+            <button type="button" class="btn-detail-plan" (click)="closeProductDetailInCopilot(); selectDishFromSearch(selectedProductDetail)">
+              📅 Planifier ce repas
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-container *ngIf="!isViewingProductDetail">
+      <!-- ÉTAT INITIAL IDLE (ACCUEIL QUAND AUCUN MESSAGE DANS LA DISCUSSION) -->
+      <div class="idle-welcome-card" *ngIf="chatMessages.length === 0 && currentState === 'IDLE'">
+      <div class="welcome-badge">
+        <span class="sparkle-icon">✦</span>
+      </div>
+      <h3 class="welcome-title" *ngIf="entryMode === 'PLANNING'">Que souhaitez-vous planifier ?</h3>
+      <h3 class="welcome-title" *ngIf="entryMode === 'CHAT'">Que souhaitez-vous manger aujourd’hui ?</h3>
+      <p class="welcome-subtext" *ngIf="entryMode === 'PLANNING'">
+        Dites-moi quel repas vous souhaitez planifier, à quelle date et heure, ou posez-moi des questions sur le catalogue AYYOU.
+      </p>
+      <p class="welcome-subtext" *ngIf="entryMode === 'CHAT'">
+        Recherchez des plats, découvrez les meilleurs restaurants de Dakar, filtrez par budget ou planifiez vos repas.
+      </p>
+      <div class="example-box">
+        <span class="example-tag">Exemples d'utilisation :</span>
+        <p class="example-text clickable" (click)="onExampleClick('J\'ai 5 000 FCFA, que peux-tu me proposer ?')">« J'ai 5 000 FCFA, que peux-tu me proposer ? »</p>
+        <p class="example-text clickable" (click)="onExampleClick('Montre-moi les restaurants qui proposent du thiéboudienne')">« Montre-moi les restaurants qui proposent du thiéboudienne »</p>
+        <p class="example-text clickable" (click)="onExampleClick('Planifie-moi du thiéboudienne demain midi')">« Planifie-moi du thiéboudienne demain midi »</p>
+      </div>
+    </div>
+
+    <!-- FIL CONVERSATIONNEL PERSISTANT (THREAD CHAT MULTI-TOURS) -->
+    <div class="chat-thread-container" *ngIf="chatMessages.length > 0">
+      <div
+        class="chat-message-row"
+        *ngFor="let msg of chatMessages"
+        [class.user-row]="msg.role === 'USER'"
+        [class.assistant-row]="msg.role === 'ASSISTANT'"
+      >
+        <!-- MESSAGE DE L'UTILISATEUR -->
+        <div class="user-speech-container" *ngIf="msg.role === 'USER'">
+          <div class="user-speech-header">
+            <span class="sparkle-icon">✦</span>
+            <span class="speech-type-tag">Vous</span>
+          </div>
+          <div class="user-speech-bubble">
+            <div class="speech-image-preview" *ngIf="msg.imagePreview">
+              <img [src]="msg.imagePreview" alt="Image transmise" class="user-uploaded-img" />
+            </div>
+            <p class="speech-text" *ngIf="msg.text">« {{ msg.text }} »</p>
+          </div>
+        </div>
+
+        <!-- MESSAGE DE L'ASSISTANT COPILOTE -->
+        <div class="copilote-container" *ngIf="msg.role === 'ASSISTANT'">
+          <div class="copilote-header">
+            <div class="copilote-avatar-badge">
+              <span class="avatar-sparkle">✦</span>
+            </div>
+            <span class="copilote-name">AYYOU Copilote</span>
+            <span class="copilote-subtag" *ngIf="msg.parsedData?.intent === 'FOOD_RECOMMENDATION'">Recommandation du chef</span>
+            <span class="copilote-subtag" *ngIf="msg.parsedData?.intent !== 'FOOD_RECOMMENDATION'">IA Gourmande</span>
+          </div>
+
+          <div class="copilote-bubble">
+            <p class="copilote-text" [innerHTML]="msg.text"></p>
+
+            <!-- BOUTONS FILTRES RAPIDES : EXPLORER PAR CATÉGORIE / TOUS LES RESTAURANTS -->
+            <div class="quick-filter-pills-row" *ngIf="msg.parsedData?.matching_establishments || msg.parsedData?.suggested_categories">
+              <button
+                type="button"
+                class="quick-pill-btn"
+                (click)="parseTextPrompt('Quelles sont les catégories ?', 'CATEGORY_SEARCH')"
+              >
+                <span class="pill-icon">🥷</span> Explorer par catégorie
+              </button>
+              <button
+                type="button"
+                class="quick-pill-btn"
+                (click)="parseTextPrompt('Tous les restaurants', 'RESTAURANT_SEARCH')"
+              >
+                <span class="pill-icon">🏪</span> Tous les restaurants
+              </button>
+            </div>
+
+            <!-- PUCE DE CATÉGORIES SUGGÉRÉES (RESTAURANT_DISCOVERY / CATEGORY_SEARCH) -->
+            <div class="suggested-categories-chips" *ngIf="msg.parsedData?.suggested_categories && msg.parsedData!.suggested_categories!.length > 0">
+              <button
+                type="button"
+                class="category-chip-btn"
+                *ngFor="let cat of msg.parsedData!.suggested_categories!"
+                (click)="selectCategory(cat)"
+              >
+                <span class="chip-icon">🏷️</span>
+                {{ cat.nom }}
+                <span class="chip-count" *ngIf="cat.nombre_plats">({{ cat.nombre_plats }})</span>
+              </button>
+            </div>
+
+            <!-- BOUTONS D'ACTIONS SUGGÉRÉES -->
+            <div class="suggested-actions-row" *ngIf="msg.parsedData?.suggested_actions && msg.parsedData!.suggested_actions!.length > 0">
+              <button
+                type="button"
+                class="suggested-action-btn"
+                [class.primary]="act.action === 'CONFIRM_PLANNING' || act.action === 'VIEW_PLANNING'"
+                [class.decline]="act.action === 'DECLINE_PLANNING'"
+                *ngFor="let act of msg.parsedData!.suggested_actions!"
+                (click)="triggerSuggestedAction(act, msg)"
+              >
+                {{ act.label }}
+              </button>
+            </div>
+          </div>
+
+          <!-- BARRE DE RECHERCHE DANS LE CATALOGUE RÉEL (DANS LE FIL) -->
+          <div class="catalog-inline-search-bar" *ngIf="msg.parsedData?.matching_establishments || msg.parsedData?.matching_products">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input
+              type="text"
+              class="catalog-search-input"
+              placeholder="Rechercher un plat, burger, thieb..."
+              [value]="getMsgSearchQuery(msg, msg.parsedData?.matching_establishments ? 'est' : 'prod')"
+              (input)="setMsgSearchQuery(msg, msg.parsedData?.matching_establishments ? 'est' : 'prod', $any($event.target).value)"
+            />
+            <button type="button" class="btn-search-mic" (click)="toggleVoiceRecording()" aria-label="Recherche vocale">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </button>
+          </div>
+
+          <!-- RÉSULTATS RECOMMANDATION À LA UNE (FOOD_RECOMMENDATION) -->
+          <div class="featured-recommendation-card" *ngIf="msg.parsedData?.intent === 'FOOD_RECOMMENDATION' && msg.parsedData?.detected_product">
+            <div class="hero-image-wrapper">
+              <img [src]="msg.parsedData!.detected_product!.image_url" [alt]="msg.parsedData!.detected_product!.nom" class="hero-img" />
+              <div class="hero-image-overlay">
+                <h3 class="hero-title">{{ msg.parsedData!.detected_product!.nom }}</h3>
+                <span class="hero-subtitle">{{ msg.parsedData!.detected_product!.etablissement_nom }} — {{ msg.parsedData!.detected_product!.etablissement_adresse }}</span>
+              </div>
+            </div>
+            <div class="hero-details-content">
+              <div class="hero-price-tag">{{ msg.parsedData!.detected_product!.prix_formate }}</div>
+              <p class="hero-description" *ngIf="msg.parsedData!.detected_product!.description">
+                {{ msg.parsedData!.detected_product!.description }}
+              </p>
+              <div class="hero-actions-row">
+                <button type="button" class="btn-hero-plan" (click)="triggerSuggestedAction({action: 'CREATE_PLANNING', label: 'Planifier'}, msg)">
+                  📅 Planifier
+                </button>
+
+                <button type="button" class="btn-hero-order" (click)="orderDish(msg.parsedData!.detected_product!)" [disabled]="isOrderingMap[msg.parsedData!.detected_product!.id]">
+                  🛍️ Commander
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- GRILLE DE RESTAURANTS (RESTAURANT_SEARCH & RESTAURANT_DISCOVERY) -->
+          <div class="catalog-grid-wrapper" *ngIf="msg.parsedData?.matching_establishments && msg.parsedData!.matching_establishments!.length > 0">
+            <div class="restaurant-grid-container">
+              <div
+                class="restaurant-grid-card clickable"
+                *ngFor="let est of getFilteredEstablishments(msg)"
+                (click)="selectRestaurant(est)"
+              >
+                <div class="card-image-box">
+                  <img [src]="est.image_url || est.couverture_url || est.logo_url || 'assets/images/thieboudienne.jpg'" [alt]="est.nom" class="card-img" />
+                  <span class="location-badge" *ngIf="est.adresse">{{ est.adresse.split(' ')[0] }}</span>
+                </div>
+                <div class="card-info-content">
+                  <h3 class="card-title">{{ est.nom }}</h3>
+                  <span class="card-subtext">{{ est.categorie_nom || est.type_etablissement || 'Sénégalais & Fast-Food' }}</span>
+                  <span class="card-price" *ngIf="est.prix_formate">{{ est.prix_formate }}</span>
+                  <button type="button" class="btn-card-view" (click)="$event.stopPropagation(); selectRestaurant(est)">
+                    Voir →
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- BOUTON VOIR PLUS DE RESTAURANTS -->
+            <div class="load-more-wrapper" *ngIf="msg.parsedData?.has_more || (msg.parsedData?.total_count && msg.parsedData!.matching_establishments!.length < msg.parsedData!.total_count!)">
+              <button
+                type="button"
+                class="btn-load-more-pill"
+                [disabled]="isLoadingMoreMap[getMsgKey(msg, 'est')]"
+                (click)="loadMoreEstablishments(msg)"
+              >
+                <span *ngIf="!isLoadingMoreMap[getMsgKey(msg, 'est')]">
+                  Voir plus de restaurants <ng-container *ngIf="msg.parsedData?.remaining_count">({{ msg.parsedData!.remaining_count }} restants)</ng-container> ∨
+                </span>
+                <span *ngIf="isLoadingMoreMap[getMsgKey(msg, 'est')]">Chargement...</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- RÉSULTATS DE RECHERCHE PRODUITS (FOOD_SEARCH) -->
+          <div class="search-results-list" *ngIf="msg.parsedData?.matching_products && msg.parsedData!.matching_products!.length > 0 && msg.parsedData?.intent !== 'FOOD_RECOMMENDATION'">
+            <div class="detected-dish-card clickable" *ngFor="let prod of getFilteredProducts(msg)" (click)="goToProductDetail(prod)">
+              <div class="dish-thumb-wrapper">
+                <img [src]="prod.image_url" [alt]="prod.nom" class="dish-thumb-img" />
+              </div>
+              <div class="dish-info-content">
+                <h3 class="dish-name" [title]="prod.nom">{{ prod.nom }}</h3>
+                <span class="dish-resto-name" *ngIf="prod.etablissement_nom">{{ prod.etablissement_nom }}</span>
+                <span class="dish-resto-location" *ngIf="prod.etablissement_adresse">{{ prod.etablissement_adresse }}</span>
+                <span class="dish-price">{{ prod.prix_formate }}</span>
+              </div>
+              <div class="dish-actions-buttons">
+                <button type="button" class="btn-order-dish" (click)="$event.stopPropagation(); orderDish(prod)" [disabled]="isOrderingMap[prod.id]">
+                  Commander
+                </button>
+                <button type="button" class="btn-plan-dish" (click)="$event.stopPropagation(); selectDishFromSearch(prod)">
+                  Planifier
+                </button>
+              </div>
+            </div>
+
+            <!-- BOUTON VOIR PLUS PRODUITS -->
+            <div class="load-more-wrapper" *ngIf="msg.parsedData?.has_more || (msg.parsedData?.total_count && msg.parsedData!.matching_products!.length < msg.parsedData!.total_count!)">
+              <button
+                type="button"
+                class="btn-load-more-pill"
+                [disabled]="isLoadingMoreMap[getMsgKey(msg, 'prod')]"
+                (click)="loadMoreProducts(msg)"
+              >
+                <span *ngIf="!isLoadingMoreMap[getMsgKey(msg, 'prod')]">
+                  Voir plus de plats <ng-container *ngIf="msg.parsedData?.remaining_count">({{ msg.parsedData!.remaining_count }} restants)</ng-container> ∨
+                </span>
+                <span *ngIf="isLoadingMoreMap[getMsgKey(msg, 'prod')]">Chargement...</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- RÉSULTAT PLANIFICATION DÉTECTÉ DANS LE MESSAGE -->
+          <ng-container *ngIf="msg.parsedData?.detected_product && msg.parsedData?.intent === 'MEAL_PLANNING'">
+            <div class="detected-dish-card">
+              <div class="dish-thumb-wrapper">
+                <img [src]="msg.parsedData!.detected_product!.image_url" [alt]="msg.parsedData!.detected_product!.nom" class="dish-thumb-img" />
+              </div>
+              <div class="dish-info-content">
+                <span class="tag-plat-detecte">PLAT SÉLECTIONNÉ</span>
+                <h3 class="dish-name">{{ msg.parsedData!.detected_product!.nom }}</h3>
+                <span class="dish-price">{{ msg.parsedData!.detected_product!.prix_formate }}</span>
+              </div>
+            </div>
+
+            <div class="grid-details-cards" *ngIf="msg.parsedData?.detected_datetime">
+              <div class="detail-box">
+                <div class="box-header">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>
+                  <span class="box-label">Restaurant</span>
+                </div>
+                <h4 class="box-title">{{ msg.parsedData?.detected_establishment?.nom || msg.parsedData!.detected_product!.etablissement_nom }}</h4>
+                <span class="box-subtitle">{{ msg.parsedData?.detected_establishment?.adresse || msg.parsedData!.detected_product!.etablissement_adresse }}</span>
+              </div>
+
+              <div class="detail-box">
+                <div class="box-header">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  <span class="box-label">Date & Heure</span>
+                </div>
+                <h4 class="box-title">{{ msg.parsedData!.detected_datetime!.date_label }}</h4>
+                <span class="box-subtitle">{{ msg.parsedData!.detected_datetime!.time_label }}</span>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- SÉLECTEUR JOUR + HEURE HORIZONTAL ET COMPACT (ÉTAPE 5 UX REFINEMENT) -->
+          <div class="compact-datetime-picker-card" *ngIf="!msg.parsedData?.detected_datetime && (msg.parsedData?.status === 'missing_info' || msg.parsedData?.intent === 'MEAL_PLANNING' || (msg.parsedData?.detected_product && parsedData?.intent === 'MEAL_PLANNING'))">
+            <div class="picker-card-title-row">
+              <span class="picker-card-title">Planifier ce repas</span>
+            </div>
+
+            <div class="picker-fields-row">
+              <!-- COLONNE JOUR -->
+              <div class="picker-col">
+                <span class="col-label">JOUR</span>
+                <button type="button" class="btn-picker-box" [class.has-value]="!!pickerSelectedDate" (click)="toggleCalendarPopover($event)">
+                  <svg class="box-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                  <div class="box-text-container">
+                    <span class="box-subtext" *ngIf="!pickerSelectedDate">Choisir le jour</span>
+                    <span class="box-maintext" *ngIf="pickerSelectedDate">{{ pickerFormattedShortDate }}</span>
+                  </div>
+                </button>
+
+                <!-- POPOVER CALENDRIER AYYOU COMPACT -->
+                <div class="ayyou-calendar-popover" *ngIf="showCalendarPopover" (click)="$event.stopPropagation()">
+                  <div class="cal-header">
+                    <button type="button" class="cal-nav-btn" (click)="prevMonth()" [disabled]="isPrevMonthDisabled()">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <span class="cal-month-title">{{ currentCalMonthName }} {{ currentCalYear }}</span>
+                    <button type="button" class="cal-nav-btn" (click)="nextMonth()">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                  </div>
+
+                  <div class="cal-weekdays">
+                    <span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span>
+                  </div>
+
+                  <div class="cal-days-grid">
+                    <button
+                      type="button"
+                      class="cal-day-cell"
+                      *ngFor="let dayObj of calDaysGrid"
+                      [class.empty]="!dayObj.day"
+                      [class.disabled]="dayObj.isDisabled"
+                      [class.selected]="dayObj.isTodayOrSelected"
+                      [disabled]="dayObj.isDisabled || !dayObj.day"
+                      (click)="selectCalendarDay(dayObj, msg)"
+                    >
+                      {{ dayObj.day }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- COLONNE HEURE -->
+              <div class="picker-col">
+                <span class="col-label">HEURE</span>
+                <button type="button" class="btn-picker-box" [class.has-value]="!!pickerSelectedTime" (click)="toggleTimePopover($event)">
+                  <svg class="box-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  <div class="box-text-container">
+                    <span class="box-subtext" *ngIf="!pickerSelectedTime">Choisir l'heure</span>
+                    <span class="box-maintext" *ngIf="pickerSelectedTime">{{ pickerSelectedTime }}</span>
+                  </div>
+                </button>
+
+                <!-- POPOVER HEURE AYYOU COMPACT -->
+                <div class="ayyou-time-popover" *ngIf="showTimePopover" (click)="$event.stopPropagation()">
+                  <div class="time-wheels-container">
+                    <div class="wheel-col">
+                      <span class="wheel-label">HEURES</span>
+                      <div class="wheel-scroll">
+                        <button
+                          type="button"
+                          class="wheel-item"
+                          *ngFor="let h of hoursList"
+                          [class.active]="selectedHour === h"
+                          (click)="selectHour(h)"
+                        >
+                          {{ h }}
+                        </button>
+                      </div>
+                    </div>
+
+                    <span class="wheel-separator">:</span>
+
+                    <div class="wheel-col">
+                      <span class="wheel-label">MINUTES</span>
+                      <div class="wheel-scroll">
+                        <button
+                          type="button"
+                          class="wheel-item"
+                          *ngFor="let m of minutesList"
+                          [class.active]="selectedMinute === m"
+                          (click)="selectMinute(m)"
+                        >
+                          {{ m }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button type="button" class="btn-time-confirm" (click)="confirmTimeSelection(msg)">
+                    OK
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- INDICATEUR DE CHARGEMENT ANALYSE IA -->
+    <div class="loading-analysis-card" *ngIf="currentState === 'ANALYZING'">
+      <div class="spinner-red"></div>
+      <span *ngIf="isAnalyzingImage">Analyse de l'image en cours...</span>
+      <span *ngIf="!isAnalyzingImage">Analyse et vérification sur le catalogue AYYOU...</span>
+    </div>
+
+    <!-- SECTION ACTIVES ET FORMULAIRE DE MODIFICATION DU REPAS EN COURS DE PLANIFICATION -->
+    <ng-container *ngIf="(currentState === 'READY' || isEditing) && parsedData && parsedData.detected_product && parsedData.intent === 'MEAL_PLANNING'">
+      <div class="active-planning-section">
+        
+        <!-- FORMULAIRE DE MODIFICATION INLINE -->
+        <div class="edit-form-card" *ngIf="isEditing">
+          <h4 class="edit-title">Modifier les informations</h4>
+
+          <!-- SÉLECTEUR RECHERCHABLE DE PLAT -->
+          <div class="form-group position-relative">
+            <label>Plat</label>
+            <div class="custom-select-trigger" (click)="toggleDishDropdown()">
+              <span class="selected-value-text" *ngIf="editForm.nomProduit">{{ editForm.nomProduit }}</span>
+              <span class="placeholder-text" *ngIf="!editForm.nomProduit">Sélectionner un plat...</span>
+              <svg class="chevron-icon" [class.open]="isDishDropdownOpen" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+
+            <!-- Panel déroulant avec barre de recherche -->
+            <div class="searchable-dropdown-panel" *ngIf="isDishDropdownOpen">
+              <div class="dropdown-search-box">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input
+                  type="text"
+                  class="dropdown-search-input"
+                  placeholder="Rechercher un plat..."
+                  [(ngModel)]="dishSearchQuery"
+                  (input)="onDishSearchChange()"
+                />
+              </div>
+              <div class="dropdown-options-list">
+                <div class="dropdown-loading" *ngIf="isLoadingDishes">Chargement des plats...</div>
+                <div class="dropdown-empty" *ngIf="!isLoadingDishes && filteredDishes.length === 0">Aucun plat trouvé</div>
+                <div
+                  class="dropdown-option-item"
+                  *ngFor="let dish of filteredDishes"
+                  [class.selected]="dish.name === editForm.nomProduit"
+                  (click)="selectDish(dish)"
+                >
+                  <img [src]="dish.imageUrl" [alt]="dish.name" class="option-dish-img" *ngIf="dish.imageUrl" />
+                  <div class="option-info">
+                    <span class="option-title">{{ dish.name }}</span>
+                    <span class="option-subtitle" *ngIf="dish.restaurantName">{{ dish.restaurantName }}</span>
+                  </div>
+                  <span class="option-price">{{ (dish.price || 0).toLocaleString('fr-FR') }} FCFA</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SÉLECTEUR RECHERCHABLE DE RESTAURANT -->
+          <div class="form-group position-relative">
+            <label>Restaurant</label>
+            <div class="custom-select-trigger" (click)="toggleEstablishmentDropdown()">
+              <span class="selected-value-text" *ngIf="editForm.nomEtablissement">{{ editForm.nomEtablissement }}</span>
+              <span class="placeholder-text" *ngIf="!editForm.nomEtablissement">Sélectionner un restaurant...</span>
+              <svg class="chevron-icon" [class.open]="isEstablishmentDropdownOpen" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+
+            <!-- Panel déroulant avec barre de recherche -->
+            <div class="searchable-dropdown-panel" *ngIf="isEstablishmentDropdownOpen">
+              <div class="dropdown-search-box">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input
+                  type="text"
+                  class="dropdown-search-input"
+                  placeholder="Rechercher un restaurant..."
+                  [(ngModel)]="establishmentSearchQuery"
+                  (input)="onEstablishmentSearchChange()"
+                />
+              </div>
+              <div class="dropdown-options-list">
+                <div class="dropdown-loading" *ngIf="isLoadingEstablishments">Chargement des établissements...</div>
+                <div class="dropdown-empty" *ngIf="!isLoadingEstablishments && filteredEstablishments.length === 0">Aucun établissement trouvé</div>
+                <div
+                  class="dropdown-option-item"
+                  *ngFor="let resto of filteredEstablishments"
+                  [class.selected]="resto.name === editForm.nomEtablissement"
+                  (click)="selectEstablishment(resto)"
+                >
+                  <div class="option-info">
+                    <span class="option-title">{{ resto.name }}</span>
+                    <span class="option-subtitle" *ngIf="resto.location">{{ resto.location }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group half position-relative">
+              <label>Date</label>
+              <div class="custom-select-trigger" (click)="toggleCalendarPopover($event)">
+                <span class="selected-value-text" *ngIf="editForm.dateLabel">{{ editForm.dateLabel }}</span>
+                <span class="placeholder-text" *ngIf="!editForm.dateLabel">Choisir le jour</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </div>
+            </div>
+
+            <div class="form-group half position-relative">
+              <label>Heure</label>
+              <div class="custom-select-trigger" (click)="toggleTimePopover($event)">
+                <span class="selected-value-text" *ngIf="editForm.timeLabel">{{ editForm.timeLabel }}</span>
+                <span class="placeholder-text" *ngIf="!editForm.timeLabel">Choisir l'heure</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Options / Instructions</label>
+            <input type="text" [(ngModel)]="editForm.options" class="edit-input" />
+          </div>
+          <button type="button" class="btn-save-edit" (click)="saveEdit()">Enregistrer les modifications</button>
+        </div>
+
+        <!-- CARTE RÉCAPITULATIF DE PLANIFICATION (EXIGENCES 7, 8, 9) -->
+        <div class="summary-planning-card" *ngIf="!isEditing && parsedData.detected_datetime">
+          <h4 class="summary-card-title">Vérifiez votre planification</h4>
+
+          <div class="summary-details-list">
+            <div class="summary-item" *ngIf="parsedData.detected_product">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"/>
+              </svg>
+              <span class="summary-value">{{ parsedData.detected_product.nom }}</span>
+            </div>
+
+            <div class="summary-item" *ngIf="parsedData.detected_establishment || parsedData.detected_product?.etablissement_nom">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span class="summary-value">{{ parsedData.detected_establishment?.nom || parsedData.detected_product.etablissement_nom }}</span>
+            </div>
+
+            <div class="summary-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              <span class="summary-value">{{ parsedData.detected_datetime.date_label }}</span>
+            </div>
+
+            <div class="summary-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <span class="summary-value">{{ parsedData.detected_datetime.time_label }}</span>
+            </div>
+          </div>
+
+          <div class="summary-actions-row">
+            <button type="button" class="btn-summary-modify" (click)="toggleEdit()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Modifier
+            </button>
+
+            <button type="button" class="btn-summary-validate" (click)="confirmPlanning()" [disabled]="isConfirming">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span *ngIf="!isConfirming && !confirmSuccess">Valider</span>
+              <span *ngIf="isConfirming">Enregistrement...</span>
+              <span *ngIf="confirmSuccess">✓ Planning créé !</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- BLOC D'INFORMATION ET RAPPEL SÉCURISÉ -->
+        <div class="notice-info-box" *ngIf="parsedData.detected_datetime">
+          <svg class="info-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <p class="notice-text">
+            Le repas sera placé dans votre calendrier. Vous recevrez une alerte de rappel 30 min avant toute validation financière.
+          </p>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+
+  </main>
+
+  <!-- BARRE INFÉRIEURE : ENTRÉE TEXTE, VOIX ET BOUTON + IMAGE -->
+  <div class="bottom-input-bar">
+    <!-- BANDEAU APERÇU DE L'IMAGE SÉLECTIONNÉE -->
+    <div class="image-preview-bar" *ngIf="selectedImagePreview">
+      <img [src]="selectedImagePreview" alt="Aperçu image" class="preview-thumbnail" />
+      <span class="preview-filename">{{ selectedImageFile?.name || 'Image collée' }}</span>
+      <button type="button" class="btn-remove-image" (click)="removeSelectedImage()" aria-label="Retirer l'image">✕</button>
+    </div>
+    
+    <div class="input-pill-container">
+      <!-- Input fichier image caché -->
+      <input
+        #imageFileInput
+        type="file"
+        accept="image/jpeg,image/jpg,image/png,image/webp"
+        style="display: none"
+        (change)="onFileSelected($event)"
+      />
+
+      <!-- Wrapper positionné du bouton + et de son menu flottant -->
+      <div class="plus-menu-container">
+        <!-- Bouton + (Floating Popover Menu Trigger) -->
+        <button
+          type="button"
+          class="btn-plus-icon"
+          [class.active]="isPlusMenuOpen"
+          [attr.aria-expanded]="isPlusMenuOpen"
+          [attr.aria-label]="isPlusMenuOpen ? 'Fermer les actions' : 'Ouvrir les actions'"
+          (click)="togglePlusMenu($event)"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        </button>
+
+        <!-- MENU FLOTTANT MULTI-OPTIONS (RATTACHÉ SANS OVERLAY NI FOND BLANC RECOUVRANT) -->
+        <div class="plus-floating-menu" *ngIf="isPlusMenuOpen" (click)="$event.stopPropagation()">
+          <div
+            class="floating-menu-item"
+            tabindex="0"
+            (click)="triggerFileInput(imageFileInput)"
+            (keyup.enter)="triggerFileInput(imageFileInput)"
+          >
+            <div class="menu-item-icon-wrapper">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="4" ry="4"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+            </div>
+            <span class="menu-item-text">Ajouter une image</span>
+          </div>
+
+          <div
+            class="floating-menu-item"
+            tabindex="0"
+            (click)="openPlannedMealsDrawer()"
+            (keyup.enter)="openPlannedMealsDrawer()"
+          >
+            <div class="menu-item-icon-wrapper">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </div>
+            <span class="menu-item-text">Mes repas planifiés</span>
+          </div>
+
+          <div
+            class="floating-menu-item"
+            tabindex="0"
+            (click)="startNewConversation()"
+            (keyup.enter)="startNewConversation()"
+          >
+            <div class="menu-item-icon-wrapper">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
+            <span class="menu-item-text">Nouvelle discussion</span>
+          </div>
+        </div>
+      </div>
+
+      <input
+        type="text"
+        class="planning-text-input"
+        placeholder="Posez votre question ou écrivez votre repas (Ctrl+V pour copier une image)"
+        [(ngModel)]="inputPrompt"
+        (keyup.enter)="onSubmitTextPrompt()"
+      />
+
+      <!-- 1. ENREGISTREMENT EN COURS : BOUTON STOP (CARRÉ BLANC SUR ROUGE) -->
+      <button
+        type="button"
+        class="btn-mic-circle-red recording"
+        *ngIf="isRecording()"
+        (click)="toggleVoiceRecording()"
+        aria-label="Arrêter l'enregistrement vocal"
+        title="Arrêter l'enregistrement"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFFFFF">
+          <rect x="5" y="5" width="14" height="14" rx="2" ry="2"/>
+        </svg>
+      </button>
+
+      <!-- 2. TRANSCRIPTION EN COURS : BOUTON EN ATTENTE (SPINNER) -->
+      <button
+        type="button"
+        class="btn-mic-circle-red transcribing"
+        *ngIf="!isRecording() && currentState === 'TRANSCRIBING'"
+        disabled
+        aria-label="Transcription en cours..."
+        title="Transcription en cours..."
+      >
+        <svg class="spinner-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round">
+          <circle cx="12" cy="12" r="9" stroke-dasharray="32" stroke-dashoffset="12">
+            <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+      </button>
+
+      <!-- 3. TEXTE PRÊT / ÉDITABLE OU IMAGE CHARGÉE : BOUTON ENVOYER MANUEL -->
+      <button
+        type="button"
+        class="btn-mic-circle-red btn-send"
+        *ngIf="!isRecording() && currentState !== 'TRANSCRIBING' && (inputPrompt.trim() || selectedImageFile)"
+        (click)="onSubmitTextPrompt()"
+        aria-label="Envoyer le message"
+        title="Envoyer"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+
+      <!-- 4. MODE REPOS SANS TEXTE : BOUTON MICROPHONE ROUGE -->
+      <button
+        type="button"
+        class="btn-mic-circle-red"
+        *ngIf="!isRecording() && currentState !== 'TRANSCRIBING' && !inputPrompt.trim() && !selectedImageFile"
+        (click)="toggleVoiceRecording()"
+        aria-label="Enregistrer un message vocal"
+        title="Enregistrer"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- TIROIR LATÉRAL : HISTORIQUE DES CONVERSATIONS -->
+  <div class="drawer-overlay" *ngIf="isHistoryDrawerOpen" (click)="closeHistoryDrawer()">
+    <div class="drawer-content" (click)="$event.stopPropagation()">
+      <div class="drawer-header">
+        <h3>Historique des discussions</h3>
+        <button type="button" class="btn-close-drawer" (click)="closeHistoryDrawer()">✕</button>
+      </div>
+      <div class="drawer-body">
+        <button type="button" class="btn-new-chat-drawer" (click)="startNewConversation()">
+          + Nouvelle discussion
+        </button>
+        <div class="history-list" *ngIf="!isLoadingConversations">
+          <div
+            class="history-item"
+            *ngFor="let conv of savedConversations"
+            [class.active]="conv.id === activeConversationId"
+            (click)="selectConversation(conv.id)"
+          >
+            <div class="history-item-info">
+              <span class="history-title">{{ conv.title || 'Discussion sans titre' }}</span>
+              <span class="history-date">{{ conv.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <button type="button" class="btn-delete-conv" (click)="deleteConversation(conv.id, $event)" aria-label="Supprimer">
+              🗑
+            </button>
+          </div>
+          <div class="empty-history" *ngIf="savedConversations.length === 0">
+            Aucune discussion enregistrée.
+          </div>
+        </div>
+        <div class="drawer-loading" *ngIf="isLoadingConversations">Chargement de l'historique...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIROIR LATÉRAL : MES REPAS PLANIFIÉS -->
+  <div class="drawer-overlay" *ngIf="isPlannedMealsDrawerOpen" (click)="closePlannedMealsDrawer()">
+    <div class="drawer-content" (click)="$event.stopPropagation()">
+      <div class="drawer-header">
+        <h3>Mes Repas Planifiés</h3>
+        <button type="button" class="btn-close-drawer" (click)="closePlannedMealsDrawer()">✕</button>
+      </div>
+      <div class="drawer-body">
+        <div class="planned-meals-list" *ngIf="!isLoadingPlannedMeals">
+          <div class="planned-meal-card" *ngFor="let meal of plannedMealsList" (click)="goToMealDetail(meal.id)">
+            <div class="meal-card-header">
+              <span class="meal-name">{{ meal.nom_produit }}</span>
+              <span class="meal-status-badge" [class.validated]="meal.statut === 'PLANIFIE' || meal.statut === 'COMMANDE'">{{ meal.statut_display || meal.statut }}</span>
+            </div>
+            <div class="meal-card-body">
+              <span class="meal-resto" *ngIf="meal.nom_etablissement">📍 {{ meal.nom_etablissement }}</span>
+              <span class="meal-time">🕒 {{ meal.date_planifiee }} <span *ngIf="meal.heure_planifiee">à {{ meal.heure_planifiee }}</span></span>
+              <span class="meal-price" *ngIf="meal.prix_total">💰 {{ meal.prix_total }} FCFA</span>
+            </div>
+          </div>
+          <div class="empty-history" *ngIf="plannedMealsList.length === 0">
+            Aucun repas planifié pour le moment.
+          </div>
+        </div>
+        <div class="drawer-loading" *ngIf="isLoadingPlannedMeals">Chargement des plannings...</div>
+      </div>
+  <!-- MODAL DE CONFIRMATION DE REMPLACEMENT DE PANIER MULTI-RESTAURANT -->
+  <div class="replace-cart-modal-backdrop" *ngIf="showReplaceCartModal" (click)="cancelReplaceCart()">
+    <div class="replace-cart-modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header-icon">
+        <span>🏪</span>
+      </div>
+      <h3 class="modal-title">Changer de restaurant ?</h3>
+      <p class="modal-body-text">
+        Votre panier contient déjà des produits d'un autre établissement.
+        <br/><br/>
+        Voulez-vous remplacer le panier existant pour commander chez <strong>{{ pendingReplaceCartDish?.etablissement_nom || 'ce restaurant' }}</strong> ?
+      </p>
+      <div class="modal-actions-row">
+        <button type="button" class="btn-cancel-replace" (click)="cancelReplaceCart()">
+          Annuler
+        </button>
+        <button type="button" class="btn-confirm-replace" (click)="confirmReplaceCart()">
+          Remplacer le panier
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <app-bottom-nav activeTab="planning"></app-bottom-nav>
+</div>

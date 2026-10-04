@@ -1,0 +1,574 @@
+.planning-detail-layout {
+  min-height: 100vh;
+  background-color: #F8F9FA;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 90px;
+}
+
+.planning-detail-content {
+  flex: 1;
+  max-width: 540px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* -------------------------------------------------------------
+ * ÉTAT DE CHARGEMENT & NON TROUVÉ
+ * ------------------------------------------------------------- */
+.loading-state-card,
+.empty-not-found-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 32px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  margin-top: 20px;
+}
+
+.spinner-red {
+  width: 36px;
+  height: 36px;
+  border: 3.5px solid #F3F3F3;
+  border-top: 3.5px solid #E51A29;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.empty-icon-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: #FDE8E9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.not-found-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin: 0;
+}
+
+.not-found-desc {
+  font-size: 0.9rem;
+  color: #666666;
+  margin: 0;
+  max-width: 320px;
+}
+
+.btn-back-planning {
+  display: inline-block;
+  margin-top: 8px;
+  background-color: #E51A29;
+  color: #FFFFFF;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #CC1624;
+  }
+}
+
+/* -------------------------------------------------------------
+ * 1. CARTE DE RAPPEL AYYOU (AYYOU • RAPPEL REPAS)
+ * ------------------------------------------------------------- */
+.reminder-card-container {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid #EEEEEE;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reminder-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.reminder-brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.red-circle-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: #E51A29;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-tag {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #1A1A1A;
+}
+
+.time-ago {
+  font-size: 0.75rem;
+  color: #888888;
+  margin-left: auto;
+  margin-right: 12px;
+}
+
+.btn-close-reminder {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  color: #999999;
+  cursor: pointer;
+  padding: 2px 6px;
+  line-height: 1;
+
+  &:hover {
+    color: #333333;
+  }
+}
+
+.reminder-headline {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin: 0;
+}
+
+.reminder-body-text {
+  font-size: 0.88rem;
+  color: #555555;
+  line-height: 1.4;
+  margin: 0;
+
+  strong {
+    color: #1A1A1A;
+    font-weight: 600;
+  }
+}
+
+.reminder-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.btn-reminder-validate-red {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background-color: #E51A29;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: #CC1624;
+  }
+
+  &:disabled {
+    opacity: 0.8;
+    cursor: default;
+  }
+}
+
+.btn-reminder-later-grey {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background-color: #F0F0F0;
+  color: #1A1A1A;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #E5E5E5;
+  }
+}
+
+/* -------------------------------------------------------------
+ * 2. CARTE HÉRO DU PLAT SELECTIONNÉ
+ * ------------------------------------------------------------- */
+.hero-dish-card {
+  position: relative;
+  width: 100%;
+  height: 230px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+  background-color: #1A1A1A;
+}
+
+.status-top-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 5;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #2E7D32;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  .status-dot {
+    font-size: 0.65rem;
+    color: #2E7D32;
+  }
+
+  &.cancelled {
+    color: #D32F2F;
+    .status-dot {
+      color: #D32F2F;
+    }
+  }
+}
+
+.hero-dish-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hero-overlay-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.75) 100%);
+  z-index: 2;
+}
+
+.hero-content-bottom {
+  position: absolute;
+  bottom: 14px;
+  left: 16px;
+  right: 16px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.resto-location-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.title-price-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hero-dish-title {
+  color: #FFFFFF;
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.hero-price-tag {
+  background-color: #E51A29;
+  color: #FFFFFF;
+  font-size: 0.95rem;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: 12px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(229, 26, 41, 0.4);
+}
+
+/* -------------------------------------------------------------
+ * 3. CARTE DATE & STATUT REPAS
+ * ------------------------------------------------------------- */
+.date-status-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  border: 1px solid #EEEEEE;
+}
+
+.date-info-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.date-title-text {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+.status-pill-grey {
+  background-color: #F2F2F2;
+  color: #444444;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 12px;
+
+  &.cancelled {
+    background-color: #FDE8E9;
+    color: #E51A29;
+  }
+}
+
+/* -------------------------------------------------------------
+ * 4. GRILLE 2 COLONNES INFORMATIONS (COMMANDE AUTO / LIVRAISON)
+ * ------------------------------------------------------------- */
+.info-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.info-box-item {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid #EEEEEE;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.info-box-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.info-box-label {
+  font-size: 0.78rem;
+  color: #777777;
+  font-weight: 600;
+}
+
+.info-box-value {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1A1A1A;
+
+  &.highlight-red {
+    color: #E51A29;
+  }
+}
+
+/* -------------------------------------------------------------
+ * 5. BOUTONS D'ACTION (MODIFIER CRÉNEAU / ANNULER)
+ * ------------------------------------------------------------- */
+.actions-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.btn-action-grey {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #EFEFEF;
+  color: #1A1A1A;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #E5E5E5;
+  }
+}
+
+.btn-action-cancel-red {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #FDE8E9;
+  color: #E51A29;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: #FBD0D3;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: default;
+  }
+}
+
+/* -------------------------------------------------------------
+ * MODALE DE CONFIRMATION D'ANNULATION
+ * ------------------------------------------------------------- */
+.cancel-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.cancel-modal-card {
+  background: #FFFFFF;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 20px;
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  animation: modalPop 0.2s ease-out;
+}
+
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-icon-warning {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background-color: #FDE8E9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin: 0;
+}
+
+.modal-text {
+  font-size: 0.88rem;
+  color: #666666;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.modal-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.btn-modal-back {
+  flex: 1;
+  background: #F0F0F0;
+  color: #333333;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: #E5E5E5;
+  }
+}
+
+.btn-modal-confirm-red {
+  flex: 1;
+  background: #E51A29;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: #CC1624;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: default;
+  }
+}

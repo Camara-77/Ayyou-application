@@ -24,28 +24,37 @@
         </div>
       </div>
 
+      <!-- Section 2: PLAT DE RÉFÉRENCE * -->
+      <div class="form-section">
+        <div class="label-with-sub">
+          <label class="section-label">PLAT DE RÉFÉRENCE <span class="required">*</span></label>
+          <span class="sub-info">(Sélectionnez le plat du menu correspondant à cette vidéo)</span>
+        </div>
+
+        <select
+          *ngIf="dishes && dishes.length > 0"
+          [(ngModel)]="selectedDishId"
+          (ngModelChange)="onDishSelect($event)"
+          name="selectedDishId"
+          style="width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #E51A29; background-color: #FFFFFF; font-weight: 700; font-size: 14px; margin-top: 4px; color: #1A1A1A;"
+        >
+          <option value="">Vidéo de présentation générale (sans plat commandable)</option>
+          <option *ngFor="let dish of dishes" [value]="dish.id">
+            {{ dish.name }} — {{ dish.price }} FCFA
+          </option>
+        </select>
+
+        <div *ngIf="!dishes || dishes.length === 0" class="selected-dish-card" style="border: 2px dashed #E51A29;">
+          <div class="card-line-top">
+            <span class="dish-title-bold">{{ productName || 'Chargement des plats du menu...' }}</span>
+            <span class="dish-price-bold" *ngIf="productPrice">{{ productPrice }} FCFA</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Error Message if duration or description invalid -->
       <div *ngIf="errorMessage" class="error-banner">
         {{ errorMessage }}
-      </div>
-
-      <!-- Section 2: PLAT OU PRODUIT ASSOCIÉ -->
-      <div class="form-section">
-        <div class="label-with-sub">
-          <label class="section-label">PLAT OU PRODUIT ASSOCIÉ</label>
-          <span class="sub-info">(Récupère le prix, le menu et le restaurant automatiquement)</span>
-        </div>
-
-        <select *ngIf="dishes && dishes.length > 0" [(ngModel)]="selectedDishId" (ngModelChange)="onDishSelect($event)" name="selectedDishId" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #E5E7EB; background-color: #F9FAFB; font-weight: 600; font-size: 14px; margin-top: 8px;">
-          <option *ngFor="let dish of dishes" [value]="dish.id">{{ dish.name }} — {{ dish.price }} FCFA</option>
-        </select>
-
-        <div *ngIf="!dishes || dishes.length === 0" class="selected-dish-card">
-          <div class="card-line-top">
-            <span class="dish-title-bold">{{ productName }}</span>
-            <span class="dish-price-bold">{{ productPrice }} FCFA</span>
-          </div>
-        </div>
       </div>
 
       <!-- Section 3: CATÉGORIE PRINCIPALE & SOUS-CATÉGORIE -->
@@ -63,42 +72,31 @@
         </div>
       </div>
 
-      <!-- Section 3b: SOUS-CATÉGORIE -->
-      <div class="form-section subcategory-section" *ngIf="selectedMainCategory && selectedMainCategory.subCategories.length > 0">
-        <label class="section-label">SOUS-CATÉGORIE ({{ selectedMainCategory.name }})</label>
-        <div class="categories-pills-row subcategories-pills-row">
-          <button 
-            type="button" 
-            class="pill-btn sub-pill" 
-            *ngFor="let sub of selectedMainCategory.subCategories" 
-            [class.active]="selectedSubCategory === sub" 
-            (click)="selectSubCategory(sub)">
-            {{ sub }}
-          </button>
-        </div>
-      </div>
-
-      <!-- Section 4: NOM DU PRODUIT * -->
+      <!-- Section 4: TITRE DE LA VIDÉO / NOM DU PLAT * -->
       <div class="form-group">
-        <label for="productName" class="input-label">NOM DU PRODUIT <span class="required">*</span></label>
+        <label for="productName" class="input-label">TITRE DE LA VIDÉO / NOM DU PLAT <span class="required">*</span></label>
         <input 
           type="text" 
           id="productName" 
           [(ngModel)]="productName" 
           name="productName" 
-          placeholder="Ex : Dibiterie d'agneau braisé, Croissant au beurre..."
+          placeholder="Ex : Thiéboudienne Penda Mbaye, Dibiterie d'agneau..."
         />
       </div>
 
-      <!-- Section 5: PRIX DU PRODUIT (FCFA) * -->
+      <!-- Section 5: PRIX DU PRODUIT (FCFA) -->
       <div class="form-group">
-        <label for="productPrice" class="input-label">PRIX DU PRODUIT (FCFA) <span class="required">*</span></label>
+        <label for="productPrice" class="input-label">
+          PRIX DU PRODUIT (FCFA)
+          <span *ngIf="selectedDishId" class="sub-info">(Prix réel PostgreSQL du menu)</span>
+        </label>
         <input 
           type="number" 
           id="productPrice" 
           [(ngModel)]="productPrice" 
           name="productPrice" 
-          placeholder="Ex : 4 500"
+          [readonly]="!!selectedDishId"
+          placeholder="Ex : 3 500"
         />
       </div>
 

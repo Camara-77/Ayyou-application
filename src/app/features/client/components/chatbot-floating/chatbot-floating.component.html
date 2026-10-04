@@ -1,154 +1,23 @@
 <div
-  *ngIf="isClientInterface"
+  *ngIf="isFloatingCopilotVisible"
   class="chatbot-wrapper"
   [style.left.px]="posX"
   [style.top.px]="posY"
   [class.dragging]="isDragging"
 >
-  <!-- Floating Trigger Button (Hamburger Icon) -->
+  <!-- Floating Trigger Button -->
   <button
     class="chatbot-btn"
     (mousedown)="onMouseDown($event)"
     (touchstart)="onTouchStart($event)"
-    (click)="toggleChat($event)"
-    aria-label="Assistant AYYOU AI"
+    (click)="onCopilotClick($event)"
+    aria-label="AYYOU Copilote"
+    title="Ouvrir AYYOU Copilote"
   >
     <div class="icon-container">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M4 6H20M4 12H20M4 18H20" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <span *ngIf="badgeCount > 0" class="badge">{{ badgeCount }}</span>
   </button>
-
-  <!-- Popover / Chat Window -->
-  <div class="chat-popover" *ngIf="isOpen">
-    <!-- Header -->
-    <div class="chat-header">
-      <div class="header-left">
-        <div class="header-logo-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#FFFFFF"/>
-            <path d="M2 17L12 22L22 17" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M2 12L12 17L22 12" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="header-title">
-          <span>Conseiller AYYOU</span>
-          <span class="ia-badge">IA</span>
-        </div>
-      <div class="header-right">
-        <span class="quota-pill" *ngIf="quotaMax > 0" [class.quota-exceeded]="isQuotaExceeded" [title]="isQuotaExceeded ? 'Recherche intelligente indisponible (disponible dans ' + timeRemainingFormatted + ')' : 'Recherches intelligentes de plats restantes sur 5h'">
-          {{ isQuotaExceeded ? 'Limité (5h)' : ('Recherches : ' + quotaUsed + '/' + quotaMax) }}
-        </span>
-        <button class="close-btn" (click)="toggleChat($event)" aria-label="Fermer">✕</button>
-      </div>
-    </div>
-
-    <!-- Body / Messages -->
-    <div class="chat-body" #messagesContainer>
-      <div class="date-separator">
-        <span class="date-pill">Aujourd'hui</span>
-      </div>
-
-      <div *ngFor="let msg of messages" [ngClass]="{'msg-row-ai': msg.sender === 'ai', 'msg-row-user': msg.sender === 'user'}">
-        <!-- AI Avatar -->
-        <div *ngIf="msg.sender === 'ai'" class="ai-avatar">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C6.477 2 2 6.477 2 12C2 17.523 6.477 22 12 22C17.523 22 22 17.523 22 12C22 6.477 17.523 2 12 2Z" fill="#E51A29"/>
-            <path d="M8 12L11 15L16 9" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-
-        <div class="msg-content-wrapper">
-          <!-- Text Bubble -->
-          <div [ngClass]="{'ai-bubble': msg.sender === 'ai', 'user-bubble': msg.sender === 'user'}">
-            <p>{{ msg.text }}</p>
-          </div>
-
-          <!-- Product Recommendation Cards (AI only) -->
-          <div *ngIf="msg.sender === 'ai' && msg.cards && msg.cards.length > 0" class="recommendations-container">
-            <div *ngFor="let card of msg.cards" class="product-card">
-              <div class="card-img-box">
-                <img [src]="card.image_url || 'assets/images/thieboudienne.jpg'" [alt]="card.nom" (error)="card.image_url = 'assets/images/thieboudienne.jpg'" />
-                <span class="price-badge">{{ card.prix_formate }}</span>
-              </div>
-              <div class="card-info">
-                <h4 class="card-title">{{ card.nom }}</h4>
-                <div class="card-meta">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                    <circle cx="12" cy="10" r="3"></circle>
-                  </svg>
-                  <span>{{ card.etablissement_nom }} • {{ card.adresse }}</span>
-                </div>
-                <div class="card-meta delivery-meta" *ngIf="card.temps_livraison">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#666666" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                  </svg>
-                  <span>{{ card.temps_livraison }}</span>
-                </div>
-                <div class="card-actions">
-                  <button class="btn-menu" (click)="viewEstablishmentMenu(card)">Voir le menu</button>
-                  <button class="btn-order" (click)="orderProduct(card)">Commander</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <span class="msg-timestamp">{{ msg.timestamp | date:'HH:mm' }}</span>
-        </div>
-      </div>
-
-      <!-- Typing / Loading indicator -->
-      <div *ngIf="isLoading" class="msg-row-ai loading-row">
-        <div class="ai-avatar">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" fill="#E51A29"/>
-          </svg>
-        </div>
-        <div class="ai-bubble typing-dots">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Input Bar -->
-    <div class="chat-input-bar">
-      <button
-        class="mic-btn"
-        type="button"
-        (click)="toggleVoiceRecording()"
-        [class.recording]="isRecording"
-        [class.transcribing]="isTranscribing"
-        [title]="isRecording ? 'Arrêter l\'enregistrement' : 'Recherche vocale'"
-      >
-        <span *ngIf="isRecording" class="recording-pulse"></span>
-        <span *ngIf="isTranscribing" class="transcribing-spinner"></span>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-          <line x1="12" y1="19" x2="12" y2="23"></line>
-          <line x1="8" y1="23" x2="16" y2="23"></line>
-        </svg>
-      </button>
-      <input
-        type="text"
-        [(ngModel)]="userInput"
-        (keyup.enter)="sendMessage()"
-        [placeholder]="isRecording ? 'Parlez... (cliquez pour arrêter)' : isTranscribing ? 'Transcription en cours...' : 'Posez votre question culinaire...'"
-        [disabled]="isLoading || isTranscribing"
-      />
-      <button class="send-btn" (click)="sendMessage()" [disabled]="!userInput.trim() || isLoading || isTranscribing" aria-label="Envoyer">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="22" y1="2" x2="11" y2="13"></line>
-          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-        </svg>
-      </button>
-    </div>
-  </div>
 </div>
-

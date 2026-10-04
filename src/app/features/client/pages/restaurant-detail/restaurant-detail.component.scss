@@ -82,6 +82,58 @@
         font-weight: 500;
       }
     }
+
+    .subscription-action-wrapper {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      align-self: flex-end;
+      margin-bottom: 2px;
+
+      .subscribers-count {
+        font-size: 0.85rem;
+        font-weight: 800;
+        color: #1A1A1A;
+        line-height: 1;
+      }
+
+      .btn-sub-toggle {
+        padding: 7px 14px;
+        border-radius: 18px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        border: 1.5px solid #E51A29;
+        background-color: #E51A29;
+        color: #FFFFFF;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+          background-color: #C01321;
+          border-color: #C01321;
+        }
+
+        &.subscribed {
+          background-color: #F4F5F7;
+          color: #555555;
+          border-color: #E0E0E0;
+
+          &:hover {
+            background-color: #EAEBEC;
+          }
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+    }
   }
 }
 

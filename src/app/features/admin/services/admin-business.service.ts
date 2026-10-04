@@ -297,4 +297,14 @@ export class AdminBusinessService {
       })
     );
   }
+
+  analyzeDocumentsWithCopilot(id: string): Observable<any> {
+    const url = `${environment.apiUrl}/api/admin/businesses/${id}/analyze-documents/`;
+    return this.http.post<any>(url, {});
+  }
+
+  resendEmail(id: string, motif?: string): Observable<any> {
+    const url = `${environment.apiUrl}/api/admin/businesses/${id}/resend-email/`;
+    return this.http.post<any>(url, { motif });
+  }
 }

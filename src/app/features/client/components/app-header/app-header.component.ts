@@ -17,6 +17,7 @@ export class AppHeaderComponent implements OnInit {
   @Input() title?: string;
   @Input() showBack: boolean = false;
   @Input() showLogo: boolean = false;
+  @Input() showPlanning: boolean = true;
   @Input() backUrl: string = '/home';
   @Input() notificationCount?: number;
 

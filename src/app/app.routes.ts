@@ -26,6 +26,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/client/pages/restaurant-detail/restaurant-detail.component').then(m => m.RestaurantDetailComponent)
   },
   {
+    path: 'boutique/:id',
+    redirectTo: 'restaurant/:id'
+  },
+  {
     path: 'search',
     loadComponent: () => import('./features/client/pages/search/search.component').then(m => m.SearchComponent)
   },
@@ -54,6 +58,44 @@ export const routes: Routes = [
     loadComponent: () => import('./features/client/pages/profile/profile.component').then(m => m.ProfileComponent)
   },
   {
+    path: 'planning',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/client/pages/planning/planning.component').then(m => m.PlanningComponent)
+  },
+  {
+    path: 'planning/create',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/client/pages/planning-create/planning-create.component').then(m => m.PlanningCreateComponent)
+  },
+  {
+    path: 'planning/new',
+    redirectTo: 'planning/create'
+  },
+  {
+    path: 'planning/edit/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/client/pages/planning-create/planning-create.component').then(m => m.PlanningCreateComponent)
+  },
+  {
+    path: 'planning/ai',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/client/pages/planning-ai/planning-ai.component').then(m => m.PlanningAiComponent)
+  },
+  {
+    path: 'planning-ai',
+    redirectTo: 'planning/ai'
+  },
+  {
+    path: 'planning/detail/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/client/pages/planning-detail/planning-detail.component').then(m => m.PlanningDetailComponent)
+  },
+  {
+    path: 'planning/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/client/pages/planning-detail/planning-detail.component').then(m => m.PlanningDetailComponent)
+  },
+  {
     path: 'profile/edit',
     canActivate: [authGuard],
     loadComponent: () => import('./features/client/pages/profile-edit/profile-edit.component').then(m => m.ProfileEditComponent)
@@ -62,6 +104,15 @@ export const routes: Routes = [
     path: 'favorites',
     canActivate: [authGuard],
     loadComponent: () => import('./features/client/pages/favorites/favorites.component').then(m => m.FavoritesComponent)
+  },
+  {
+    path: 'profile/subscriptions',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/client/pages/my-subscriptions/my-subscriptions.component').then(m => m.MySubscriptionsComponent)
+  },
+  {
+    path: 'subscriptions',
+    redirectTo: 'profile/subscriptions'
   },
   {
     path: 'notifications',

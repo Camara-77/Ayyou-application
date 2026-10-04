@@ -16,11 +16,24 @@ export interface RecommendationCard {
   est_disponible: boolean;
 }
 
+export interface ActionProposal {
+  action_type: string;
+  planning_id?: number;
+  order_id?: number;
+  nom_produit?: string;
+  nom_etablissement?: string;
+  current_date?: string;
+  current_creneau?: string;
+  changes?: any;
+  summary?: string;
+}
+
 export interface ChatMessage {
   id?: string;
   sender: 'ai' | 'user';
   text: string;
   cards?: RecommendationCard[];
+  action_proposal?: ActionProposal;
   timestamp: Date;
 }
 
@@ -28,6 +41,8 @@ export interface AIChatResponse {
   status: string;
   reply: string;
   cards?: RecommendationCard[];
+  action_proposal?: ActionProposal;
+  planning?: any;
   intent?: any;
   user_name?: string;
   quota_used?: number;
@@ -46,8 +61,12 @@ export class AiChatService {
 
   constructor(private http: HttpClient) {}
 
-  sendMessage(message: string, history: { sender: string; text: string }[] = []): Observable<AIChatResponse> {
-    return this.http.post<AIChatResponse>(this.apiUrl, { message, history }).pipe(
+  sendMessage(message: string, history: { sender: string; text: string }[] = [], context: any = {}, confirmAction: boolean = false): Observable<AIChatResponse> {
+    const payload: any = { message, history, context };
+    if (confirmAction) {
+      payload.confirm_action = true;
+    }
+    return this.http.post<AIChatResponse>(this.apiUrl, payload).pipe(
       catchError(error => {
         console.error('Error communicating with AYYOU AI Chatbot:', error);
         return of({

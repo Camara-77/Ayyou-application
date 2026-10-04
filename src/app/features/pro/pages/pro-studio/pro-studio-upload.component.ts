@@ -46,9 +46,10 @@ export class ProStudioUploadComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.proMenuService.loadBackendProducts().subscribe();
     this.proMenuService.dishes$.subscribe(d => {
       this.dishes = d;
-      if (d.length > 0) {
+      if (d.length > 0 && !this.selectedDishId) {
         const first = d[0];
         this.selectedDishId = first.id;
         this.productName = first.name;
@@ -60,6 +61,12 @@ export class ProStudioUploadComponent implements OnInit {
 
   onDishSelect(dishId: string): void {
     this.selectedDishId = dishId;
+    if (!dishId) {
+      this.productName = '';
+      this.productPrice = null;
+      this.description = '';
+      return;
+    }
     const selected = this.dishes.find(d => d.id === dishId);
     if (selected) {
       this.productName = selected.name;
@@ -70,7 +77,7 @@ export class ProStudioUploadComponent implements OnInit {
 
   selectMainCategory(mainCat: MainCategory): void {
     this.selectedMainCategory = mainCat;
-    this.selectedSubCategory = mainCat.subCategories.length > 0 ? mainCat.subCategories[0] : 'Général';
+    this.selectedSubCategory = '';
   }
 
   selectSubCategory(subCat: string): void {
@@ -149,7 +156,7 @@ export class ProStudioUploadComponent implements OnInit {
       return;
     }
 
-    if (!this.productPrice || Number(this.productPrice) <= 0) {
+    if (this.selectedDishId && (!this.productPrice || Number(this.productPrice) <= 0)) {
       this.errorMessage = 'Veuillez indiquer un prix valide (FCFA).';
       return;
     }

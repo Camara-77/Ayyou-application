@@ -1,0 +1,154 @@
+<div class="planning-detail-layout">
+  <!-- Header avec Bouton Retour, Titre et Raccourcis à droite -->
+  <app-header [showBack]="true" backUrl="/planning" title="Détails Repas" [showPlanning]="true"></app-header>
+
+  <main class="planning-detail-content">
+
+    <!-- ÉTAT DE CHARGEMENT -->
+    <div class="loading-state-card" *ngIf="currentState === 'LOADING'">
+      <div class="spinner-red"></div>
+      <span>Chargement des détails du repas...</span>
+    </div>
+
+    <!-- ÉTAT INTROUVABLE / ERREUR -->
+    <div class="empty-not-found-card" *ngIf="currentState === 'NOT_FOUND' || currentState === 'ERROR'">
+      <div class="empty-icon-circle">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <h3 class="not-found-title">Repas planifié introuvable</h3>
+      <p class="not-found-desc">Ce repas n'existe pas ou a été annulé par votre compte.</p>
+      <a routerLink="/planning" class="btn-back-planning">Retourner à Mon Planning</a>
+    </div>
+
+    <!-- ÉTAT SUCCÈS : REPAS TROUVÉ -->
+    <ng-container *ngIf="currentState === 'SUCCESS' && meal">
+      
+      <!-- 1. CARTE DE RAPPEL AYYOU (AYYOU • RAPPEL REPAS) -->
+      <div class="reminder-card-container" *ngIf="!reminderDismissed">
+        <div class="reminder-header-row">
+          <div class="reminder-brand-badge">
+            <div class="red-circle-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>
+            </div>
+            <span class="brand-tag">AYYOU • RAPPEL REPAS</span>
+          </div>
+          <span class="time-ago">Il y a 2 min</span>
+          <button type="button" class="btn-close-reminder" (click)="postponeReminder()" aria-label="Fermer">✕</button>
+        </div>
+
+        <h3 class="reminder-headline">C'est l'heure de votre repas 🍲</h3>
+        <p class="reminder-body-text">
+          Votre <strong>{{ meal.nom_produit }}</strong> chez <strong>{{ meal.nom_etablissement }}</strong> est prête. Livraison prévue à <strong>{{ getDeliveryTimeDisplay() }}</strong>.
+        </p>
+
+        <div class="reminder-actions-row">
+          <button type="button" class="btn-reminder-validate-red" (click)="validateReminder()" [disabled]="reminderValidated">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span *ngIf="!reminderValidated">Valider</span>
+            <span *ngIf="reminderValidated">✓ Validé !</span>
+          </button>
+
+          <button type="button" class="btn-reminder-later-grey" (click)="postponeReminder()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Plus tard</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. CARTE HÉRO DU PLAT SELECTIONNÉ -->
+      <div class="hero-dish-card">
+        <!-- Top Status Pill -->
+        <div class="status-top-badge" [class.cancelled]="meal.statut === 'ANNULE'">
+          <span class="status-dot">●</span>
+          <span>Statut : {{ meal.statut_display }} (Rappel 30 min)</span>
+        </div>
+
+        <img
+          [src]="meal.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'"
+          [alt]="meal.nom_produit"
+          class="hero-dish-img"
+        />
+
+        <div class="hero-overlay-gradient"></div>
+
+        <div class="hero-content-bottom">
+          <span class="resto-location-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            {{ meal.nom_etablissement }} — {{ meal.adresse_etablissement || 'Dakar' }}
+          </span>
+
+          <div class="title-price-row">
+            <h2 class="hero-dish-title">{{ meal.nom_produit }}</h2>
+            <div class="hero-price-tag">{{ formatPrice(meal.prix_total) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. CARTE DATE & STATUT REPAS -->
+      <div class="date-status-card">
+        <div class="date-info-group">
+          <svg class="calendar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span class="date-title-text">{{ getFormattedDate(meal.date_planifiee) }}</span>
+        </div>
+        <span class="status-pill-grey" [class.cancelled]="meal.statut === 'ANNULE'">{{ meal.statut_display }}</span>
+      </div>
+
+      <!-- 4. GRILLE 2 COLONNES INFORMATIONS (COMMANDE AUTO / LIVRAISON ESTIMÉE) -->
+      <div class="info-grid-2col">
+        <!-- Box Commande Auto -->
+        <div class="info-box-item">
+          <div class="info-box-header">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span class="info-box-label">Commande auto</span>
+          </div>
+          <span class="info-box-value">{{ getOrderTimeDisplay() }}</span>
+        </div>
+
+        <!-- Box Livraison Estimée -->
+        <div class="info-box-item">
+          <div class="info-box-header">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="info-box-label">Livraison estimée</span>
+          </div>
+          <span class="info-box-value highlight-red">{{ getDeliveryTimeDisplay() }}</span>
+        </div>
+      </div>
+
+      <!-- 5. BOUTONS D'ACTION (MODIFIER CRÉNEAU / ANNULER LE REPAS) -->
+      <div class="actions-grid-2col">
+        <button type="button" class="btn-action-grey" (click)="onModifySlotClick()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <span>Modifier</span>
+        </button>
+
+        <button type="button" class="btn-action-cancel-red" (click)="openCancelModal()" [disabled]="meal.statut === 'ANNULE'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          <span *ngIf="meal.statut !== 'ANNULE'">Annuler le repas</span>
+          <span *ngIf="meal.statut === 'ANNULE'">Repas Annulé</span>
+        </button>
+      </div>
+
+    </ng-container>
+
+  </main>
+
+  <!-- MODALE DE CONFIRMATION D'ANNULATION -->
+  <div class="cancel-modal-overlay" *ngIf="showCancelConfirmModal">
+    <div class="cancel-modal-card">
+      <div class="modal-icon-warning">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <h3 class="modal-title">Annuler ce repas planifié ?</h3>
+      <p class="modal-text">Cette action annulera la réservation de ce repas dans votre planning personnel.</p>
+      <div class="modal-actions-row">
+        <button type="button" class="btn-modal-back" (click)="closeCancelModal()">Retour</button>
+        <button type="button" class="btn-modal-confirm-red" (click)="confirmCancelMeal()" [disabled]="isCancelling">
+          <span *ngIf="!isCancelling">Confirmer l'annulation</span>
+          <span *ngIf="isCancelling">Annulation...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <app-bottom-nav activeTab="planning"></app-bottom-nav>
+</div>

@@ -53,19 +53,18 @@
   }
 }
 
-/* Slidable Sheet Card */
+/* Tracking Sheet Card */
 .tracking-sheet-card {
   background: #ffffff;
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
-  margin-top: -24px;
+  border-radius: 24px;
+  margin: 12px 12px 0 12px;
   position: relative;
   z-index: 10;
-  padding: 16px;
+  padding: 20px 16px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 
   .drag-handle {
     width: 36px;

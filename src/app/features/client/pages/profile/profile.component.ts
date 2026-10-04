@@ -31,6 +31,59 @@ export class ProfileComponent implements OnInit {
   isSwitchingMode: boolean = false;
   switchError: string | null = null;
 
+  showPhoneModal: boolean = false;
+  newPhoneInput: string = '';
+  isSavingPhone: boolean = false;
+  phoneError: string | null = null;
+  phoneSuccessMsg: string | null = null;
+
+  openPhoneModal(): void {
+    this.newPhoneInput = '';
+    this.phoneError = null;
+    this.phoneSuccessMsg = null;
+    this.showPhoneModal = true;
+  }
+
+  closePhoneModal(): void {
+    this.showPhoneModal = false;
+    this.phoneError = null;
+  }
+
+  savePhone(): void {
+    const cleaned = (this.newPhoneInput || '').trim();
+    if (!cleaned) {
+      this.phoneError = 'Veuillez saisir un numéro de téléphone valide.';
+      return;
+    }
+
+    this.isSavingPhone = true;
+    this.phoneError = null;
+
+    this.clientDataService.updatePhone(cleaned).subscribe({
+      next: () => {
+        if (this.userProfile) {
+          this.userProfile.phoneNumber = cleaned;
+        }
+        this.isSavingPhone = false;
+        this.phoneSuccessMsg = 'Numéro de téléphone mis à jour avec succès !';
+        setTimeout(() => {
+          this.closePhoneModal();
+        }, 1000);
+      },
+      error: (err) => {
+        this.isSavingPhone = false;
+        if (err?.error?.errors?.numero_telephone) {
+          const errList = err.error.errors.numero_telephone;
+          this.phoneError = Array.isArray(errList) ? errList[0] : errList;
+        } else if (err?.error?.detail) {
+          this.phoneError = err.error.detail;
+        } else {
+          this.phoneError = 'Impossible de mettre à jour le numéro de téléphone.';
+        }
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.clientDataService.getUserProfile().subscribe(profile => {
       this.userProfile = profile;

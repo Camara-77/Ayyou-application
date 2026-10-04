@@ -37,6 +37,8 @@ export class RestaurantDetailComponent implements OnInit {
     private cartService: CartService
   ) {}
 
+  isSubscribing: boolean = false;
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id') || '69';
     this.clientDataService.getRestaurant(id).subscribe(res => {
@@ -45,6 +47,60 @@ export class RestaurantDetailComponent implements OnInit {
     this.clientDataService.getFeedForRestaurant(id).subscribe(vids => {
       this.restaurantVideos = vids;
     });
+  }
+
+  toggleSubscription(): void {
+    if (!this.restaurant) return;
+
+    if (!this.authService.requireAuth({
+      title: 'Connectez-vous pour vous abonner',
+      message: 'Vous devez avoir un compte AYYOU pour vous abonner à un établissement.',
+      actionType: 'generic'
+    })) {
+      return;
+    }
+
+    if (this.isSubscribing) return;
+    this.isSubscribing = true;
+
+    const etabId = this.restaurant.id;
+    const currentlySubscribed = !!this.restaurant.isSubscribed;
+
+    if (currentlySubscribed) {
+      this.restaurant.isSubscribed = false;
+      if (this.restaurant.followersCount && this.restaurant.followersCount > 0) {
+        this.restaurant.followersCount--;
+      }
+      this.clientDataService.unsubscribeFromEstablishment(etabId).subscribe({
+        next: () => {
+          this.isSubscribing = false;
+        },
+        error: () => {
+          if (this.restaurant) {
+            this.restaurant.isSubscribed = true;
+            this.restaurant.followersCount = (this.restaurant.followersCount || 0) + 1;
+          }
+          this.isSubscribing = false;
+        }
+      });
+    } else {
+      this.restaurant.isSubscribed = true;
+      this.restaurant.followersCount = (this.restaurant.followersCount || 0) + 1;
+      this.clientDataService.subscribeToEstablishment(etabId).subscribe({
+        next: () => {
+          this.isSubscribing = false;
+        },
+        error: () => {
+          if (this.restaurant) {
+            this.restaurant.isSubscribed = false;
+            if (this.restaurant.followersCount && this.restaurant.followersCount > 0) {
+              this.restaurant.followersCount--;
+            }
+          }
+          this.isSubscribing = false;
+        }
+      });
+    }
   }
 
   selectCategory(catId: string): void {

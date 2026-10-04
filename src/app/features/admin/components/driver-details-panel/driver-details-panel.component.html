@@ -87,8 +87,92 @@
     </ng-template>
   </div>
 
+  <!-- AI Copilot Analysis Result Card -->
+  <div class="ai-analysis-report-card" *ngIf="driver.aiAnalysisReport">
+    <div class="report-header">
+      <div class="header-left">
+        <span class="robot-icon">🤖</span>
+        <span class="report-title">ANALYSE AYYOU COPILOT</span>
+      </div>
+      <div class="decision-badge" [ngClass]="{
+        'badge-conforme': driver.aiAnalysisReport.decision === 'CONFORME',
+        'badge-non-conforme': driver.aiAnalysisReport.decision === 'NON_CONFORME',
+        'badge-verifier': driver.aiAnalysisReport.decision === 'A_VERIFIER'
+      }">
+        <span *ngIf="driver.aiAnalysisReport.decision === 'CONFORME'">✓ DOSSIER CONFORME</span>
+        <span *ngIf="driver.aiAnalysisReport.decision === 'NON_CONFORME'">⚠ DOSSIER NON CONFORME</span>
+        <span *ngIf="driver.aiAnalysisReport.decision === 'A_VERIFIER'">🔍 À VÉRIFIER</span>
+      </div>
+    </div>
+
+    <div class="report-breakdown">
+      <div class="breakdown-item">
+        <span class="item-name">Identité</span>
+        <span class="item-status" [ngClass]="(driver.aiAnalysisReport.identity_analysis?.status === 'COHERENT' || driver.aiAnalysisReport.identity_consistency?.status === 'COHERENT') ? 'text-green' : 'text-red'">
+          {{ (driver.aiAnalysisReport.identity_analysis?.status === 'COHERENT' || driver.aiAnalysisReport.identity_consistency?.status === 'COHERENT') ? '✓ Cohérente' : '⚠ Incohérente' }}
+        </span>
+      </div>
+
+      <div class="breakdown-item">
+        <span class="item-name">Véhicule / Plaque</span>
+        <span class="item-status" [ngClass]="(driver.aiAnalysisReport.vehicle_registration_analysis?.status === 'COHERENT' || driver.aiAnalysisReport.vehicle_consistency?.status === 'COHERENT') ? 'text-green' : 'text-orange'">
+          {{ (driver.aiAnalysisReport.vehicle_registration_analysis?.status === 'COHERENT' || driver.aiAnalysisReport.vehicle_consistency?.status === 'COHERENT') ? '✓ Conforme' : '⚠ À vérifier' }}
+        </span>
+      </div>
+
+      <div class="breakdown-item">
+        <span class="item-name">Assurance</span>
+        <span class="item-status" [ngClass]="(driver.aiAnalysisReport.insurance_analysis?.status === 'CONFORME' || driver.aiAnalysisReport.insurance_status?.status === 'VALIDE') ? 'text-green' : 'text-orange'">
+          {{ (driver.aiAnalysisReport.insurance_analysis?.status === 'CONFORME' || driver.aiAnalysisReport.insurance_status?.status === 'VALIDE') ? '✓ En cours' : '⚠ À vérifier / Expirée' }}
+        </span>
+      </div>
+
+      <div class="breakdown-item">
+        <span class="item-name">Photo profil</span>
+        <span class="item-status" [ngClass]="driver.aiAnalysisReport.photo_analysis?.photos_exploitables ? 'text-green' : 'text-orange'">
+          {{ driver.aiAnalysisReport.photo_analysis?.photos_exploitables ? '✓ Exploitable' : '⚠ Inexploitable' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Inconsistencies List -->
+    <div class="inconsistencies-block" *ngIf="driver.aiAnalysisReport.inconsistencies && driver.aiAnalysisReport.inconsistencies.length > 0">
+      <span class="block-title">Incohérences détectées :</span>
+      <ul class="inconsistencies-list">
+        <li *ngFor="let inc of driver.aiAnalysisReport.inconsistencies">• {{ inc }}</li>
+      </ul>
+    </div>
+
+    <!-- AI Recommendation -->
+    <div class="recommendation-box">
+      <span class="rec-label">Recommandation :</span>
+      <p class="rec-text">{{ driver.aiAnalysisReport.recommendation }}</p>
+    </div>
+  </div>
+
+  <div class="analysis-error-alert" *ngIf="analysisError">
+    <span>{{ analysisError }}</span>
+  </div>
+
   <!-- Admin Action Buttons Stack -->
   <div class="admin-actions-stack">
+    <!-- Copilot AI Trigger Button -->
+    <button
+      type="button"
+      class="btn-admin-copilot-ai"
+      [disabled]="isAnalyzing"
+      (click)="analyzeWithCopilot()"
+    >
+      <div class="copilot-btn-content">
+        <div class="title-row">
+          <span class="plus-icon" *ngIf="!isAnalyzing">+</span>
+          <span class="spinner-inline" *ngIf="isAnalyzing">⏳</span>
+          <span class="copilot-main-text">{{ isAnalyzing ? 'AYYOU Copilot analyse le dossier...' : 'Analyser avec AYYOU Copilot' }}</span>
+        </div>
+        <span class="copilot-sub-text">Analyse intelligente des pièces et du permis</span>
+      </div>
+    </button>
+
     <button type="button" class="btn-admin-primary-red" (click)="promptApprove()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>

@@ -1,0 +1,435 @@
+.planning-page-layout {
+  min-height: 100vh;
+  background-color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+
+  .planning-main-content {
+    flex: 1;
+    max-width: 440px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 16px 16px 90px;
+    box-sizing: border-box;
+  }
+}
+
+/* 1. SÉLECTEUR JOUR / SEMAINE / MOIS */
+.view-tabs-container {
+  margin-bottom: 20px;
+
+  .tabs-pill-wrapper {
+    display: flex;
+    background-color: #F2F4F7;
+    border-radius: 24px;
+    padding: 4px;
+    gap: 4px;
+
+    .tab-pill {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 10px 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #667085;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &.active {
+        background-color: #E51A29;
+        color: #FFFFFF;
+        box-shadow: 0 2px 4px rgba(229, 26, 41, 0.2);
+      }
+    }
+  }
+}
+
+/* 2. CARTE CALENDRIER MENSUEL */
+.calendar-card {
+  background-color: #FFFFFF;
+  border-radius: 16px;
+  border: 1px solid #F0F0F0;
+  padding: 16px;
+  margin-bottom: 24px;
+
+  .month-nav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+
+    .month-title-group {
+      .month-name-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        .month-title {
+          font-size: 18px;
+          font-weight: 700;
+          color: #1A1A1A;
+          margin: 0;
+        }
+
+        .chevron-icon {
+          cursor: pointer;
+        }
+      }
+
+      .dates-count-sub {
+        font-size: 12px;
+        color: #757575;
+        font-weight: 500;
+      }
+    }
+
+    .nav-arrows-group {
+      display: flex;
+      gap: 8px;
+
+      .btn-arrow {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: #F8F9FA;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:active {
+          background-color: #E9ECEF;
+        }
+      }
+    }
+  }
+
+  /* Weekdays grid */
+  .weekdays-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    margin-bottom: 12px;
+
+    .weekday-cell {
+      font-size: 11px;
+      font-weight: 700;
+      color: #9CA3AF;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  /* Days grid */
+  .days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    row-gap: 8px;
+
+    .day-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      cursor: pointer;
+      position: relative;
+
+      .day-number-circle {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 600;
+        color: #1A1A1A;
+        transition: all 0.2s ease;
+      }
+
+      &.other-month {
+        .day-number-circle {
+          color: #D1D5DB;
+        }
+      }
+
+      &.selected {
+        .day-number-circle {
+          background-color: #E51A29;
+          color: #FFFFFF;
+          font-weight: 700;
+        }
+      }
+
+      .planned-dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background-color: #E51A29;
+        margin-top: 2px;
+      }
+    }
+  }
+}
+
+/* 3. EN-TÊTE JOUR SÉLECTIONNÉ */
+.selected-day-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+
+  .selected-day-info {
+    .selected-day-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1A1A1A;
+      margin: 0 0 2px 0;
+    }
+
+    .selected-day-subtitle {
+      font-size: 12px;
+      color: #757575;
+      margin: 0;
+    }
+  }
+
+  .meal-count-badge {
+    background-color: #FEE2E2;
+    color: #E51A29;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .dot-red {
+      font-size: 8px;
+    }
+  }
+}
+
+/* 4. LISTE DES CARTES DE REPAS PLANIFIÉS */
+.meals-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+
+  .meal-card {
+    background-color: #F8F9FA;
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+
+    .meal-img-wrapper {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      border-radius: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+
+      .meal-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .creneau-tag {
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        background: rgba(0, 0, 0, 0.65);
+        color: #FFFFFF;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+    }
+
+    .meal-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      .status-price-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 4px;
+
+        .meal-status {
+          font-size: 12px;
+          font-weight: 700;
+          color: #E51A29;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+
+          .status-dot {
+            font-size: 8px;
+          }
+        }
+
+        .meal-price {
+          font-size: 14px;
+          font-weight: 800;
+          color: #E51A29;
+        }
+      }
+
+      .meal-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #1A1A1A;
+        margin: 0 0 2px 0;
+        line-height: 1.3;
+      }
+
+      .meal-establishment {
+        font-size: 12px;
+        color: #4B5563;
+        margin: 0 0 10px 0;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        flex-wrap: wrap;
+
+        .restaurant-icon {
+          flex-shrink: 0;
+        }
+
+        .restaurant-name {
+          font-weight: 600;
+          color: #1F2937;
+        }
+
+        .restaurant-address {
+          color: #6B7280;
+        }
+      }
+
+      .btn-detail-link {
+        align-self: flex-start;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background-color: #FFFFFF;
+        border: 1px solid #E5E7EB;
+        padding: 6px 14px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #E51A29;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:active {
+          background-color: #F3F4F6;
+        }
+      }
+    }
+  }
+}
+
+/* 5. ÉTAT VIDE */
+.empty-planning-state {
+  background-color: #F8F9FA;
+  border-radius: 16px;
+  padding: 32px 20px;
+  text-align: center;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .empty-icon-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #E5E7EB;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+
+  .empty-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1A1A1A;
+    margin: 0 0 4px 0;
+  }
+
+  .empty-text {
+    font-size: 13px;
+    color: #757575;
+    margin: 0;
+  }
+}
+
+/* 6. BOUTONS D'ACTION PRINCIPAUX (PLACEMENT HAUT) */
+.action-buttons-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-bottom: 20px;
+
+  .btn-plan-meal-red {
+    flex: 1;
+    height: 46px;
+    background-color: #E51A29;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 24px;
+    font-size: 13.5px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(229, 26, 41, 0.2);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+
+    &:active {
+      background-color: #C41422;
+      transform: scale(0.98);
+    }
+  }
+
+  .btn-plan-ai-grey {
+    flex: 1;
+    height: 46px;
+    background-color: #FEE2E2;
+    color: #E51A29;
+    border: none;
+    border-radius: 24px;
+    font-size: 13.5px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+
+    &:active {
+      background-color: #FCA5A5;
+      transform: scale(0.98);
+    }
+  }
+}

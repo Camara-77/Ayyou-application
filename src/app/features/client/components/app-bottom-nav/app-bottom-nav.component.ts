@@ -13,7 +13,7 @@ import { CartService } from '../../../../core/services/cart.service';
   styleUrls: ['./app-bottom-nav.component.scss']
 })
 export class AppBottomNavComponent implements OnInit, OnDestroy {
-  @Input() activeTab: 'home' | 'search' | 'cart' | 'profile' = 'home';
+  @Input() activeTab: 'home' | 'search' | 'cart' | 'profile' | 'planning' | string = 'home';
 
   cartItemCount: number = 0;
   private sub?: Subscription;

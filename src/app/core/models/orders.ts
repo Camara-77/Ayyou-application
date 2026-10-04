@@ -94,6 +94,9 @@ export interface SubOrder {
   etablissement?: number | string;
   etablissement_nom: string;
   etablissement_logo?: string;
+  etablissement_adresse?: string;
+  etablissement_specialite?: string;
+  etablissement_statut?: string;
   statut: string;
   sous_total: string;
   frais_livraison: string;
@@ -114,6 +117,7 @@ export interface CommandeOrder {
   instructions_livraison?: string;
   nom_destinataire?: string;
   telephone_destinataire?: string;
+  mode_paiement?: string;
   sous_commandes: SubOrder[];
   date_creation: string;
 }

@@ -49,6 +49,9 @@ export interface VerifyOtpRequest {
 export interface VerifyOtpResponse {
   message: string;
   verified: boolean;
+  access?: string;
+  refresh?: string;
+  utilisateur?: DjangoUser;
 }
 
 export interface DjangoUser {

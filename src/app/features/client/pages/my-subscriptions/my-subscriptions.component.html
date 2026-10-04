@@ -1,0 +1,81 @@
+<div class="page-container">
+  <app-header [showBack]="true" backUrl="/profile" title="Mes abonnements"></app-header>
+
+  <main class="subscriptions-content">
+    <div class="page-sub-header">
+      <h1 class="page-title">Mes abonnements</h1>
+      <p class="page-subtitle">Retrouvez tous vos établissements favoris suivis sur AYYOU</p>
+    </div>
+
+    <!-- Loading Skeleton -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="skeleton-card" *ngFor="let i of [1, 2, 3]"></div>
+    </div>
+
+    <!-- Subscriptions List (1 Item per Row - Mobile First List Format) -->
+    <div class="subscriptions-list" *ngIf="!isLoading && subscriptions.length > 0">
+      <div 
+        class="subscription-item-card" 
+        *ngFor="let item of subscriptions"
+        (click)="openEstablishment(item)"
+      >
+        <div class="item-logo-wrap">
+          <img 
+            [src]="item.etablissementDetail.logoUrl" 
+            [alt]="item.etablissementDetail.name" 
+            class="item-logo-img"
+          />
+        </div>
+
+        <div class="item-meta">
+          <div class="name-row">
+            <h3 class="etab-name">{{ item.etablissementDetail.name }}</h3>
+            <span class="type-tag" [class.vendeur]="item.etablissementDetail.typeEtablissement === 'VENDEUR'">
+              {{ item.etablissementDetail.typeEtablissement === 'VENDEUR' ? 'Vendeur' : 'Restaurant' }}
+            </span>
+          </div>
+
+          <p class="etab-location" *ngIf="item.etablissementDetail.location">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 17C14.5 13.8 17 11.2 17 8.5C17 5.74 14.76 3.5 12 3.5C9.24 3.5 7 5.74 7 8.5C7 11.2 9.5 13.8 12 17Z" fill="#E51A29"/>
+            </svg>
+            <span>{{ item.etablissementDetail.location }}</span>
+          </p>
+
+          <p class="etab-followers" *ngIf="item.etablissementDetail.followersCount !== undefined">
+            {{ item.etablissementDetail.followersCount }} {{ item.etablissementDetail.followersCount > 1 ? 'abonnés' : 'abonné' }}
+          </p>
+        </div>
+
+        <div class="item-action">
+          <button 
+            type="button" 
+            class="btn-unsub" 
+            (click)="unsubscribe($event, item)"
+            [disabled]="unsubscribingIds.has(item.id)"
+          >
+            ✓ Abonné
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && subscriptions.length === 0">
+      <div class="empty-icon-circle">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" stroke="#E51A29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 class="empty-title">Aucun abonnement pour le moment</h2>
+      <p class="empty-description">
+        Abonnez-vous à vos restaurants et vendeurs préférés pour recevoir leurs dernières offres et publications vidéo.
+      </p>
+      <button class="btn-discover" (click)="goToDiscovery()">
+        Découvrir des établissements
+      </button>
+    </div>
+  </main>
+
+  <app-bottom-nav activeTab="profile"></app-bottom-nav>
+</div>

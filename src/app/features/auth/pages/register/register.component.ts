@@ -272,6 +272,12 @@ export class RegisterComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
+  onSocialLogin(provider: string): void {
+    if (provider === 'google') {
+      this.router.navigate(['/google-auth']);
+    }
+  }
+
   onSubmit(): void {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();

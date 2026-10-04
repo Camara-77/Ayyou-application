@@ -26,6 +26,8 @@ export class ProMenuEditComponent implements OnInit {
 
   isEditMode: boolean = false;
   dishId: string | null = null;
+  isSubmitting: boolean = false;
+  errorMessage: string = '';
 
   categoriesHierarchy: MainCategory[] = CATEGORIES_HIERARCHY;
   selectedMainCategory: MainCategory = CATEGORIES_HIERARCHY[0];
@@ -63,10 +65,7 @@ export class ProMenuEditComponent implements OnInit {
       next: (cats) => {
         if (cats && cats.length > 0) {
           this.backendCategories = cats;
-          const found = cats.find(c => c.nom.toLowerCase() === this.selectedCategory.toLowerCase());
-          if (found) {
-            this.dish.categoryId = found.id.toString();
-          }
+          this.syncCategoryId();
         }
       },
       error: () => {}
@@ -93,6 +92,7 @@ export class ProMenuEditComponent implements OnInit {
             } else if (this.selectedMainCategory.subCategories.length > 0) {
               this.selectedSubCategory = this.selectedMainCategory.subCategories[0];
             }
+            this.syncCategoryId();
           }
         },
         error: () => {}
@@ -121,6 +121,21 @@ export class ProMenuEditComponent implements OnInit {
           }
         ]
       };
+      this.syncCategoryId();
+    }
+  }
+
+  syncCategoryId(): void {
+    if (!this.backendCategories || this.backendCategories.length === 0) return;
+    const currentCategoryName = this.selectedMainCategory.name;
+    const found = this.backendCategories.find(c =>
+      c.nom.toLowerCase() === currentCategoryName.toLowerCase() ||
+      c.slug.toLowerCase() === currentCategoryName.toLowerCase()
+    );
+    if (found) {
+      this.dish.categoryId = found.id.toString();
+    } else if (this.backendCategories.length > 0) {
+      this.dish.categoryId = this.backendCategories[0].id.toString();
     }
   }
 
@@ -135,10 +150,7 @@ export class ProMenuEditComponent implements OnInit {
       this.selectedSubCategory = '';
       this.dish.subCategory = '';
     }
-    const catObj = this.backendCategories.find(c => c.nom.toLowerCase() === mainCat.name.toLowerCase());
-    if (catObj) {
-      this.dish.categoryId = catObj.id.toString();
-    }
+    this.syncCategoryId();
   }
 
   selectSubCategory(subCat: string): void {
@@ -164,6 +176,7 @@ export class ProMenuEditComponent implements OnInit {
       this.selectedImageFile = file;
       this.isUploadingImage = true;
       this.imageUploadError = '';
+      this.errorMessage = '';
 
       // Aperçu instantané local
       const reader = new FileReader();
@@ -207,14 +220,19 @@ export class ProMenuEditComponent implements OnInit {
   }
 
   saveDish(): void {
-    if (!this.dish.name.trim()) return;
+    if (this.isSubmitting || this.isUploadingImage) return;
+
+    if (!this.dish.name || !this.dish.name.trim()) {
+      this.errorMessage = 'Le nom du plat est obligatoire.';
+      return;
+    }
+
+    this.errorMessage = '';
+    this.isSubmitting = true;
 
     this.dish.category = this.selectedMainCategory.name;
     this.dish.subCategory = this.selectedSubCategory;
-    const catObj = this.backendCategories.find(c => c.nom.toLowerCase() === this.selectedMainCategory.name.toLowerCase());
-    if (catObj) {
-      this.dish.categoryId = catObj.id.toString();
-    }
+    this.syncCategoryId();
 
     if (this.dish.variants && this.dish.variants.length > 0) {
       this.dish.price = this.dish.variants[0].price || this.dish.price;
@@ -222,11 +240,28 @@ export class ProMenuEditComponent implements OnInit {
 
     this.proMenuService.saveDish(this.dish).subscribe({
       next: () => {
+        this.isSubmitting = false;
         this.router.navigate(['/pro/profile']);
       },
       error: (err) => {
+        this.isSubmitting = false;
         console.error('Erreur lors de la sauvegarde du plat:', err);
-        this.router.navigate(['/pro/profile']);
+
+        if (err?.error?.detail) {
+          this.errorMessage = err.error.detail;
+        } else if (err?.error && typeof err.error === 'object') {
+          const keys = Object.keys(err.error);
+          if (keys.length > 0) {
+            const firstKey = keys[0];
+            const val = err.error[firstKey];
+            const msg = Array.isArray(val) ? val.join(', ') : val;
+            this.errorMessage = `${firstKey}: ${msg}`;
+          } else {
+            this.errorMessage = "Impossible d'enregistrer le plat. Veuillez vérifier les informations et réessayer.";
+          }
+        } else {
+          this.errorMessage = "Une erreur serveur ou réseau s'est produite lors de l'enregistrement du plat.";
+        }
       }
     });
   }

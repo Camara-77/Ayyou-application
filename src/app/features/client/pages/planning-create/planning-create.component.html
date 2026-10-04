@@ -1,0 +1,251 @@
+<div class="planning-create-layout">
+  <!-- Header Client avec Retour, Titre et Icônes -->
+  <app-header [showBack]="true" [backUrl]="isEditMode ? '/planning/detail/' + editingMealId : '/planning'" [title]="isEditMode ? 'Modifier Repas' : 'Planification'" [showPlanning]="true"></app-header>
+
+  <main class="planning-create-content">
+
+    <!-- BANNIÈRE CONTEXTUELLE ÉDITION OU CRÉATION -->
+    <div class="edit-mode-header-card" *ngIf="isEditMode">
+      <div class="edit-header-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <span>MODIFICATION DU PLANNING EXISTANT #{{ editingMealId }}</span>
+      </div>
+      <p class="edit-header-sub">Modifiez les champs ci-dessous et enregistrez pour mettre à jour votre planning.</p>
+    </div>
+
+    <!-- STEPPER INDICATEUR DE PROGRESSION -->
+    <div class="stepper-bar-container" *ngIf="!isEditMode">
+      <div class="step-item step-1" [class.active]="!selectedEstablishment && !selectedDish">
+        <div class="step-circle">1</div>
+        <span class="step-label">Restaurant / Plat</span>
+      </div>
+      <div class="step-connector" [class.active]="selectedEstablishment || selectedDish"></div>
+      <div class="step-item step-2" [class.active]="selectedEstablishment && selectedDish">
+        <div class="step-circle">2</div>
+        <span class="step-label">Créneau & Date</span>
+      </div>
+    </div>
+
+    <!-- AVERTISSEMENT DE COHÉRENCE RESTAURANT / PLAT -->
+    <div class="coherence-alert-box" *ngIf="dishMismatchNotice">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span>{{ dishMismatchNotice }}</span>
+    </div>
+
+    <!-- FORMULAIRE COMPACT PRÉREMPLI DE MODIFICATION -->
+    <div class="planning-form-card">
+
+      <!-- 1. RESTAURANT (DROPDOWN RECHERCHABLE BDD) -->
+      <div class="form-group-field">
+        <label class="field-label">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>
+          <span>Restaurant</span>
+        </label>
+
+        <div class="dropdown-trigger-box" (click)="toggleRestaurantDropdown()" [class.active]="isRestaurantDropdownOpen">
+          <div class="trigger-selected-info">
+            <span class="selected-val-bold" *ngIf="selectedEstablishment">{{ selectedEstablishment.name }}</span>
+            <span class="selected-val-placeholder" *ngIf="!selectedEstablishment">Choisir un restaurant...</span>
+            <span class="selected-val-sub" *ngIf="selectedEstablishment?.location"> · {{ selectedEstablishment?.location }}</span>
+          </div>
+          <svg class="chevron-icon" [class.open]="isRestaurantDropdownOpen" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+
+        <!-- LISTE DÉROULANTE RECHERCHABLE RESTAURANTS -->
+        <div class="dropdown-menu-panel" *ngIf="isRestaurantDropdownOpen">
+          <div class="dropdown-search-wrapper">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input
+              type="text"
+              class="dropdown-search-input"
+              placeholder="Rechercher un restaurant..."
+              [(ngModel)]="restaurantSearchQuery"
+              (input)="onRestaurantSearchChange()"
+            />
+          </div>
+
+          <div class="dropdown-options-list">
+            <div
+              *ngFor="let resto of filteredRestaurants"
+              class="dropdown-option-item"
+              [class.selected]="selectedEstablishment?.id === resto.id"
+              (click)="selectEstablishment(resto)"
+            >
+              <div class="option-info-group">
+                <span class="option-name">{{ resto.name }}</span>
+                <span class="option-sub">{{ resto.location || 'Dakar' }}</span>
+              </div>
+              <svg *ngIf="selectedEstablishment?.id === resto.id" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="dropdown-empty-msg" *ngIf="filteredRestaurants.length === 0">
+              Aucun restaurant trouvé.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. PLAT (DROPDOWN RECHERCHABLE BDD) -->
+      <div class="form-group-field">
+        <label class="field-label">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2"><path d="M12 2a10 10 0 0 0-10 10c0 5.5 4.5 10 10 10s10-4.5 10-10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>
+          <span>Plat</span>
+        </label>
+
+        <div class="dropdown-trigger-box" (click)="toggleDishDropdown()" [class.active]="isDishDropdownOpen">
+          <div class="trigger-selected-info">
+            <span class="selected-val-bold" *ngIf="selectedDish">{{ selectedDish.name }}</span>
+            <span class="selected-val-placeholder" *ngIf="!selectedDish">Choisir un plat...</span>
+            <span class="selected-val-price" *ngIf="selectedDish"> — {{ formatPrice(selectedDish.price) }}</span>
+          </div>
+          <svg class="chevron-icon" [class.open]="isDishDropdownOpen" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+
+        <!-- LISTE DÉROULANTE RECHERCHABLE PLATS -->
+        <div class="dropdown-menu-panel" *ngIf="isDishDropdownOpen">
+          <div class="dropdown-search-wrapper">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#757575" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input
+              type="text"
+              class="dropdown-search-input"
+              placeholder="Rechercher un plat..."
+              [(ngModel)]="dishSearchQuery"
+              (input)="onDishSearchChange()"
+            />
+            <button type="button" class="btn-mic-mini" [class.recording]="isRecording" (click)="toggleVoiceSearch()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </button>
+          </div>
+
+          <div class="dropdown-options-list">
+            <div
+              *ngFor="let dish of filteredDishes"
+              class="dropdown-option-item"
+              [class.selected]="selectedDish?.id === dish.id"
+              (click)="selectDish(dish)"
+            >
+              <div class="option-info-group">
+                <span class="option-name">{{ dish.name }}</span>
+                <span class="option-sub" *ngIf="dish.restaurantName">{{ dish.restaurantName }}</span>
+              </div>
+              <span class="option-price">{{ formatPrice(dish.price) }}</span>
+            </div>
+            <div class="dropdown-empty-msg" *ngIf="filteredDishes.length === 0">
+              Aucun plat disponible pour ce filtre.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAS B : CHOIX ENTRE PLUSIEURS ÉTABLISSEMENTS S'IL Y EN A MULTIPLES -->
+      <div class="multiple-establishments-choice-box" *ngIf="showEstablishmentChoice && availableEstablishments.length > 1">
+        <h4 class="choice-heading">Ce plat est proposé par plusieurs établissements. Choisissez-en un :</h4>
+        <div class="choice-list">
+          <button
+            *ngFor="let resto of availableEstablishments"
+            type="button"
+            class="choice-btn"
+            [class.selected]="selectedEstablishment?.id === resto.id"
+            (click)="confirmEstablishmentChoice(resto)"
+          >
+            <span>{{ resto.name }}</span>
+            <span class="choice-loc">{{ resto.location || 'Dakar' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- CARTE RÉSUMÉ PLAT ET RESTAURANT SÉLECTIONNÉS -->
+      <div class="selected-summary-banner" *ngIf="selectedDish && selectedEstablishment">
+        <img [src]="selectedDish.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'" [alt]="selectedDish.name" class="summary-thumb" />
+        <div class="summary-details">
+          <h4 class="summary-title">{{ selectedDish.name }}</h4>
+          <p class="summary-resto">{{ selectedEstablishment.name }} — {{ selectedEstablishment.location || 'Dakar' }}</p>
+          <span class="summary-price">{{ formatPrice(selectedDish.price) }}</span>
+        </div>
+      </div>
+
+      <!-- 3. DATE & HEURE DE DÉGUSTATION -->
+      <div class="section-card-box date-section-card">
+        <div class="section-box-header">
+          <div class="title-with-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <h3 class="box-heading">Date & Heure planifiées</h3>
+          </div>
+          <div class="header-action-buttons">
+            <button type="button" class="btn-modify-date" (click)="triggerDatePicker(datePickerInput)">
+              <span>Changer Date</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </button>
+            <button type="button" class="btn-modify-time" (click)="triggerTimePicker(timePickerInput)">
+              <span>Changer Heure</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="date-picker-row">
+          <input #datePickerInput type="date" [(ngModel)]="selectedDate" class="custom-date-input" />
+          <input #timePickerInput type="time" [(ngModel)]="selectedTime" (change)="onTimeChange()" class="custom-time-input" />
+
+          <div class="selected-date-display-box">
+            <div class="date-text-group" (click)="triggerDatePicker(datePickerInput)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span class="formatted-date-bold">{{ getFormattedSelectedDate() }}</span>
+            </div>
+
+            <div class="time-text-group" (click)="triggerTimePicker(timePickerInput)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#E51A29" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span class="formatted-time-bold">{{ getFormattedSelectedTime() }}</span>
+              <span class="creneau-pill-grey">{{ getCreneauDisplayLabel() }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SÉLECTION TYPE DE REPAS -->
+        <div class="meal-types-pills-row">
+          <button type="button" class="meal-type-pill" [class.active]="selectedMealType === 'MIDI'" (click)="selectMealType('MIDI')">Déjeuner</button>
+          <button type="button" class="meal-type-pill" [class.active]="selectedMealType === 'SOIR'" (click)="selectMealType('SOIR')">Dîner</button>
+          <button type="button" class="meal-type-pill" [class.active]="selectedMealType === 'MATIN'" (click)="selectMealType('MATIN')">Petit-déjeuner</button>
+          <button type="button" class="meal-type-pill" [class.active]="selectedMealType === 'EN_CAS'" (click)="selectMealType('EN_CAS')">En-cas</button>
+        </div>
+      </div>
+
+      <!-- 4. PORTIONS SOUHAITÉES -->
+      <div class="section-card-box quantity-box-row">
+        <div class="quantity-label-group">
+          <h3 class="quantity-heading">Portions souhaitées</h3>
+          <p class="quantity-sub-text">Nombre de portions pour ce repas</p>
+        </div>
+        <div class="quantity-counter-wrapper">
+          <button type="button" class="btn-qty btn-minus" (click)="decrementQuantity()">-</button>
+          <span class="qty-number">{{ quantity }}</span>
+          <button type="button" class="btn-qty btn-plus" (click)="incrementQuantity()">+</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BOUTONS D'ACTION EN BAS DE PAGE (ANNULER ET ENREGISTRER) -->
+    <div class="sticky-bottom-actions-bar">
+      <div class="total-preview-info">
+        <span class="total-lbl">Total estimé</span>
+        <span class="total-val">{{ getCalculatedTotal().toLocaleString('fr-FR') }} FCFA</span>
+      </div>
+
+      <div class="action-buttons-group">
+        <!-- BOUTON ANNULER (ZERO REQUÊTE, DEUXIÈME CAS DE RETOUR) -->
+        <button type="button" class="btn-cancel-action-grey" (click)="onCancel()" [disabled]="isSubmitting">
+          <span>Annuler</span>
+        </button>
+
+        <!-- BOUTON ENREGISTRER (PATCH /api/orders/planning/{id}/ SUR MÊME ID) -->
+        <button type="button" class="btn-save-action-red" (click)="confirmPlanning()" [disabled]="!canConfirm() || isSubmitting">
+          <span *ngIf="!isSubmitting">{{ isEditMode ? 'Enregistrer les modifications' : 'Confirmer la planification' }}</span>
+          <span *ngIf="isSubmitting">Enregistrement...</span>
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <app-bottom-nav activeTab="planning"></app-bottom-nav>
+</div>
